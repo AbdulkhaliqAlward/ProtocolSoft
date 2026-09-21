@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.next
+out
+*.log
+.env
+.env.*
+!.env.example
+apps/cms/media
+apps/cms/media-staging
+apps/cms/backups
+docs
+.git
+coverage

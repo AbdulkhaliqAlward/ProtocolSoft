@@ -1,0 +1,35 @@
+# Caddy reverse proxy (Phase 1 §11.3) — the ONLY public entry point (80/443).
+# - protosoftdev.com  -> web service (public site)
+# - admin.protosoftdev.com is served through the Cloudflare Tunnel (cloudflared),
+#   NOT through Caddy: the CMS has no inbound port. If the tunnel is ever replaced,
+#   a hardened vhost restricted to Cloudflare IP ranges + Authenticated Origin
+#   Pulls would be required instead (Phase 1 §11.5 alternative).
+
+{
+	email {$ACME_EMAIL}
+}
+
+protosoftdev.com, www.protosoftdev.com {
+	encode zstd gzip
+
+	# Security headers (Phase 1 §11.4)
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Rate limiting for sensitive routes is enforced at the Cloudflare edge
+	# (WAF rate-limiting rules on /contact submissions and login paths); the
+	# application layers add their own limits (Phase 2 §6.6, §7).
+
+	reverse_proxy web:3000
+}
+
+# Explicit block: admin hostname must never be served by this proxy.
+admin.protosoftdev.com {
+	respond 421
+}

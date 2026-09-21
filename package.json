@@ -1,0 +1,30 @@
+{
+  "name": "protocol-soft-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Protocol Soft — bilingual public website + isolated admin CMS (Phase 4 foundation). One codebase, two containerized services: web (public, no DB credentials) and cms (Payload admin + Internal Public Content API, the only DB writer).",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev:cms": "npm run dev -w @protocol-soft/cms",
+    "dev:web": "npm run dev -w @protocol-soft/web",
+    "build:shared": "npm run build -w @protocol-soft/shared",
+    "build:cms": "npm run build -w @protocol-soft/cms",
+    "build:web": "npm run build -w @protocol-soft/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "seed:cms": "npm run seed -w @protocol-soft/cms",
+    "bootstrap:superadmin": "npm run bootstrap:superadmin -w @protocol-soft/cms",
+    "verify:roles": "npm run verify:roles -w @protocol-soft/cms"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.25.12": true,
+    "sharp@0.34.5": true
+  }
+}

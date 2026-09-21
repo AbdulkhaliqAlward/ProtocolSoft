@@ -1,0 +1,43 @@
+{
+  "name": "@protocol-soft/cms",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "start": "next start -p 3001",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "seed": "tsx --env-file-if-exists=.env src/scripts/seed.ts",
+    "publish:local-review": "tsx --env-file-if-exists=.env src/scripts/publish-local-review.ts",
+    "bootstrap:superadmin": "tsx --env-file-if-exists=.env src/scripts/bootstrap-superadmin.ts",
+    "verify:roles": "tsx src/scripts/verify-roles.ts",
+    "typecheck": "tsc --noEmit",
+    "verify:media": "tsx --env-file-if-exists=.env src/scripts/verify-media-delivery.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.0.0",
+    "@payloadcms/next": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "@payloadcms/translations": "^3.0.0",
+    "@payloadcms/ui": "^3.0.0",
+    "@protocol-soft/shared": "*",
+    "drizzle-orm": "^0.45.2",
+    "next": "~15.4.11",
+    "payload": "^3.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sanitize-html": "^2.14.0",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/sanitize-html": "^2.13.0",
+    "cross-env": "^7.0.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

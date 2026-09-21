@@ -1,0 +1,91 @@
+# Local development stack (Phase 4).
+# Isolation mirrors production: PostgreSQL is private (no published ports) — use
+# `docker compose --profile debug up` for a localhost-only DB port when tooling needs it.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: protocol_soft
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d protocol_soft']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # NO ports: PostgreSQL is never published (Phase 1 §11.3)
+
+  postgres-debug:
+    # ⚠ DEV-ONLY TOOLING: localhost-only TCP forwarder into the private data
+    # network so native dev servers (npm run dev:cms/web) can reach PostgreSQL.
+    # The postgres service itself still publishes nothing. This service is
+    # profile-gated — default `docker compose up` does NOT start it. Production
+    # stacks (docker-compose.production.yml) never reference it.
+    # Usage: docker compose --profile debug up -d postgres postgres-debug
+    image: alpine/socat
+    profiles: [debug]
+    command: ['tcp-listen:5432,fork,reuseaddr', 'tcp-connect:postgres:5432']
+    ports:
+      - '127.0.0.1:5432:5432'
+    networks: [data]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  cms:
+    build:
+      context: .
+      args: { SERVICE: cms }
+    environment:
+      NODE_ENV: development
+      DEPLOYMENT_ENV: local
+      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/protocol_soft
+      PAYLOAD_SECRET: dev-only-secret-change-me
+      WEB_INTERNAL_URL: http://web:3000
+      CMS_TO_WEB_REVALIDATE_KEY: dev-revalidate-key
+      WEB_TO_CMS_CONTENT_READ_KEY: dev-content-key
+      WEB_TO_CMS_LEAD_SUBMIT_KEY: dev-leads-key
+      LEAD_IP_HASH_SECRET: dev-ip-hash-secret
+      PREVIEW_SIGNING_PRIVATE_KEY: ${PREVIEW_SIGNING_PRIVATE_KEY:-}
+      MEDIA_STATIC_DIR: /app/apps/cms/media
+    volumes:
+      - cms-media:/app/apps/cms/media
+    ports:
+      - '3001:3001' # LOCAL DEV ONLY — removed in the production stack (tunnel only)
+    networks: [app, data]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      args: { SERVICE: web }
+    environment:
+      NODE_ENV: development
+      DEPLOYMENT_ENV: local
+      CMS_INTERNAL_URL: http://cms:3001
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      WEB_TO_CMS_CONTENT_READ_KEY: dev-content-key
+      WEB_TO_CMS_LEAD_SUBMIT_KEY: dev-leads-key
+      LEAD_IP_HASH_SECRET: dev-ip-hash-secret
+      CMS_TO_WEB_REVALIDATE_KEY: dev-revalidate-key
+      PREVIEW_VERIFY_PUBLIC_KEY: ${PREVIEW_VERIFY_PUBLIC_KEY:-}
+    ports:
+      - '3000:3000' # LOCAL DEV ONLY — production uses the reverse proxy
+    networks: [app]
+    depends_on: [cms]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  cms-media:
+
+networks:
+  app:
+  data: # PostgreSQL reachable ONLY from here

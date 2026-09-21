@@ -1,0 +1,135 @@
+# Production stack (Phase 1 §11.3): self-hosted on Protocol Soft's own server.
+# ONLY the reverse proxy publishes 80/443. PostgreSQL, internal APIs, Redis (if
+# used), and container management ports are NEVER publicly exposed. The CMS has
+# NO inbound port at all — it is reached exclusively through Cloudflare Tunnel
+# after Cloudflare Access + MFA (deny-by-default). Backups run as a profile-gated
+# service, DISABLED by default (BD1) until an encrypted off-server destination is
+# approved and a restore test is completed.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - '80:80'
+      - '443:443' # the ONLY public ports
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge, app]
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: ['tunnel', 'run', '--token', '${CLOUDFLARE_TUNNEL_TOKEN}']
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN} # server-side secret only (never in Git)
+    networks: [app] # outbound-only connection to Cloudflare; targets cms:3001 privately
+    depends_on: [cms]
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      args: { SERVICE: web }
+    environment:
+      NODE_ENV: production
+      DEPLOYMENT_ENV: production
+      CMS_INTERNAL_URL: http://cms:3001
+      NEXT_PUBLIC_SITE_URL: https://protosoftdev.com
+      WEB_TO_CMS_CONTENT_READ_KEY: ${WEB_TO_CMS_CONTENT_READ_KEY}
+      WEB_TO_CMS_LEAD_SUBMIT_KEY: ${WEB_TO_CMS_LEAD_SUBMIT_KEY}
+      LEAD_IP_HASH_SECRET: ${LEAD_IP_HASH_SECRET}
+      CMS_TO_WEB_REVALIDATE_KEY: ${CMS_TO_WEB_REVALIDATE_KEY}
+      PREVIEW_VERIFY_PUBLIC_KEY: ${PREVIEW_VERIFY_PUBLIC_KEY}
+    networks: [app]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3000/api/health >/dev/null 2>&1 || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  cms:
+    build:
+      context: .
+      args: { SERVICE: cms }
+    environment:
+      NODE_ENV: production
+      DEPLOYMENT_ENV: production
+      DATABASE_URI: postgresql://${POSTGRES_CMS_USER}:${POSTGRES_CMS_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      WEB_INTERNAL_URL: http://web:3000
+      WEB_TO_CMS_CONTENT_READ_KEY: ${WEB_TO_CMS_CONTENT_READ_KEY}
+      WEB_TO_CMS_LEAD_SUBMIT_KEY: ${WEB_TO_CMS_LEAD_SUBMIT_KEY}
+      BACKUP_REPORT_KEY: ${BACKUP_REPORT_KEY}
+      CMS_TO_WEB_REVALIDATE_KEY: ${CMS_TO_WEB_REVALIDATE_KEY}
+      LEAD_IP_HASH_SECRET: ${LEAD_IP_HASH_SECRET}
+      PREVIEW_SIGNING_PRIVATE_KEY: ${PREVIEW_SIGNING_PRIVATE_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_SINK_ADDRESS: ${EMAIL_SINK_ADDRESS}
+      BACKUP_ENCRYPTION_PUBLIC_KEY: ${BACKUP_ENCRYPTION_PUBLIC_KEY}
+      MEDIA_STATIC_DIR: /app/apps/cms/media
+    volumes:
+      - cms-media:/app/apps/cms/media
+    networks: [app, data] # NO ports — reachable only via the tunnel
+    depends_on: [postgres]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3001/api/internal/health >/dev/null 2>&1 || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [data] # NO ports — private only (Phase 1 §11.3)
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Backup runner — profile-gated, NOT started by default (BD1).
+  # Starts only after: approved encrypted off-server destination + completed restore test.
+  backup:
+    image: postgres:17-alpine
+    profiles: [backup]
+    entrypoint: ['/bin/sh', '/run-backup.sh']
+    environment:
+      PGHOST: postgres
+      PGPORT: '5432'
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_BACKUP_USER} # read-only role (backup_readonly)
+      PGPASSWORD: ${POSTGRES_BACKUP_PASSWORD}
+      BACKUP_REPORT_URL: http://cms:3001/api/internal/backup/report
+      BACKUP_REPORT_KEY: ${BACKUP_REPORT_KEY}
+      BACKUP_ENCRYPTION_PUBLIC_KEY: ${BACKUP_ENCRYPTION_PUBLIC_KEY} # age recipient (public half only)
+      BACKUP_SPOOL_DIR: /backups/spool
+      MEDIA_VOLUME_SOURCE: /var/lib/docker/volumes/protocol-soft_cms-media/_data # host path, server-side only
+    volumes:
+      - ./scripts/backup/run.sh:/run-backup.sh:ro
+      - backup-spool:/backups/spool
+    networks: [data, app]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  cms-media:
+  caddy_data:
+  caddy_config:
+  backup-spool:
+
+networks:
+  edge:
+  app: # web <-> cms <-> cloudflared (private)
+  data: # PostgreSQL reachable ONLY from here

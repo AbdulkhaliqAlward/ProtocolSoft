@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp/
+
+# Builds
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# NEVER commit secrets, keys, credentials, tokens, or storage configs.
+# Only *.example env files are tracked (names only, no real values).
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Secrets / keys material (defense in depth — real secrets live only on the server)
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Payload generated / media
+packages/shared/src/payload-types.ts
+apps/cms/src/payload-types.ts
+apps/cms/media/
+apps/cms/media-staging/
+apps/cms/backups/
+
+# Logs / OS
+logs/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Test artifacts & scratch
+coverage/
+verification-output/*.json
+*.ps1
+cms-log.txt
+cms-err.txt
+verify-output.txt

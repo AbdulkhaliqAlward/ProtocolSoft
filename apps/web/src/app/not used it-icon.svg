@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- TEMPORARY brand icon (D-6): neutral "P" monogram — clearly replaceable
+       when the final logo is supplied. Not a fake final logo. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="url(#g)"/>
+  <text x="32" y="45" font-family="Inter, 'IBM Plex Sans', system-ui, sans-serif" font-size="36" font-weight="800" fill="#F8FAFC" text-anchor="middle">P</text>
+</svg>
