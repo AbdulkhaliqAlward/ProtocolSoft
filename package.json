@@ -11,6 +11,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "dev": "npm run dev:web",
     "dev:cms": "npm run dev -w @protocol-soft/cms",
     "dev:web": "npm run dev -w @protocol-soft/web",
     "build:shared": "npm run build -w @protocol-soft/shared",

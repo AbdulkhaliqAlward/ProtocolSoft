@@ -2,6 +2,18 @@
 
 A modern, high-performance web platform and enterprise Content Management System (CMS) for **ProtocolSoft**.
 
+## Local development
+
+The root `dev` script starts the public web workspace on port 3000. Start the CMS separately when you need the full content-backed stack:
+
+```bash
+npm run dev:cms
+npm run dev:web
+```
+
+The local Docker Compose stack starts PostgreSQL privately, then the CMS on port 3001 and web on port 3000. PostgreSQL is never published directly; the debug profile is the only localhost-only database bridge.
+
+
 ---
 
 ## 🏗️ Architecture & Monorepo Overview
