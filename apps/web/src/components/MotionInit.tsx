@@ -30,7 +30,35 @@ export const MotionInit = () => {
       { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
     );
     els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    // Fail-safe: anything already above the viewport bottom is revealed even if
+    // the observer never saw it intersect (anchor jumps, fast scroll, find-in-
+    // page skip straight past it). Printing reveals everything.
+    const revealPassed = () => {
+      for (const el of els) {
+        if (!el.classList.contains('is-visible') && el.getBoundingClientRect().top < window.innerHeight) {
+          el.classList.add('is-visible');
+          io.unobserve(el);
+        }
+      }
+    };
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        revealPassed();
+      });
+    };
+    revealPassed(); // deep links / restored scroll positions load mid-page
+    const revealAll = () => document.documentElement.classList.add('reveal-done');
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('beforeprint', revealAll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('beforeprint', revealAll);
+      window.cancelAnimationFrame(frame);
+      io.disconnect();
+    };
   }, []);
   return null;
 };

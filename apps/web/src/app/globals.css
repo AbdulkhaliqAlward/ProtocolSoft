@@ -393,6 +393,11 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
+/* Print: MotionInit adds .reveal-done on beforeprint (plus the media rule). */
+.js.reveal-done [data-reveal] { opacity: 1; transform: none; }
+@media print {
+  .js [data-reveal] { opacity: 1 !important; transform: none !important; }
+}
 
 /* Theme transitions on large surfaces */
 .site-header, .site-footer, .hero, .cta-band, .card, .input, .textarea, .select, .choice {
@@ -1184,3 +1189,12 @@ html[dir="ltr"] .page-header p { line-height: 1.6; }
 
 /* Preview page */
 .preview-frame { color: var(--color-text-muted); font-size: var(--fs-body-sm); }
+
+/* ── Arabic labels: mono/tracked styles never apply to Arabic script ───────
+   IBM Plex Mono has no Arabic glyphs and letter-spacing breaks Arabic letter
+   joining, so RTL labels use the Arabic face with natural spacing. */
+html[dir="rtl"] :is(.kicker, .site-footer h3, .channel-list .channel-label, .hero .kicker) {
+  font-family: var(--font-ar);
+  letter-spacing: normal;
+  text-transform: none;
+}
