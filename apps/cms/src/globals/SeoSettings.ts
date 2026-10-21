@@ -1,9 +1,9 @@
 /** SEO settings (Phase 2 §5.1.5): templates valid in both languages; sitemap covers the public domain only. */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditGlobalChange } from '../utilities/audit.js';
-import { revalidateGlobal } from '../utilities/revalidate.js';
+import { requireCapability } from '../access/roles';
+import { auditGlobalChange } from '../utilities/audit';
+import { revalidateGlobal } from '../utilities/revalidate';
 
 export const SeoSettings: GlobalConfig = {
   slug: 'seo-settings',

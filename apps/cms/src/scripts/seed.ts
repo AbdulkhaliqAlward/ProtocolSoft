@@ -5,7 +5,7 @@
  */
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const seed = async (): Promise<void> => {
   const payload = await getPayload({ config: configPromise });

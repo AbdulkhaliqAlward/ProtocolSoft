@@ -5,9 +5,9 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability, roleOf } from '../access/roles.js';
+import { requireCapability, roleOf } from '../access/roles';
 import { hasCapability } from '@protocol-soft/shared';
-import { writeAudit } from '../utilities/audit.js';
+import { writeAudit } from '../utilities/audit';
 
 const LEAD_STATUSES = ['new', 'contacted', 'qualified', 'proposal_sent', 'won', 'lost', 'archived'] as const;
 

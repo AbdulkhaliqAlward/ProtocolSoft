@@ -1,9 +1,9 @@
 /** Site settings (Phase 2 §5.1.1). WhatsApp: configurable; empty in production => availability-state CTA (WA1). */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditGlobalChange } from '../utilities/audit.js';
-import { revalidateGlobal } from '../utilities/revalidate.js';
+import { requireCapability } from '../access/roles';
+import { auditGlobalChange } from '../utilities/audit';
+import { revalidateGlobal } from '../utilities/revalidate';
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',

@@ -14,7 +14,7 @@
  */
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const BASE = process.argv[2] ?? `http://localhost:${process.env.CMS_PORT ?? '3001'}`;
 const KEY = process.env.WEB_TO_CMS_CONTENT_READ_KEY ?? '';

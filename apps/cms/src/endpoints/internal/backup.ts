@@ -8,9 +8,9 @@
  */
 import type { PayloadRequest } from 'payload';
 
-import { guardInternalKey } from './guard.js';
-import { writeAudit } from '../../utilities/audit.js';
-import { sanitizeErrorSummary } from '../../utilities/sanitize.js';
+import { guardInternalKey } from './guard';
+import { writeAudit } from '../../utilities/audit';
+import { sanitizeErrorSummary } from '../../utilities/sanitize';
 
 const DISABLE_WORDS = new Set(['DISABLE', 'تعطيل']);
 

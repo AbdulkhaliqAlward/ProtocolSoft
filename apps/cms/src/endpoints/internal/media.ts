@@ -22,7 +22,7 @@ import path from 'node:path';
 
 import type { PayloadRequest } from 'payload';
 
-import { guardInternalKey } from './guard.js';
+import { guardInternalKey } from './guard';
 
 const SAFE_RASTER = new Set(['image/jpeg', 'image/png', 'image/webp']);
 

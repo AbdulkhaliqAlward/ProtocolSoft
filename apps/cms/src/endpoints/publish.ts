@@ -8,10 +8,10 @@ import type { PayloadRequest } from 'payload';
 
 import { isLocale, type Locale } from '@protocol-soft/shared';
 
-import { roleOf } from '../access/roles.js';
-import { missingForLocale, missingStructural } from '../utilities/completeness.js';
-import { evaluatePublicReadiness } from '../utilities/publicReadiness.js';
-import { writeAudit } from '../utilities/audit.js';
+import { roleOf } from '../access/roles';
+import { missingForLocale, missingStructural } from '../utilities/completeness';
+import { evaluatePublicReadiness } from '../utilities/publicReadiness';
+import { writeAudit } from '../utilities/audit';
 
 const PUBLISHABLE: Record<string, { arabicFirst: boolean; readinessGate: boolean; legalGate: boolean }> = {
   services: { arabicFirst: true, readinessGate: false, legalGate: false },

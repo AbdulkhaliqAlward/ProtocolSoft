@@ -24,7 +24,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = (await request.json().catch(() => ({}))) as Partial<RevalidateRequest>;
   const tags = Array.isArray(body.tags) ? body.tags.filter((t): t is string => typeof t === 'string').slice(0, 50) : [];
   for (const tag of tags) {
-    revalidateTag(tag);
+    // A CMS publish must show immediately: expire now instead of stale-while-revalidate.
+    revalidateTag(tag, { expire: 0 });
   }
   return NextResponse.json({ ok: true, revalidated: tags.length });
 }

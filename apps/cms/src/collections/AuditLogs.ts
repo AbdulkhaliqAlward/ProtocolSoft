@@ -5,7 +5,7 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability, systemWriteOnly } from '../access/roles.js';
+import { requireCapability, systemWriteOnly } from '../access/roles';
 
 export const AuditLogs: CollectionConfig = {
   slug: 'audit-logs',

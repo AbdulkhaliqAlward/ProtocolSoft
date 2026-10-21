@@ -1,5 +1,5 @@
 /**
- * Locale routing (Phase 1 §7): Arabic is the default at `/` (no prefix); the
+ * Proxy (Next 16 name for middleware). Locale routing (Phase 1 §7): Arabic is the default at `/` (no prefix); the
  * complete English site lives under /en. Non-/en paths are internally rewritten
  * to /ar/... so URLs stay clean. Injects x-locale for the root layout.
  * /preview, /api, and assets bypass (preview defaults to LTR chrome).
@@ -8,7 +8,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const PUBLIC_FILE = /\.(svg|png|jpg|jpeg|webp|ico|txt|xml|json|webmanifest|woff2?)$/i;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Preview codes are FRAGMENT-ONLY (/preview#code=…). A legacy /preview?code=…

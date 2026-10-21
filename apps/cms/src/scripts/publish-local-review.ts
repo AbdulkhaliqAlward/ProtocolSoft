@@ -17,7 +17,7 @@
  */
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const guard = (): void => {
   if (process.env.NODE_ENV === 'production' || process.env.DEPLOYMENT_ENV === 'production') {

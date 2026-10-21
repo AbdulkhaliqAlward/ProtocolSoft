@@ -6,7 +6,7 @@
  */
 import { hasCapability, ROLES, type AdminCapability, type Role } from '@protocol-soft/shared';
 
-import { requireCapability, roleOf, type AdminUser } from '../access/roles.js';
+import { requireCapability, roleOf, type AdminUser } from '../access/roles';
 
 const CAPABILITY_LABELS: Record<AdminCapability, string> = {
   users_manage: 'users & roles',

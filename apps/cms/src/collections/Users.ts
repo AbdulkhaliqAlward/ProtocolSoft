@@ -5,8 +5,8 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireAnyAdmin, requireCapability, requireCapabilityForField, roleOf, type AdminUser } from '../access/roles.js';
-import { writeAudit } from '../utilities/audit.js';
+import { requireAnyAdmin, requireCapability, requireCapabilityForField, roleOf, type AdminUser } from '../access/roles';
+import { writeAudit } from '../utilities/audit';
 import { ROLES } from '@protocol-soft/shared';
 
 export const Users: CollectionConfig = {

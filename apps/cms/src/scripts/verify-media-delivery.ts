@@ -14,7 +14,7 @@ import path from 'node:path';
 
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const BASE = process.argv[2] ?? `http://localhost:${process.env.CMS_PORT ?? '3001'}`;
 const WEB_BASE = process.argv[3] ?? `http://localhost:${process.env.WEB_PORT ?? '3000'}`;

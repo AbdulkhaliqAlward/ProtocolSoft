@@ -1,9 +1,9 @@
 /** Navigation (Phase 2 §5.1.3): header items + single CTA + footer columns. */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditGlobalChange } from '../utilities/audit.js';
-import { revalidateGlobal } from '../utilities/revalidate.js';
+import { requireCapability } from '../access/roles';
+import { auditGlobalChange } from '../utilities/audit';
+import { revalidateGlobal } from '../utilities/revalidate';
 
 export const Navigation: GlobalConfig = {
   slug: 'navigation',

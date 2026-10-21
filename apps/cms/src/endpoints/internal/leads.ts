@@ -10,9 +10,9 @@ import type { PayloadRequest } from 'payload';
 
 import { isLocale, type LeadSubmission, type LeadSubmissionResult } from '@protocol-soft/shared';
 
-import { guardInternalKey } from './guard.js';
-import { writeAudit } from '../../utilities/audit.js';
-import { sendLeadNotification } from '../../utilities/email.js';
+import { guardInternalKey } from './guard';
+import { writeAudit } from '../../utilities/audit';
+import { sendLeadNotification } from '../../utilities/email';
 
 /* CMS-side per-ipHash limiter (Phase 2 §6.6 — form-settings value; Redis-backed hardening later). */
 const WINDOW_MS = 60_000;

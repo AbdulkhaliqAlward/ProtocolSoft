@@ -9,7 +9,7 @@ import { createHash, createPublicKey, verify } from 'node:crypto';
 
 import type { PreviewCodeClaims, PreviewExchangeResult } from '@protocol-soft/shared';
 
-import { internalCmsUrl } from './env.js';
+import { internalCmsUrl } from './env';
 
 const PREVIEW_AUD = 'web-preview';
 const MAX_TTL_SECONDS = 15 * 60;

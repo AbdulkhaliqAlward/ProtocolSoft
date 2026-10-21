@@ -5,7 +5,7 @@
  */
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const bootstrap = async (): Promise<void> => {
   const email = process.env.BOOTSTRAP_SUPERADMIN_EMAIL;

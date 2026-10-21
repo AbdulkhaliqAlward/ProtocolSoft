@@ -1,6 +1,6 @@
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const t0 = Date.now();
 const payload = await getPayload({ config: configPromise });

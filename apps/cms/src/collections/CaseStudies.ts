@@ -9,9 +9,9 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditAfterChange } from '../utilities/audit.js';
-import { revalidateOnPublish } from '../utilities/revalidate.js';
+import { requireCapability } from '../access/roles';
+import { auditAfterChange } from '../utilities/audit';
+import { revalidateOnPublish } from '../utilities/revalidate';
 
 const contentAccess = {
   read: requireCapability('content_edit'),

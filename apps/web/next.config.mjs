@@ -37,19 +37,6 @@ const nextConfig = {
       },
     ];
   },
-  // Workspace sources use NodeNext `.js` specifiers pointing at `.ts` files;
-  // webpack needs the alias to resolve them in the Next build.
-  webpack: (webpackConfig) => {
-    webpackConfig.resolve = {
-      ...webpackConfig.resolve,
-      extensionAlias: {
-        ...(webpackConfig.resolve?.extensionAlias || {}),
-        '.js': ['.ts', '.tsx', '.js'],
-        '.mjs': ['.mts', '.mjs'],
-      },
-    };
-    return webpackConfig;
-  },
 };
 
 export default nextConfig;

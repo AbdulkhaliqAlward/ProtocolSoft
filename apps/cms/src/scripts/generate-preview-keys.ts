@@ -2,7 +2,7 @@
  *  Private key -> cms env (PREVIEW_SIGNING_PRIVATE_KEY) ONLY.
  *  Public key  -> web env (PREVIEW_VERIFY_PUBLIC_KEY).
  *  Never committed to Git. */
-import { generateKeyPairPem } from '../utilities/preview-signing.js';
+import { generateKeyPairPem } from '../utilities/preview-signing';
 
 const { privateKeyPem, publicKeyPem } = generateKeyPairPem();
 console.log('=== PREVIEW_SIGNING_PRIVATE_KEY (apps/cms env ONLY) ===');

@@ -14,8 +14,8 @@ import type { PayloadRequest } from 'payload';
 
 import { isLocale, type Locale, type PublicContactConfig, type PublicInitiativeCard } from '@protocol-soft/shared';
 
-import { guardInternalKey, ok } from './guard.js';
-import { evaluatePublicReadiness } from '../../utilities/publicReadiness.js';
+import { guardInternalKey, ok } from './guard';
+import { evaluatePublicReadiness } from '../../utilities/publicReadiness';
 
 type Doc = Record<string, unknown>;
 

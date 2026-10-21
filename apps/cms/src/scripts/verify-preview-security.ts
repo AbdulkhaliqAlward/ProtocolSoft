@@ -25,7 +25,7 @@
  */
 import { getPayload } from 'payload';
 
-import configPromise from '../payload.config.js';
+import configPromise from '../payload.config';
 
 const CMS = process.env.CMS_BASE_URL ?? `http://localhost:${process.env.CMS_PORT ?? '3001'}`;
 const WEB = process.env.WEB_BASE_URL ?? 'http://localhost:3000';

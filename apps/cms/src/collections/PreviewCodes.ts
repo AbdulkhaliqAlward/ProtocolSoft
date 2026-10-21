@@ -5,7 +5,7 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { systemWriteOnly } from '../access/roles.js';
+import { systemWriteOnly } from '../access/roles';
 
 export const PreviewCodes: CollectionConfig = {
   slug: 'preview-codes',

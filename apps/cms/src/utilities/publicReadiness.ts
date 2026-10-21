@@ -9,7 +9,7 @@
  */
 import type { Locale } from '@protocol-soft/shared';
 
-import { missingForLocale, missingStructural } from './completeness.js';
+import { missingForLocale, missingStructural } from './completeness';
 
 type Doc = Record<string, unknown>;
 

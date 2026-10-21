@@ -1,8 +1,8 @@
 /** Social links (Phase 2 §5.3.5): platform, URL, visibility, ordering. */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditAfterChange } from '../utilities/audit.js';
+import { requireCapability } from '../access/roles';
+import { auditAfterChange } from '../utilities/audit';
 
 export const SocialLinks: CollectionConfig = {
   slug: 'social-links',

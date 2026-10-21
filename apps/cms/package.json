@@ -20,19 +20,19 @@
     "verify:media": "tsx --env-file-if-exists=.env src/scripts/verify-media-delivery.ts"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "^3.0.0",
-    "@payloadcms/next": "^3.0.0",
-    "@payloadcms/richtext-lexical": "^3.0.0",
-    "@payloadcms/translations": "^3.0.0",
-    "@payloadcms/ui": "^3.0.0",
+    "@payloadcms/db-postgres": "^3.91.0",
+    "@payloadcms/next": "^3.91.0",
+    "@payloadcms/richtext-lexical": "^3.91.0",
+    "@payloadcms/translations": "^3.91.0",
+    "@payloadcms/ui": "^3.91.0",
     "@protocol-soft/shared": "*",
     "drizzle-orm": "^0.45.2",
-    "next": "~15.4.11",
-    "payload": "^3.0.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "next": "~16.4.2",
+    "payload": "^3.91.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "sanitize-html": "^2.14.0",
-    "sharp": "^0.34.0"
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

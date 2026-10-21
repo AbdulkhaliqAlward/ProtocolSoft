@@ -6,7 +6,7 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability, systemWriteOnly } from '../access/roles.js';
+import { requireCapability, systemWriteOnly } from '../access/roles';
 
 export const BackupRecords: CollectionConfig = {
   slug: 'backup-records',

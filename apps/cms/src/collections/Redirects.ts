@@ -1,8 +1,8 @@
 /** Redirects (Phase 2 §5.3.6): launch safety net. */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditAfterChange } from '../utilities/audit.js';
+import { requireCapability } from '../access/roles';
+import { auditAfterChange } from '../utilities/audit';
 
 export const Redirects: CollectionConfig = {
   slug: 'redirects',

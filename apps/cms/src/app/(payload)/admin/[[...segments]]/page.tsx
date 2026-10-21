@@ -2,7 +2,7 @@
 import { RootPage } from '@payloadcms/next/views';
 import type { Metadata } from 'next';
 import configPromise from '@payload-config';
-import { importMap } from '../importMap.js';
+import { importMap } from '../importMap';
 
 type Args = {
   params: Promise<{ segments: string[] }>;

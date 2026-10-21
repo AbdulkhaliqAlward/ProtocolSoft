@@ -120,7 +120,10 @@ const main = async () => {
     await cdp.goto(`${WEB}/`);
     await cdp.eval(`localStorage.setItem('protocol-soft-theme','dark')`);
     const pollScript = await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
-      source: `window.__themePoll=[];const iv=setInterval(()=>{const v=document.documentElement&&document.documentElement.getAttribute('data-theme');if(v)window.__themePoll.push(v);},1);addEventListener('DOMContentLoaded',()=>clearInterval(iv));`,
+      // MutationObserver records every data-theme value ever set (a light flash
+      // would show up as 'light'); DOMContentLoaded adds a final sample. A 1ms
+      // interval alone misses everything on a fast production build.
+      source: `window.__themePoll=[];new MutationObserver(()=>{const v=document.documentElement.getAttribute('data-theme');if(v)window.__themePoll.push(v);}).observe(document,{subtree:true,attributes:true,attributeFilter:['data-theme']});addEventListener('DOMContentLoaded',()=>{const v=document.documentElement.getAttribute('data-theme');if(v)window.__themePoll.push(v);});`,
     });
     await cdp.goto(`${WEB}/`);
     const poll = await cdp.eval(`window.__themePoll`);

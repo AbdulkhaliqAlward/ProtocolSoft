@@ -17,9 +17,9 @@
  */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditGlobalChange } from '../utilities/audit.js';
-import { revalidateGlobal } from '../utilities/revalidate.js';
+import { requireCapability } from '../access/roles';
+import { auditGlobalChange } from '../utilities/audit';
+import { revalidateGlobal } from '../utilities/revalidate';
 
 export const COLOR_PRESETS = ['ink_stone_v1'] as const;
 

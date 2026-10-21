@@ -4,7 +4,7 @@ import type { ServerFunctionClient } from 'payload';
 import React from 'react';
 import configPromise from '@payload-config';
 
-import { importMap } from './importMap.js';
+import { importMap } from './importMap';
 
 import '@payloadcms/next/css';
 import './custom.scss';

@@ -5,9 +5,9 @@
  */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability } from '../access/roles.js';
-import { auditAfterChange, auditAfterDelete, writeAudit } from '../utilities/audit.js';
-import { sanitizeSvg } from '../utilities/sanitize.js';
+import { requireCapability } from '../access/roles';
+import { auditAfterChange, auditAfterDelete, writeAudit } from '../utilities/audit';
+import { sanitizeSvg } from '../utilities/sanitize';
 
 const CATEGORIES = ['logos', 'og-images', 'team', 'projects', 'initiatives', 'content', 'documents'] as const;
 

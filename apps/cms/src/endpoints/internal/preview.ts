@@ -11,8 +11,8 @@ import { sql } from 'drizzle-orm';
 
 import { isLocale } from '@protocol-soft/shared';
 
-import { writeAudit } from '../../utilities/audit.js';
-import { signPreviewCode, verifyPreviewCode } from '../../utilities/preview-signing.js';
+import { writeAudit } from '../../utilities/audit';
+import { signPreviewCode, verifyPreviewCode } from '../../utilities/preview-signing';
 
 const PREVIEWABLE_COLLECTIONS = new Set(['services', 'case-studies', 'technical-initiatives', 'team-members', 'pages']);
 

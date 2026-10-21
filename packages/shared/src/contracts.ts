@@ -10,7 +10,7 @@
  *   backup   : (admin-session endpoints, not service keys) + BACKUP_REPORT_KEY for job reporting
  *   revalidate: POST /api/web-internal/revalidate  -> CMS_TO_WEB_REVALIDATE_KEY (lives on the WEB service)
  */
-import type { Locale } from './locales.js';
+import type { Locale } from './locales';
 
 export const INTERNAL_KEY_HEADER = 'x-internal-key';
 
