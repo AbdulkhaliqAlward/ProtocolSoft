@@ -2,7 +2,7 @@
  * RTL/LTR verification (Phase 5 visual rebuild §17C). Uses headless Chrome via
  * CDP to assert document direction, header layout direction, locale switch
  * behavior, mobile navigation, form labels + service selection, mixed-direction
- * content, footer alignment, and service-card reading order in both locales.
+ * content, footer alignment, and service-panel reading order in both locales.
  * Run with the web dev server up:  node ./scripts/verify-rtl-ltr.mjs [webBase]
  */
 import { Cdp, sleep } from './cdp.mjs';
@@ -207,31 +207,22 @@ const main = async () => {
     })()`);
     check('EN footer direction is ltr', enFooter.dir === 'ltr', `dir=${enFooter.dir}`);
 
-    /* ── 9. Service-card reading order ── */
-    await cdp.goto(`${WEB}/services`);
-    const arOrder = await cdp.eval(`(() => {
-      // RTL: the [index | body | CTA] grid columns lay out right-to-left, so the
-      // index is at the right edge, the CTA at the left edge.
-      const panel = document.querySelector('.service-panel');
-      const index = panel.querySelector('.service-panel__index').getBoundingClientRect();
-      const body = panel.querySelector('.service-panel__body').getBoundingClientRect();
-      const cta = panel.querySelector('.service-panel__cta').getBoundingClientRect();
-      return { indexRight: index.left > body.left, ctaLeft: cta.left < body.left, indexX: index.left };
-    })()`);
-    check('AR services: index column at start (right), body middle, CTA at end (left)',
-      arOrder.indexRight && arOrder.ctaLeft, JSON.stringify(arOrder));
-
-    await cdp.goto(`${WEB}/en/services`);
-    const enOrder = await cdp.eval(`(() => {
-      // LTR: index at the left edge, body middle, CTA right
-      const panel = document.querySelector('.service-panel');
-      const index = panel.querySelector('.service-panel__index').getBoundingClientRect();
-      const body = panel.querySelector('.service-panel__body').getBoundingClientRect();
-      const cta = panel.querySelector('.service-panel__cta').getBoundingClientRect();
-      return { indexLeft: index.left < body.left, bodyBeforeCta: body.left < cta.left };
-    })()`);
-    check('EN services: index column is at the start (left) edge, body middle, CTA end',
-      enOrder.indexLeft && enOrder.bodyBeforeCta, JSON.stringify(enOrder));
+    /* ── 9. Service panel reading order (services overview) ──
+       Each panel is [head: number, title, actions | what you receive]. The
+       head must sit at the reading start: right in Arabic, left in English. */
+    const order = async (url) => {
+      await cdp.goto(url);
+      return cdp.eval(`(() => {
+        const panel = document.querySelector('.svc-panel');
+        const head = panel.querySelector('.svc-panel__head').getBoundingClientRect();
+        const list = panel.querySelector('.svc-panel__list').getBoundingClientRect();
+        return { headLeft: Math.round(head.left), listLeft: Math.round(list.left) };
+      })()`);
+    };
+    const arOrder = await order(`${WEB}/services`);
+    check('AR services: panel head at the start (right), deliverables at the end (left)', arOrder.headLeft > arOrder.listLeft, JSON.stringify(arOrder));
+    const enOrder = await order(`${WEB}/en/services`);
+    check('EN services: panel head at the start (left), deliverables at the end (right)', enOrder.headLeft < enOrder.listLeft, JSON.stringify(enOrder));
 
     /* ── 10. No horizontal scroll at 375px in either locale ── */
     for (const url of [`${WEB}/`, `${WEB}/en/contact`]) {

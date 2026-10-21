@@ -1,14 +1,16 @@
-/** Legal page template (§16.7, LD1): narrow prose, zero marketing components.
- *  These pages render ONLY when actually published per locale — while they
- *  remain draft templates they 404 publicly (D-2), which is the correct,
- *  approved Phase 5 state. */
+/** Legal pages (privacy, terms): plain reading layout, no marketing blocks.
+ *  They render ONLY when published per locale; while they remain draft
+ *  templates they return a real public 404. */
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import type { Locale } from '@protocol-soft/shared';
+
+import { PageBlocks } from '@/components/PageBlocks';
+import { PageHero } from '@/components/sections';
+import { localePath } from '@/components/siteChrome';
 import { getContent } from '@/lib/internalApi';
 import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
-import { PageBlocks } from '@/components/PageBlocks';
-import type { Locale } from '@protocol-soft/shared';
 
 interface PageData {
   slug: string;
@@ -37,21 +39,16 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
   try {
     page = await getContent<PageData>('/api/internal/content/pages', locale, { slug: legal });
   } catch {
-    notFound(); // Draft-only (the Phase 5 state): a real public 404.
+    notFound(); // draft-only: a real public 404
   }
 
   return (
     <>
-      <header className="page-header">
-        <div className="container page-header__inner">
-          <h1>{page.title}</h1>
-        </div>
-      </header>
-      <section className="section" style={{ paddingTop: 'var(--sp-4)' }}>
-        <div className="container">
-          <PageBlocks blocks={page.blocks} locale={locale} />
-        </div>
-      </section>
+      <PageHero
+        title={page.title}
+        crumbs={[{ label: locale === 'ar' ? 'الرئيسية' : 'Home', href: localePath(locale, '/') }, { label: page.title }]}
+      />
+      <PageBlocks blocks={page.blocks} locale={locale} fallbackHeading={page.title} />
     </>
   );
 }

@@ -270,6 +270,9 @@ export const contentEndpoints = [
             summary: d.summary,
             overview: d.overview,
             deliverables: d.deliverables ?? [],
+            engagementFacts: d.engagementFacts ?? [],
+            notIncluded: d.notIncluded ?? [],
+            capabilityGroups: d.capabilityGroups ?? [],
             capabilities: d.capabilities ?? [],
             processSteps: d.processSteps ?? [],
             faqs: d.faqs ?? [],
@@ -487,6 +490,8 @@ export const contentEndpoints = [
             technicalInitiatives: { enabled: false, heading: null },
             secureByDesignEnabled: false,
             secureByDesign: null,
+            faqEnabled: false,
+            faqs: [],
           },
           finalCta: { enabled: false, heading: null, body: null, ctaLabel: null, ctaTarget: null },
         }, locale);
@@ -563,6 +568,8 @@ export const contentEndpoints = [
             technicalInitiatives: { enabled: ti.enabled === true, heading: ti.heading ?? null, initiatives },
             secureByDesignEnabled: s.secureByDesignEnabled !== false,
             secureByDesign: s.secureByDesign ?? null,
+            faqEnabled: s.faqEnabled !== false,
+            faqs: (s.faqs as Doc[] | undefined) ?? [],
           },
           finalCta: {
             enabled: fc.enabled !== false,

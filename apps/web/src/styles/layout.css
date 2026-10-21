@@ -54,6 +54,10 @@
      forced LTR would otherwise stretch it and pin the number to the left. */
   width: fit-content; justify-self: start; align-self: flex-start;
 }
+/* Text eyebrow (words, any script). Clause numbers above are for digits only:
+   the mono face has no Arabic glyphs and tracking breaks Arabic joining. */
+.eyebrow { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-small); color: var(--text-muted); }
+.plate .eyebrow { color: var(--plate-muted); }
 .lead { font-size: var(--fs-lead); color: var(--text-muted); line-height: var(--lh-body); }
 .muted { color: var(--text-muted); }
 .mono { font-family: var(--font-mono); font-size: 0.92em; font-weight: 500; }

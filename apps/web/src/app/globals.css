@@ -1,15 +1,15 @@
 /*
  * Protocol Soft design system — entry point.
  * Cascade layers fix the order, so a later layer always wins regardless of
- * selector specificity: tokens < base < layout < components < interim < motion.
+ * selector specificity: tokens < base < layout < components < motion.
  * Fonts are loaded by next/font (src/app/fonts.ts), not here.
  */
-@layer tokens, base, layout, components, interim, motion;
+@layer tokens, base, layout, components, motion;
 
 @import "../styles/tokens.css" layer(tokens);
 @import "../styles/base.css" layer(base);
 @import "../styles/layout.css" layer(layout);
 @import "../styles/components.css" layer(components);
 @import "../styles/chrome.css" layer(components);
-@import "../styles/interim.css" layer(interim);
+@import "../styles/pages.css" layer(components);
 @import "../styles/motion.css" layer(motion);

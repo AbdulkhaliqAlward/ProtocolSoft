@@ -31,13 +31,13 @@
 .btn--primary:hover { background: var(--action-hover); }
 .btn--primary:active { transform: translateY(1px); box-shadow: var(--key-primary-pressed); }
 
-.btn--secondary, .btn--soft { background: var(--surface); color: var(--text); border-color: var(--text); box-shadow: var(--key-secondary); }
-.btn--secondary:hover, .btn--soft:hover { background: var(--surface-sunken); }
-.btn--secondary:active, .btn--soft:active { transform: translateY(1px); box-shadow: var(--key-secondary-pressed); }
+.btn--secondary { background: var(--surface); color: var(--text); border-color: var(--text); box-shadow: var(--key-secondary); }
+.btn--secondary:hover { background: var(--surface-sunken); }
+.btn--secondary:active { transform: translateY(1px); box-shadow: var(--key-secondary-pressed); }
 
-.btn--text, .btn--ghost { background: transparent; color: var(--text); padding-inline: 12px; }
-.btn--text:hover, .btn--ghost:hover { background: var(--surface-sunken); }
-.btn--text:active, .btn--ghost:active { transform: translateY(1px); }
+.btn--text { background: transparent; color: var(--text); padding-inline: 12px; }
+.btn--text:hover { background: var(--surface-sunken); }
+.btn--text:active { transform: translateY(1px); }
 .btn__arrow { display: inline-block; transition: translate var(--dur-2) var(--ease-out); }
 [dir="rtl"] .btn__arrow { transform: scaleX(-1); }
 .btn:hover .btn__arrow { translate: 4px 0; }
@@ -98,10 +98,11 @@ a.card:hover { border-color: var(--line-strong); background: color-mix(in srgb, 
 
 /* Facts list (key/value pairs, e.g. a service's engagement facts) */
 .facts { display: grid; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--surface); padding: var(--s-2); }
-.facts > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto); gap: var(--s-4); align-items: baseline; padding: 14px 16px; border-top: 1px solid var(--line); }
+.facts > div { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--s-4); align-items: baseline; padding: 14px 16px; border-top: 1px solid var(--line); }
 .facts > div:first-child { border-top: 0; }
 .facts dt { font-size: var(--fs-small); color: var(--text-muted); }
 .facts dd { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 0.9375rem; text-align: end; }
+.facts dd .tbc { display: table; margin-inline-start: auto; margin-top: 6px; }
 .plate .facts { background: rgba(254, 240, 225, .06); border-color: var(--plate-line); }
 .plate .facts > div { border-top-color: rgba(254, 240, 225, .16); }
 .plate .facts dt { color: var(--plate-muted); }
@@ -254,3 +255,6 @@ a.card:hover { border-color: var(--line-strong); background: color-mix(in srgb, 
 .wa-cta--active:hover { background: var(--surface-sunken); }
 .wa-cta--unavailable { border: 1px dashed var(--line-strong); color: var(--text-muted); cursor: default; }
 .wa-cta--unavailable small { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-label); line-height: 1.6; }
+
+/* Draft preview banner (/preview) */
+.preview-frame { border: 1.5px dashed var(--line-strong); border-radius: var(--r-lg); padding: var(--s-5); font-size: var(--fs-small); }

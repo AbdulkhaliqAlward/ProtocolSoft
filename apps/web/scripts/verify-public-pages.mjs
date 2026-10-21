@@ -81,12 +81,12 @@ const main = async () => {
 
   /* ── 5. Services overview + detail ── */
   const svcs = await get('/services');
-  check('services page has 3 panels', (svcs.body.match(/service-panel/g) ?? []).length >= 3);
+  check('services page has 3 service panels', (svcs.body.match(/class="svc-panel"/g) ?? []).length >= 3);
   check('services panels render localized titles', svcs.body.includes('تطوير الأنظمة المخصصة') && svcs.body.includes('>خدماتنا<'));
   const svcsEn = await get('/en/services');
   check('EN services panels render titles', svcsEn.body.includes('Custom Systems Development') || svcsEn.body.includes('Custom Software'));
   const detail = await get('/services/cybersecurity');
-  check('service detail: deliverables section', detail.body.includes('ما نسلّمه'));
+  check('service detail: scope section with included and not-included lists', detail.body.includes('نطاق العمل') && detail.body.includes('يشمل') && detail.body.includes('لا يشمل'));
   check('service detail: process timeline', detail.body.includes('كيف نعمل'));
   check('service detail: FAQ accordion', detail.body.includes('أسئلة شائعة'));
   check('service detail: CTA with service preselect', detail.body.includes('/contact?service=cybersecurity'));

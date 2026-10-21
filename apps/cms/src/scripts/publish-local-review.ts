@@ -19,6 +19,8 @@ import { getPayload } from 'payload';
 
 import configPromise from '../payload.config';
 
+import { HOME_FAQS, SERVICE_SPECS } from './review-content/serviceSpecs';
+
 const guard = (): void => {
   if (process.env.NODE_ENV === 'production' || process.env.DEPLOYMENT_ENV === 'production') {
     console.error('REFUSED: publish-local-review runs in LOCAL DEVELOPMENT only.');
@@ -217,7 +219,7 @@ const SERVICES: ServiceCopy[] = [
         { title: 'المتابعة', description: 'مراقبة ومراجعات دورية تحافظ على الحالة الأمنية.' },
       ],
       faqs: [
-        { question: 'هل تقدمون اختبارات اختراق؟', answer: 'نركز على الخدمات الدفاعية: التقييم والتحصين والمراقبة والاستجابة. اختبارات الاختراق الخارجية تُنفَّذ عبر مختبرين معتمدين بالتنسيق الكامل معك — ونساعدك في تجهيز نطاقها ومتابعة معالجة نتائجها.' },
+        { question: 'هل تقدمون اختبارات اختراق؟', answer: 'نركز على الخدمات الدفاعية: التقييم والتحصين والمراقبة والاستجابة. أي اختبار هجومي يتم فقط بتفويض مكتوب ونطاق متفق عليه مسبقاً، ونساعدك في تحديد نطاقه ومتابعة معالجة نتائجه.' },
         { question: 'من أين نبدأ إن لم يكن لدينا أي وضع أمني موثق؟', answer: 'من تقييم أساسي: جرد الأنظمة والصلاحيات، مراجعة التهيئة، ثم معالجة الأولويات القصوى أولاً بخطة زمنية واقعية.' },
       ],
       seoDescription: 'خدمات أمن سيبراني دفاعية: تقييم الوضع الأمني، تحصين الأنظمة والبنية، المراقبة، والجاهزية للاستجابة للحوادث.',
@@ -246,7 +248,7 @@ const SERVICES: ServiceCopy[] = [
         { title: 'Follow-up', description: 'Monitoring and periodic reviews that keep the posture healthy.' },
       ],
       faqs: [
-        { question: 'Do you offer penetration testing?', answer: 'We focus on defensive services: assessment, hardening, monitoring, and response. External penetration testing is performed by certified testers with your full coordination — we help you scope it and follow up on remediating its findings.' },
+        { question: 'Do you offer penetration testing?', answer: 'We focus on defensive services: assessment, hardening, monitoring and response. Any offensive testing happens only with written authorisation and a scope agreed in advance, and we help you define that scope and follow up on the fixes.' },
         { question: 'Where do we start with no documented security posture?', answer: 'With a baseline assessment: inventory systems and access, review configurations, then remediate the highest priorities first with a realistic timeline.' },
       ],
       seoDescription: 'Defensive cybersecurity services: security posture assessment, system and infrastructure hardening, monitoring, and incident-response readiness.',
@@ -259,6 +261,7 @@ const ABOUT_AR = {
   blocks: [
     {
       blockType: 'contentRichText' as const,
+      heading: 'قصتنا',
       content: lexical(
         [
           'بروتوكول سوفت شركة هندسة برمجيات وأمن سيبراني. نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة — لفرق تعمل بوضوح وتنمو بثقة.',
@@ -286,6 +289,7 @@ const ABOUT_EN = {
   blocks: [
     {
       blockType: 'contentRichText' as const,
+      heading: 'Our story',
       content: lexical(
         [
           'Protocol Soft is a software engineering and cybersecurity company. We build reliable digital systems and protect them to run with confidence — for teams that work with clarity and grow with confidence.',
@@ -321,6 +325,8 @@ const publish = async (): Promise<void> => {
       console.warn(`service "${copy.slug}" not found — run the seed first; skipping`);
       continue;
     }
+    const spec = SERVICE_SPECS[copy.slug];
+    if (!spec) throw new Error(`no spec-sheet content for ${copy.slug}`);
     for (const locale of ['ar', 'en'] as const) {
       const c = copy[locale];
       await payload.update({
@@ -338,8 +344,11 @@ const publish = async (): Promise<void> => {
           overview: lexical(c.overview, locale === 'ar' ? 'rtl' : 'ltr'),
           deliverables: c.deliverables,
           capabilities: c.capabilities,
-          processSteps: c.processSteps,
-          faqs: c.faqs,
+          processSteps: c.processSteps.map((step, i) => ({ ...step, ...(spec[locale].exchange[i] ?? {}) })),
+          faqs: [...c.faqs, ...(spec[locale].extraFaqs ?? [])],
+          engagementFacts: spec[locale].engagementFacts,
+          notIncluded: spec[locale].notIncluded,
+          capabilityGroups: spec[locale].capabilityGroups,
           seo: { description: c.seoDescription },
         } as never,
       });
@@ -367,6 +376,7 @@ const publish = async (): Promise<void> => {
     }
     const data = { ...homeDraft };
     for (const k of ['id', 'globalType', 'createdAt', 'updatedAt'] as const) delete data[k];
+    data.sections = { ...((data.sections ?? {}) as Record<string, unknown>), faqEnabled: true, faqs: HOME_FAQS[locale] };
     // Globals with versions.drafts publish by saving the draft content with an
     // explicit published status (the local API's draft flag alone is not enough).
     await payload.updateGlobal({

@@ -48,8 +48,8 @@ const PreviewInner = ({ state }: { state: PreviewState }) => {
         )}
       </p>
       <h1 style={{ marginTop: 48 }}>{title}</h1>
-      {!isReady && <p style={{ color: 'var(--color-text-muted)' }}>{state.messageAr}</p>}
-      {!isReady && <p style={{ color: 'var(--color-text-muted)' }}>{state.messageEn}</p>}
+      {!isReady && <p style={{ color: 'var(--text-muted)' }}>{state.messageAr}</p>}
+      {!isReady && <p style={{ color: 'var(--text-muted)' }}>{state.messageEn}</p>}
       {isReady && <PreviewSnapshot snapshot={state.snapshot ?? {}} />}
     </main>
   );
@@ -69,10 +69,10 @@ const PreviewSnapshot = ({ snapshot }: { snapshot: Record<string, unknown> }) =>
   const title = pick(snapshot.title);
   const summary = pick(snapshot.summary);
   return (
-    <article style={{ border: '1px solid var(--color-border)', borderRadius: 16, padding: 32, background: 'var(--color-surface)' }}>
+    <article style={{ border: '1px solid var(--line)', borderRadius: 22, padding: 32, background: 'var(--surface)' }}>
       <h2>{title ?? '(بدون عنوان / untitled)'}</h2>
-      {summary && <p style={{ color: 'var(--color-text-muted)' }}>{summary}</p>}
-      <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
+      {summary && <p style={{ color: 'var(--text-muted)' }}>{summary}</p>}
+      <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
         عرض مبسّط للمسودة في أساس المرحلة 4 — العرض الكامل لكل نوع محتوى يُبنى في المرحلة 6/7. / Simplified foundation rendering — full per-type preview lands in Phase 6/7.
       </p>
     </article>

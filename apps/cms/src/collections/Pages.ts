@@ -55,7 +55,10 @@ export const Pages: CollectionConfig = {
       blocks: [
         {
           slug: 'contentRichText',
-          fields: [{ name: 'content', type: 'richText', required: true }],
+          fields: [
+            { name: 'heading', type: 'text', admin: { description: 'عنوان القسم (اختياري) / section heading (optional)' } },
+            { name: 'content', type: 'richText', required: true },
+          ],
         },
         {
           slug: 'featureGrid',
@@ -74,6 +77,7 @@ export const Pages: CollectionConfig = {
         {
           slug: 'faqAccordion',
           fields: [
+            { name: 'heading', type: 'text' },
             {
               name: 'faqs',
               type: 'array',

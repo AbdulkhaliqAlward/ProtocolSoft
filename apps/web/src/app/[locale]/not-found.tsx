@@ -1,10 +1,12 @@
-/** 404 (§16.8): oversized 404, honest apology, actions. Serves unknown URLs in
- *  both locales (unknown locale path → Arabic default). No Case Studies link
- *  (D-4). */
+/** 404: a purple plate with a plain apology and the places people usually
+ *  want, as a list rather than a row of buttons. Serves unknown URLs in both
+ *  locales (unknown locale path → Arabic default). */
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import type { Locale } from '@protocol-soft/shared';
+
+import { Spark } from '@/components/Spark';
 
 export const metadata: Metadata = {
   title: '404',
@@ -13,21 +15,33 @@ export const metadata: Metadata = {
 
 export default async function NotFound() {
   const locale: Locale = (await headers()).get('x-locale') === 'en' ? 'en' : 'ar';
-  const base = locale === 'ar' ? '' : '/en';
+  const ar = locale === 'ar';
+  const base = ar ? '' : '/en';
+  const links = [
+    { href: `${base}/`, label: ar ? 'الصفحة الرئيسية' : 'Home page' },
+    { href: `${base}/services`, label: ar ? 'خدماتنا' : 'Our services' },
+    { href: `${base}/contact`, label: ar ? 'تواصل معنا' : 'Contact us' },
+  ];
   return (
-    <div className="container error-panel">
-      <div className="error-panel__code bidi" aria-hidden="true">404</div>
-      <h1>{locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found'}</h1>
-      <p className="secondary">
-        {locale === 'ar'
-          ? 'الرابط الذي فتحته غير موجود أو تغيّر عنوانه.'
-          : 'The link you opened does not exist, or its address has changed.'}
-      </p>
-      <div className="empty-state__actions" style={{ marginTop: 'var(--sp-6)' }}>
-        <a href={`${base}/`} className="btn btn--primary">{locale === 'ar' ? 'العودة للرئيسية' : 'Back to home'}</a>
-        <a href={`${base}/services`} className="btn btn--secondary">{locale === 'ar' ? 'الخدمات' : 'Services'}</a>
-        <a href={`${base}/contact`} className="btn btn--text">{locale === 'ar' ? 'تواصل معنا' : 'Contact'}</a>
+    <section className="lost">
+      <div className="container">
+        <div className="plate lost__plate">
+          <div className="stack" style={{ ['--stack' as string]: 'var(--s-4)' }}>
+            <span className="lost__code" aria-hidden="true">404</span>
+            <h1>{ar ? 'الصفحة غير موجودة' : 'Page not found'}</h1>
+            <p>{ar ? 'الرابط الذي فتحته غير موجود أو تغيّر عنوانه. هذه أماكن قد تبحث عنها:' : 'The link you opened does not exist, or its address has changed. You might be looking for one of these:'}</p>
+          </div>
+          <nav aria-label={ar ? 'روابط مفيدة' : 'Useful links'}>
+            <ul className="lost__links" role="list">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href}><span>{l.label}</span><Spark size="sm" /></a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -125,6 +125,18 @@ export const Homepage: GlobalConfig = {
             },
             { name: 'secureByDesignEnabled', type: 'checkbox', defaultValue: true },
             { name: 'secureByDesign', type: 'textarea', localized: true },
+            { name: 'faqEnabled', type: 'checkbox', defaultValue: true },
+            {
+              name: 'faqs',
+              type: 'array',
+              localized: true,
+              admin: { description: 'أسئلة عامة قبل التواصل / general questions people ask before getting in touch' },
+              fields: [
+                { name: 'question', type: 'text', required: true },
+                { name: 'answer', type: 'textarea', required: true },
+                { name: 'needsConfirmation', type: 'checkbox', defaultValue: false },
+              ],
+            },
           ],
         },
         {
