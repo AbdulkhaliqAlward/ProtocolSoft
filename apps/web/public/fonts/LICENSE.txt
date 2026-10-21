@@ -1,41 +1,26 @@
-Self-hosted font record — Phase 5 visual revision ("Trusted Engineering Editorial")
-=====================================================================================
+Self-hosted font record
+=======================
 
 All files in this directory are served first-party from /fonts/ (no third-party
-runtime font requests). Fallbacks are declared in globals.css.
+runtime font requests). Fallbacks are declared in src/app/globals.css.
+Every file below is licensed under the SIL Open Font License 1.1 (text below).
 
-1) Noto Sans Arabic — NotoSansArabic-arabic.woff2
-   Source:    Google Fonts CSS API v2 (fonts.googleapis.com/css2), variable
-              weight axis, arabic unicode-range subset, woff2.
-   License:   SIL Open Font License 1.1 — Copyright 2015-2023 The Noto Project
-              Authors (https://github.com/notofonts/arabic), with Reserved Name
-              "Noto". Full text: https://openfontlicense.org/open-font-license-official-text/
-   Use:       Primary Arabic UI/text family (weights 400-700 instanced from the
-              variable file via @font-face font-weight ranges).
+1) IBM Plex Sans Arabic — IBMPlexSansArabic-arabic.woff2 (400),
+   IBMPlexSansArabic-SemiBold-arabic.woff2 (600), IBMPlexSansArabic-Bold-arabic.woff2 (700)
+   Copyright 2017 IBM Corp., Reserved Font Name "Plex". Arabic subset.
 
-2) Source Sans 3 — SourceSans3-latin.woff2, SourceSans3-latin-ext.woff2
-   Source:    Google Fonts CSS API v2, variable weight axis, latin + latin-ext
-              unicode-range subsets, woff2.
-   License:   SIL Open Font License 1.1 — Copyright 2010, 2012-2019 Adobe
-              (http://www.adobe.com/type/), with Reserved Names "Source" and
-              "Source Sans". Same OFL 1.1 text as above.
-   Use:       Primary Latin UI/text family. Also serves the Latin fallback slot
-              inside the Arabic stack (per-glyph fallback).
+2) Inter — Inter-latin.woff2 (variable 400-700)
+   Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter). Latin subset.
 
-3) IBM Plex Mono — IBMPlexMono-Regular.woff2, IBMPlexMono-Medium.woff2
-   Source:    Google Fonts / IBM Plex GitHub releases (static woff2).
-   License:   SIL Open Font License 1.1 — Copyright 2017 IBM Corp., Reserved
-              Name "Plex". Full text below.
-   Use:       Technical metadata ONLY (reference codes, dates, numbering,
-              technical labels) — never body or heading text.
+3) Space Grotesk — SpaceGrotesk-latin.woff2 (variable 400-700)
+   Copyright 2020 The Space Grotesk Project Authors
+   (https://github.com/floriankarsten/space-grotesk). Latin subset.
 
-The retired IBM Plex Sans / IBM Plex Sans Arabic files from the previous visual
-direction were removed when the approved font system changed; IBM Plex Mono is
-retained under its existing OFL 1.1 grant.
+4) IBM Plex Mono — IBMPlexMono-Regular.woff2, IBMPlexMono-Medium.woff2
+   Copyright 2017 IBM Corp., Reserved Font Name "Plex".
 
-No commercial font files are used; no font requires a license Protocol Soft has
-not been granted. If the brand later supplies licensed typefaces, replace the
-@font-face blocks in src/app/globals.css and update this record.
+No commercial font files are used. When the typeface system changes, replace the
+@font-face blocks in src/app/globals.css, remove retired files, and update this record.
 
 --------------------------------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 — 26 February 2007

@@ -14,10 +14,9 @@ protocol_soft_webApp/
 │   ├── cms/          # Payload CMS (v3) - Headless CMS & Admin Portal
 │   └── web/          # Next.js Frontend - Marketing & Client Platform
 ├── packages/
-│   ├── shared/       # Shared TypeScript types, schemas, and helpers
-│   └── ui/           # Shared UI component library
+│   └── shared/       # Shared TypeScript types, contracts, locales, roles
 ├── docs/             # Technical architecture and design documentation
-├── scripts/          # Automation and database seed scripts
+├── scripts/          # Infrastructure scripts (backup runner)
 ├── docker-compose.yml
 ├── Dockerfile
 └── package.json
@@ -27,8 +26,8 @@ protocol_soft_webApp/
 
 ## 🚀 Tech Stack
 
-- **Frontend (`apps/web`)**: Next.js (App Router), React, Tailwind CSS / Vanilla CSS Design System, Lucide Icons
-- **Backend / CMS (`apps/cms`)**: Payload CMS v3, Next.js, Postgres / SQLite DB Adapter
+- **Frontend (`apps/web`)**: Next.js (App Router), React, Tailwind CSS v4 + a token-based CSS design system
+- **Backend / CMS (`apps/cms`)**: Payload CMS v3, Next.js, PostgreSQL (same engine in dev and production)
 - **Language**: TypeScript across all apps and packages
 - **Internationalization (i18n)**: Native bilingual support for Arabic (`ar`) and English (`en`)
 - **Deployment & Infra**: Docker, Docker Compose, Caddy Reverse Proxy
@@ -65,16 +64,31 @@ Configure your environment variables in `.env` and `apps/cms/.env` accordingly.
 
 ### 3. Running Locally
 
-You can start the development servers for both apps concurrently:
+Dev uses PostgreSQL in Docker (never SQLite). The database publishes no port; the
+`debug` profile adds a localhost-only forwarder so the native dev servers can reach it.
+Set `DATABASE_URI=postgresql://postgres:postgres@localhost:5432/protocol_soft_dev`
+in `apps/cms/.env`, then:
 
 ```bash
-# Start all apps
-npm run dev
+# 1. Start PostgreSQL (+ localhost-only forwarder)
+docker compose --profile debug up -d postgres postgres-debug
 
-# Or start specific applications
-npm run dev:web   # Frontend at http://localhost:3000
-npm run dev:cms   # CMS Admin at http://localhost:3001
+# 2. Apply schema migrations (create the DB first if it does not exist)
+npm run migrate -w @protocol-soft/cms
+
+# 3. Seed structural content (drafts only), local review publish, first admin
+npm run seed:cms
+npm run publish:local-review -w @protocol-soft/cms
+npm run bootstrap:superadmin
+
+# 4. Start the apps (two terminals)
+npm run dev:cms   # CMS Admin at http://localhost:3001/admin
+npm run dev:web   # Public site at http://localhost:3000
 ```
+
+Schema changes: edit collections/globals, then `npm run migrate:create -w @protocol-soft/cms`
+and commit the generated file in `apps/cms/src/migrations/`. Auto-push is disabled in
+every environment.
 
 ### 4. Running with Docker Compose
 

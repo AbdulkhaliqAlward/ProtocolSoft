@@ -8,7 +8,6 @@ import { MotionInit } from '@/components/MotionInit';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
 import { BRAND } from '@/components/siteChrome';
-import '../globals.css';
 
 export const metadata: Metadata = {
   title: {
