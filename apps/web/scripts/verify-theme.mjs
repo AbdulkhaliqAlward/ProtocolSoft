@@ -110,8 +110,11 @@ const main = async () => {
     check('theme bootstrap is the first script in <body>, behind only hidden dev markers',
       firstScript >= 0 && preScript.trim().startsWith('<div hidden="') && preScript.replace(/<div hidden="">.*?<\/div>/g, '').trim() === '',
       `pre=${JSON.stringify(preScript.slice(0, 60))}`);
-    check('bootstrap reads stored choice before OS preference', bootstrap.includes("localStorage.getItem(k)") && bootstrap.indexOf('protocol-soft-theme') < bootstrap.indexOf('prefers-color-scheme'));
-    check('bootstrap catches storage failure -> light', bootstrap.includes("catch(e){document.documentElement.setAttribute('data-theme','light')"));
+    // The bootstrap is serialised from ThemeBootstrap.applyTheme, so check its
+    // behaviour markers rather than exact source text.
+    check('bootstrap reads stored choice before OS preference', /localStorage\.getItem\(\s*["']protocol-soft-theme["']\s*\)/.test(bootstrap) && bootstrap.indexOf('protocol-soft-theme') < bootstrap.indexOf('prefers-color-scheme'));
+    const catchAt = bootstrap.indexOf('catch');
+    check('bootstrap catches storage failure -> light', catchAt > 0 && /data-theme["'],\s*["']light["']/.test(bootstrap.slice(catchAt)));
 
     /* Early-DOM check: data-theme is already pinned at the earliest poll moment.
        The early-poll script is injected BEFORE the next navigation so it runs
