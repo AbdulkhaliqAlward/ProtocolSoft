@@ -22,7 +22,9 @@ const themeBootstrap = `(function(){try{var k='protocol-soft-theme';var s=localS
 export const DocumentShell = ({ lang, dir, children }: { lang: string; dir: 'rtl' | 'ltr'; children: ReactNode }) => (
   // suppressHydrationWarning: the bootstrap sets data-theme and the js class
   // before hydration (same pattern as next-themes; React never manages them).
-  <html lang={lang} dir={dir} className={fontVariables} suppressHydrationWarning>
+  // data-scroll-behavior: Next turns smooth scrolling off while it resets
+  // the scroll position on navigation (otherwise the reset animates).
+  <html lang={lang} dir={dir} className={fontVariables} data-scroll-behavior="smooth" suppressHydrationWarning>
     <body>
       <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       {children}

@@ -85,7 +85,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               return (
                 <article key={s.slug} id={s.slug} className="svc-panel" aria-labelledby={`${s.slug}-title`} data-reveal>
                   <div className="svc-panel__head">
-                    <span className="clause-no">{clause(i + 1)} <Spark size="sm" /></span>
+                    <span className="clause-no">{clause(i + 1)}</span>
                     <h2 id={`${s.slug}-title`}>{T(s.title, locale)}</h2>
                     <p>{d?.heroHeadline || T(s.summary, locale)}</p>
                     <div className="cluster">

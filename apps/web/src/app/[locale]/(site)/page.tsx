@@ -120,36 +120,37 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         ]}
       />
 
-      {/* Hero plate: the thesis, two actions, and the three services at a glance. */}
-      <section className="home-hero" aria-labelledby="hero-title">
-        <div className="container">
-          <div className="plate home-hero__plate">
-            <div className="home-hero__main">
-              <span className="eyebrow">{kicker}</span>
-              <h1 id="hero-title" className="home-hero__title">{headline}</h1>
-              {has(sub) && <p className="lead">{sub}</p>}
-              <div className="cluster home-hero__actions">
-                <Link href={localePath(locale, '/contact')} className="btn btn--inverse btn--lg">{primaryCta}</Link>
-                <Link href={localePath(locale, '/services')} className="btn btn--outline-inverse btn--lg">{secondaryCta}</Link>
-              </div>
-            </div>
-            {services.length > 0 && (
-              <nav className="home-hero__index" aria-label={ar ? 'خدماتنا' : 'Our services'}>
-                <ol role="list">
-                  {services.map((svc, i) => (
-                    <li key={svc.slug}>
-                      <Link href={localePath(locale, `/services/${svc.slug}`)} className="home-hero__link">
-                        <span className="clause-no home-hero__num">{clause(i + 1)}</span>
-                        <span className="home-hero__svc">{T(svc.title, locale)}</span>
-                        <span className="btn__arrow" aria-hidden="true">→</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            )}
-            <span className="home-hero__sparks" aria-hidden="true"><Spark size="lg" /><Spark /></span>
+      {/* Hero: a full-width purple band. The thesis spans the whole width;
+          below it, the promise and actions sit beside the three services. */}
+      <section className="home-hero plate plate--bleed" aria-labelledby="hero-title">
+        <span className="home-hero__sparks" aria-hidden="true"><Spark size="lg" /><Spark /></span>
+        <div className="container home-hero__grid">
+          <div className="home-hero__head">
+            <span className="eyebrow">{kicker}</span>
+            <h1 id="hero-title" className="home-hero__title">{headline}</h1>
           </div>
+          <div className="home-hero__main">
+            {has(sub) && <p className="lead">{sub}</p>}
+            <div className="cluster home-hero__actions">
+              <Link href={localePath(locale, '/contact')} className="btn btn--inverse btn--lg">{primaryCta}</Link>
+              <Link href={localePath(locale, '/services')} className="btn btn--outline-inverse btn--lg">{secondaryCta}</Link>
+            </div>
+          </div>
+          {services.length > 0 && (
+            <nav className="home-hero__index" aria-label={ar ? 'خدماتنا' : 'Our services'}>
+              <ol role="list">
+                {services.map((svc, i) => (
+                  <li key={svc.slug}>
+                    <Link href={localePath(locale, `/services/${svc.slug}`)} className="home-hero__link">
+                      <span className="clause-no home-hero__num">{clause(i + 1)}</span>
+                      <span className="home-hero__svc">{T(svc.title, locale)}</span>
+                      <span className="btn__arrow" aria-hidden="true">→</span>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
         </div>
       </section>
 
@@ -216,7 +217,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <section className="section section--band statement" aria-labelledby="secure-title" data-reveal>
           <div className="container rail">
             <div className="rail__head">
-              <span className="clause-no">{next()} <Spark size="sm" /></span>
+              <span className="clause-no">{next()}</span>
               <h2 id="secure-title">{ar ? 'الأمان من اليوم الأول' : 'Secure from day one'}</h2>
             </div>
             <div className="rail__body">
@@ -237,7 +238,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {faqs.length > 0 && (
         <Section id="faq" no={next()} title={ar ? 'أسئلة قبل أن تتواصل' : 'Before you get in touch'} lead={ar ? 'إجابات مختصرة عن أكثر ما يُسأل في البداية.' : 'Short answers to what people usually ask first.'}>
-          <Faq items={faqs} />
+          <Faq items={faqs} locale={locale} />
         </Section>
       )}
 

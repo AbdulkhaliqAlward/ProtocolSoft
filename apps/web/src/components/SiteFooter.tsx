@@ -1,5 +1,5 @@
 /**
- * Site footer: a purple plate set into the page. Brand (mark + name +
+ * Site footer: a full-width purple band with rounded top corners. Brand (mark + name +
  * positioning line), Services (published services only), Company, Contact
  * (every empty channel is hidden, never placeholder text; WhatsApp is always
  * present via its honest availability state), then a bottom bar with the
@@ -46,8 +46,8 @@ export const SiteFooter = ({
 
   return (
     <footer className="site-footer">
-      <div className="container">
-        <div className="site-footer__plate">
+      <div className="site-footer__plate">
+        <div className="container">
           <div className="site-footer__grid">
             <div className="site-footer__brand">
               <Link href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>

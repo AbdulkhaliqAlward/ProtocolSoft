@@ -67,7 +67,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               <h2><Spark size="sm" />{T('بعد الإرسال', 'After you send')}</h2>
               <ol className="next-steps">
                 <li><span>{T('يصل طلبك إلى الفريق ونقرأه.', 'Your request reaches the team and we read it.')}</span></li>
-                <li><span>{T('نرد برد أولي واضح: هل نحن الأنسب لطلبك أم لا.', 'We send a clear first reply: whether we are the right fit or not.')} <Tbc /></span></li>
+                <li><span>{T('نرد برد أولي واضح: هل نحن الأنسب لطلبك أم لا.', 'We send a clear first reply: whether we are the right fit or not.')} <Tbc locale={locale} /></span></li>
                 <li><span>{T('نرتب جلسة استكشاف قصيرة ونوضح النطاق والخيارات قبل أي التزام.', 'We arrange a short discovery session and set out scope and options before any commitment.')}</span></li>
               </ol>
             </div>

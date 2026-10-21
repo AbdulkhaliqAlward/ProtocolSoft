@@ -2,12 +2,18 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 html {
+  /* Reserve the scrollbar's space so pages with and without a scrollbar do
+     not shift sideways when navigating between them. */
+  scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + var(--s-4));
 }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
+  /* No scroll anchoring: when a navigation swaps the page content, anchoring
+     would otherwise push the new page down to keep an old element in view. */
+  overflow-anchor: none;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
@@ -30,7 +36,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: var(--fw-heading);
   line-height: var(--lh-heading);
-  text-wrap: balance;
+  /* pretty, not balance: balance splits a two-line heading into equal halves,
+     so lines stop mid-page; pretty only avoids a lonely last word. */
+  text-wrap: pretty;
   overflow-wrap: break-word;
 }
 h1 { font-size: var(--fs-h1); }

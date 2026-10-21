@@ -1,8 +1,8 @@
 /**
  * Service detail — a spec sheet. Reading order:
  *   hero plate (headline, promise, actions, engagement facts)
- *   § 01 overview · § 02 scope (included / not included) · § 03 process as an
- *   exchange · § 04 capabilities by stage · § 05 questions · related services
+ *   01 overview · 02 scope (included / not included) · 03 process as an
+ *   exchange · 04 capabilities by stage · 05 questions · related services
  *   · one closing action (contact form preselected with this service).
  * Only published, per-locale content renders; empty sections hide themselves.
  * Lines flagged needsConfirmation in the CMS show a NEEDS CONFIRMATION tag.
@@ -103,38 +103,40 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
         ]}
       />
 
-      <section className="svc-hero" aria-labelledby="svc-title">
-        <div className="container">
-          <div className="plate svc-hero__plate">
-            <div className="svc-hero__main">
-              <Breadcrumbs
-                items={[
-                  { label: ar ? 'الرئيسية' : 'Home', href: localePath(locale, '/') },
-                  { label: ar ? 'الخدمات' : 'Services', href: localePath(locale, '/services') },
-                  { label: svc.title },
-                ]}
-              />
-              <span className="clause-no">{clause(index + 1)} <Spark size="sm" /></span>
-              <h1 id="svc-title">{svc.heroHeadline || svc.title}</h1>
-              {svc.heroSubhead && <p className="lead svc-hero__lead">{svc.heroSubhead}</p>}
-              <div className="cluster svc-hero__actions">
-                <Link href={contactHref} className="btn btn--inverse btn--lg">{ctaLabel}</Link>
-                {(svc.deliverables.length > 0 || excluded.length > 0) && (
-                  <a href="#scope" className="btn btn--outline-inverse btn--lg">{ar ? 'ما الذي يشمله؟' : "What's included?"}</a>
-                )}
-              </div>
-            </div>
-            {facts.length > 0 && (
-              <dl className="facts" aria-label={ar ? 'حقائق الارتباط' : 'Engagement facts'}>
-                {facts.map((f) => (
-                  <div key={f.label} className="svc-hero__fact">
-                    <dt>{f.label}</dt>
-                    <dd>{f.value} {f.needsConfirmation && <Tbc />}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
+      {/* Hero: a full-width purple band; the headline spans the width, then
+          the promise and actions sit beside the engagement facts. */}
+      <section className="svc-hero plate plate--bleed" aria-labelledby="svc-title">
+        <div className="container svc-hero__grid">
+          <div className="svc-hero__head">
+            <Breadcrumbs
+              items={[
+                { label: ar ? 'الرئيسية' : 'Home', href: localePath(locale, '/') },
+                { label: ar ? 'الخدمات' : 'Services', href: localePath(locale, '/services') },
+                { label: svc.title },
+              ]}
+            />
+            <span className="clause-no">{clause(index + 1)}</span>
+            <h1 id="svc-title">{svc.heroHeadline || svc.title}</h1>
           </div>
+          <div className="svc-hero__main">
+            {svc.heroSubhead && <p className="lead svc-hero__lead">{svc.heroSubhead}</p>}
+            <div className="cluster svc-hero__actions">
+              <Link href={contactHref} className="btn btn--inverse btn--lg">{ctaLabel}</Link>
+              {(svc.deliverables.length > 0 || excluded.length > 0) && (
+                <a href="#scope" className="btn btn--outline-inverse btn--lg">{ar ? 'ما الذي يشمله؟' : "What's included?"}</a>
+              )}
+            </div>
+          </div>
+          {facts.length > 0 && (
+            <dl className="facts" aria-label={ar ? 'حقائق الارتباط' : 'Engagement facts'}>
+              {facts.map((f) => (
+                <div key={f.label} className="svc-hero__fact">
+                  <dt>{f.label}</dt>
+                  <dd>{f.value} {f.needsConfirmation && <Tbc locale={locale} />}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </section>
 
@@ -181,7 +183,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
 
       {svc.faqs.length > 0 && (
         <Section id="faq" no={next()} title={ar ? 'أسئلة شائعة' : 'Common questions'}>
-          <Faq items={svc.faqs} />
+          <Faq items={svc.faqs} locale={locale} />
         </Section>
       )}
 

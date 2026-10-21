@@ -11,10 +11,35 @@ import type { Locale } from '@protocol-soft/shared';
 
 import { Spark } from './Spark';
 
-export const clause = (n: number | string): string => `§ ${typeof n === 'number' ? String(n).padStart(2, '0') : n}`;
+/** Section number: two digits, Western numerals in both languages (approved). */
+export const clause = (n: number | string): string => (typeof n === 'number' ? String(n).padStart(2, '0') : n);
 
-/** Visible marker for content Protocol Soft still has to confirm. */
-export const Tbc = () => <span className="tbc">⚠️ NEEDS CONFIRMATION</span>;
+/** Visible marker for content Protocol Soft still has to confirm, in the page
+ *  language. data-tbc lets scripts/list-confirmations.mjs collect every one. */
+export const Tbc = ({ locale, detail }: { locale: Locale; detail?: string }) => (
+  <span className="tbc" data-tbc="">
+    <span className="tbc__dot" aria-hidden="true" />
+    {locale === 'ar' ? 'بحاجة إلى تأكيد' : 'Needs confirmation'}
+    {detail ? `: ${detail}` : ''}
+  </span>
+);
+
+/** Turns inline CMS markers like "[⚠️ NEEDS CONFIRMATION: reply time]" into
+ *  the same tag, so editors can flag a phrase inside running text. */
+const INLINE_TBC = /\[\s*⚠️?\s*NEEDS CONFIRMATION:?\s*([^\]]*)\]/gu;
+export const withTbc = (text: string, locale: Locale): ReactNode => {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  for (const m of text.matchAll(INLINE_TBC)) {
+    const at = m.index ?? 0;
+    if (at > last) parts.push(text.slice(last, at).trimEnd(), ' ');
+    parts.push(<Tbc key={at} locale={locale} detail={m[1]?.trim() || undefined} />);
+    last = at + m[0].length;
+  }
+  if (parts.length === 0) return text;
+  if (last < text.length) parts.push(text.slice(last));
+  return <>{parts}</>;
+};
 
 export const SectionHead = ({ no, title, lead, as = 'h2', id, children }: {
   no?: string;
@@ -27,7 +52,7 @@ export const SectionHead = ({ no, title, lead, as = 'h2', id, children }: {
   const Heading = as;
   return (
     <div className="rail__head">
-      {no && <span className="clause-no">{no} <Spark size="sm" /></span>}
+      {no && <span className="clause-no">{no}</span>}
       <Heading id={id}>{title}</Heading>
       {lead && <p>{lead}</p>}
       {children}
@@ -77,7 +102,7 @@ export const PageHero = ({ no, title, lead, crumbs, aside, children }: {
     <div className="container rail">
       <div className="page-hero__main">
         {crumbs && crumbs.length > 0 && <Breadcrumbs items={crumbs} />}
-        {no && <span className="clause-no">{no} <Spark size="sm" /></span>}
+        {no && <span className="clause-no">{no}</span>}
         <h1>{title}</h1>
         {lead && <p className="lead">{lead}</p>}
         {children}
@@ -136,7 +161,7 @@ export const Scope = ({ locale, included, excluded }: {
             {excluded.map((x) => (
               <li key={x.item}>
                 <span aria-hidden="true" />
-                <span>{x.item} {x.needsConfirmation && <Tbc />}</span>
+                <span>{x.item} {x.needsConfirmation && <Tbc locale={locale} />}</span>
               </li>
             ))}
           </ul>
@@ -202,7 +227,7 @@ export const CapabilityGroups = ({ groups }: { groups: Array<{ stage: string; ti
   </div>
 );
 
-export const Faq = ({ items }: { items: Array<{ question: string; answer: string; needsConfirmation?: boolean | null }> }) => (
+export const Faq = ({ items, locale }: { items: Array<{ question: string; answer: string; needsConfirmation?: boolean | null }>; locale: Locale }) => (
   <div className="faq">
     {items.map((f, i) => (
       <details key={f.question} open={i === 0}>
@@ -212,7 +237,7 @@ export const Faq = ({ items }: { items: Array<{ question: string; answer: string
             <svg width="12" height="12" viewBox="0 0 12 12" focusable="false"><path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </span>
         </summary>
-        <p>{f.answer} {f.needsConfirmation && <Tbc />}</p>
+        <p>{withTbc(f.answer, locale)} {f.needsConfirmation && <Tbc locale={locale} />}</p>
       </details>
     ))}
   </div>

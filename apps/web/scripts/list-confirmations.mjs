@@ -1,5 +1,5 @@
 /**
- * Lists every "NEEDS CONFIRMATION" marker on the public site, page by page,
+ * Lists every "needs confirmation" tag (بحاجة إلى تأكيد) on the public site, page by page,
  * with the line it belongs to: the checklist of facts Protocol Soft still has
  * to confirm before launch. Crawls the sitemap of a running web server.
  *
@@ -20,13 +20,14 @@ let total = 0;
 for (const path of urls) {
   const html = (await (await fetch(`${base}${path}`)).text()).replace(/<script[\s\S]*?<\/script>/g, '');
   const hits = [];
-  const re = /NEEDS CONFIRMATION/g;
+  // Every confirmation tag carries data-tbc (components/sections.tsx: Tbc).
+  const re = /data-tbc=""/g;
   let m;
   while ((m = re.exec(html))) {
     // The flagged line is the nearest enclosing list item, fact row or paragraph.
     const start = Math.max(...['<li', '<dd', '<p', '<summary'].map((t) => html.lastIndexOf(t, m.index)));
     const ends = ['</li>', '</dd>', '</p>', '</summary>'].map((t) => html.indexOf(t, m.index)).filter((i) => i > 0);
-    const line = text(html.slice(start, Math.min(...ends))).replace(/\[?⚠️\s*NEEDS CONFIRMATION:?\s*/u, ' → ').replace(/\]\s*$/, '').replace(/\s→\s*$/, '');
+    const line = text(html.slice(start, Math.min(...ends))).replace(/\s*(بحاجة إلى تأكيد|Needs confirmation):?\s*/u, ' → ').replace(/\s→\s*$/, '');
     hits.push(line);
   }
   if (hits.length) {

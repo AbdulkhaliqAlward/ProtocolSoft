@@ -5,8 +5,8 @@
  * (menu of the published services) · About · Contact. Language and theme sit
  * together in one quiet utilities pill; one primary call to action at the end.
  *
- * - Sticky; compacts after a short scroll (name and utilities fold away) and
- *   returns to full size when scrolling up.
+ * - Sticky with a constant height (nothing resizes, so the page never jumps);
+ *   after a short scroll it gains a soft shadow.
  * - Services menu: disclosure button (click / Enter / Space), also opens on
  *   hover for fine pointers; Escape, outside click and leaving focus close it.
  * - Below 1024px the nav becomes a full-height sheet: Services expands inline,
@@ -49,7 +49,7 @@ export const SiteHeader = ({
   const current = barePath(pathname);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -59,21 +59,21 @@ export const SiteHeader = ({
 
   const isActive = (path: string): boolean => (path === '/' ? current === '/' : current === path || current.startsWith(`${path}/`));
 
-  // Close everything on navigation.
+  // Close everything on navigation, and re-read the scroll position once the
+  // router has reset it (that reset does not always fire a scroll event).
   useEffect(() => {
     setSheetOpen(false);
     setMenuOpen(false);
+    const raf = window.requestAnimationFrame(() => setScrolled(window.scrollY > 8));
+    return () => window.cancelAnimationFrame(raf);
   }, [pathname]);
 
-  // Compact after 24px; expand again on any upward scroll.
+  // Shadow once the page has scrolled; height never changes (no layout shift).
   useEffect(() => {
-    let last = window.scrollY;
     let frame = 0;
     const update = (): void => {
       frame = 0;
-      const y = window.scrollY;
-      setCompact(y > 24 && y >= last);
-      last = y;
+      setScrolled(window.scrollY > 8);
     };
     const onScroll = (): void => {
       if (!frame) frame = window.requestAnimationFrame(update);
@@ -151,7 +151,7 @@ export const SiteHeader = ({
   );
 
   return (
-    <header ref={headerRef} className="site-header" data-compact={compact || undefined} data-sheet={sheetOpen || undefined}>
+    <header ref={headerRef} className="site-header" data-scrolled={scrolled || undefined} data-sheet={sheetOpen || undefined}>
       <div className="container site-header__inner">
         <Link href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>
           <LogoMark className="brand__mark" size={44} />
@@ -182,7 +182,7 @@ export const SiteHeader = ({
                         return (
                           <li key={s.slug}>
                             <Link href={href} className="mega__item" aria-current={current === `/services/${s.slug}` ? 'page' : undefined}>
-                              <span className="clause-no">§ {String(i + 1).padStart(2, '0')} <Spark size="sm" /></span>
+                              <span className="clause-no">{String(i + 1).padStart(2, '0')}</span>
                               <span className="mega__title">{T(s.title, locale)}</span>
                               {T(s.summary, locale) && <span className="mega__summary">{T(s.summary, locale)}</span>}
                             </Link>

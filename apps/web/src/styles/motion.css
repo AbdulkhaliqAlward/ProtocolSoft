@@ -42,8 +42,8 @@
 
   /* ── Signature moment: the hero acknowledges the three services ────── */
   /* The headline (LCP) stays still; everything around it arrives in turn. */
-  .js .home-hero__plate .eyebrow { animation: rv-from-start var(--dur-4) var(--ease-out) 80ms both; }
-  .js .home-hero__plate .lead { animation: rv-rise var(--dur-4) var(--ease-out) 180ms both; }
+  .js .home-hero .eyebrow { animation: rv-from-start var(--dur-4) var(--ease-out) 80ms both; }
+  .js .home-hero .lead { animation: rv-rise var(--dur-4) var(--ease-out) 180ms both; }
   .js .home-hero__actions { animation: rv-rise var(--dur-4) var(--ease-out) 280ms both; }
   .js .home-hero__index ol { border-top-color: transparent; }
   .js .home-hero__index li { position: relative; border-bottom-color: transparent; }
@@ -86,5 +86,6 @@
 }
 
 /* Print and the beforeprint fail-safe show everything. */
-.reveal-done .rv { animation: none !important; opacity: 1 !important; }
-@media print { .rv, .steps-line__no { animation: none !important; opacity: 1 !important; } }
+.reveal-done :is(.rv, .steps-line__no, .steps-line > li)::before,
+.reveal-done :is(.rv, .steps-line__no) { animation: none !important; opacity: 1 !important; transform: none !important; }
+@media print { :is(.rv, .steps-line__no), .steps-line > li::before { animation: none !important; opacity: 1 !important; transform: none !important; } }

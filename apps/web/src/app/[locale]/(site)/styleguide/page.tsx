@@ -43,7 +43,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 00 <Spark size="sm" /></span>
+            <span className="clause-no">00</span>
             <h1>{t('نظام التصميم', 'Design system')}</h1>
             <p>{t('كل رمز ومكوّن في الاتجاه المعتمد، بالعربية والإنجليزية وفي المظهرين.', 'Every token and component of the approved direction, in both languages and both themes.')}</p>
           </div>
@@ -66,7 +66,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 01 <Spark size="sm" /></span>
+            <span className="clause-no">01</span>
             <h2>{t('الخطوط', 'Type')}</h2>
           </div>
           <div className="rail__body stack" style={{ ['--stack' as string]: 'var(--s-5)' }}>
@@ -79,7 +79,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
             <p className="lead">{t('نوضح وضعك الأمني الحالي بلغة واضحة، ونرتب ما يجب معالجته أولاً.', 'We explain your current security posture in plain language and rank what to fix first.')}</p>
             <p>{t('نبدأ بفهم طريقة العمل والتحديات الفعلية، ثم نصمم حلاً مناسباً بدلاً من فرض قالب جاهز. ونوضح نطاق العمل وما سيتم تسليمه قبل أن نبدأ، حتى لا تكون هناك مفاجآت لاحقاً.', 'We start with how your business actually works, then design a solution that fits it instead of forcing a template. We define scope and deliverables before we start, so there are no surprises later.')}</p>
             <p className="muted" style={{ fontSize: 'var(--fs-small)' }}>{t('نص ثانوي صغير.', 'Small secondary text.')}</p>
-            <span className="clause-no">§ 03.2 · REF LF-2026-0042</span>
+            <span className="clause-no">03.2 · REF LF-2026-0042</span>
           </div>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 02 <Spark size="sm" /></span>
+            <span className="clause-no">02</span>
             <h2>{t('الأزرار', 'Buttons')}</h2>
           </div>
           <div className="rail__body stack" style={{ ['--stack' as string]: 'var(--s-5)' }}>
@@ -116,7 +116,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 03 <Spark size="sm" /></span>
+            <span className="clause-no">03</span>
             <h2>{t('الأشكال', 'Shape')}</h2>
           </div>
           <div className="rail__body">
@@ -136,7 +136,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
         <div className="container">
           <div className="plate rail">
             <div className="rail__head">
-              <span className="clause-no">§ 04 <Spark size="sm" /></span>
+              <span className="clause-no">04</span>
               <h2>{t('لوح بنفسجي', 'Purple plate')}</h2>
               <p>{t('السطح المميز للهوية: نص كريمي وانحناء واسع.', 'The signature surface: cream type, generous curve.')}</p>
               <div className="cluster" style={{ marginTop: 'var(--s-4)' }}>
@@ -156,7 +156,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 05 <Spark size="sm" /></span>
+            <span className="clause-no">05</span>
             <h2>{t('كتل المواصفات', 'Spec blocks')}</h2>
           </div>
           <div className="rail__body stack" style={{ ['--stack' as string]: 'var(--s-6)' }}>
@@ -183,7 +183,7 @@ export default async function StyleguidePage({ params }: { params: Promise<{ loc
       <section className="section">
         <div className="container rail">
           <div className="rail__head">
-            <span className="clause-no">§ 06 <Spark size="sm" /></span>
+            <span className="clause-no">06</span>
             <h2>{t('النماذج', 'Forms')}</h2>
           </div>
           <form className="rail__body" action="#">
