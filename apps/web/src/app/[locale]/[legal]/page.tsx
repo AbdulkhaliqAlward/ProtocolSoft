@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { getContent } from '@/lib/internalApi';
-import { pageMetadata } from '@/lib/pageMeta';
+import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
 import { PageBlocks } from '@/components/PageBlocks';
 import type { Locale } from '@protocol-soft/shared';
 
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     const page = await getContent<PageData>('/api/internal/content/pages', locale, { slug: legal });
     return pageMetadata(locale, page.title, page.seo?.description || page.title, `/${legal}`);
   } catch {
-    return pageMetadata(locale, '404', '', `/${legal}`);
+    return notFoundMetadata();
   }
 }
 

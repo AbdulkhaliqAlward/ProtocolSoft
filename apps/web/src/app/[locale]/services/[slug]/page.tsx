@@ -6,9 +6,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { getContent } from '@/lib/internalApi';
-import { pageMetadata } from '@/lib/pageMeta';
-import { CtaBand, Icon } from '@/components/ui';import { InitiativeCard } from '@/components/InitiativeCard';
+import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
+import { CtaBand, Icon } from '@/components/ui';
+import { InitiativeCard } from '@/components/InitiativeCard';
+import { JsonLd } from '@/components/JsonLd';
 import { RichText } from '@/components/RichText';
+import { breadcrumbLd, faqLd, serviceLd } from '@/lib/structuredData';
 import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary } from '@protocol-soft/shared';
 
 const SLUGS = ['custom-software', 'digital-products', 'cybersecurity'] as const;
@@ -41,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       `/services/${slug}`,
     );
   } catch {
-    return pageMetadata(locale, '404', '', `/services/${slug}`);
+    return notFoundMetadata();
   }
 }
 
@@ -99,6 +102,17 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
 
   return (
     <>
+      <JsonLd
+        data={[
+          serviceLd(locale, { slug, title: svc.title, description: svc.seo?.description || svc.summary }),
+          breadcrumbLd(locale, [
+            { name: locale === 'ar' ? 'الرئيسية' : 'Home', path: '/' },
+            { name: locale === 'ar' ? 'الخدمات' : 'Services', path: '/services' },
+            { name: svc.title, path: `/services/${slug}` },
+          ]),
+          ...(svc.faqs.length > 0 ? [faqLd(svc.faqs)] : []),
+        ]}
+      />
       <header className="page-header">
         <div className="container page-header__inner">
           <nav aria-label={locale === 'ar' ? 'مسار التنقل' : 'Breadcrumb'}>

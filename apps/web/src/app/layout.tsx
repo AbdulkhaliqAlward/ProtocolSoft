@@ -4,9 +4,12 @@ import React from 'react';
 
 import { LOCALE_DIR, type Locale } from '@protocol-soft/shared';
 
+import { siteUrl } from '@/lib/env';
+
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   robots: { index: true, follow: true },
 };
 

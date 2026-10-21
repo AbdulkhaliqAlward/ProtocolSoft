@@ -120,9 +120,10 @@ const main = async () => {
   check('unknown EN URL -> 404 (EN copy)', nfEn.status === 404 && nfEn.body.includes('Page not found'));
 
   /* ── 10. SEO metadata: canonical + hreflang alternates (React emits hrefLang) ── */
-  check('AR home canonical = /', /rel="canonical"[^>]*href="\/"/.test(ar.body));
-  check('AR home hreflang en -> /en', /rel="alternate"[^>]*hrefLang="en"[^>]*href="\/en"/.test(ar.body));
-  check('EN home hreflang ar -> /', /rel="alternate"[^>]*hrefLang="ar"[^>]*href="\/"/.test(en.body));
+  // Absolute since metadataBase is set (origin = NEXT_PUBLIC_SITE_URL); the bare root has no trailing slash.
+  check('AR home canonical = /', /rel="canonical"[^>]*href="(?:https?:\/\/[^"\/]+)?\/?"/.test(ar.body));
+  check('AR home hreflang en -> /en', /rel="alternate"[^>]*hrefLang="en"[^>]*href="(?:https?:\/\/[^"\/]+)?\/en"/.test(ar.body));
+  check('EN home hreflang ar -> /', /rel="alternate"[^>]*hrefLang="ar"[^>]*href="(?:https?:\/\/[^"\/]+)?\/?"/.test(en.body));
 
   /* ── 11. Lead path end-to-end (web proxy -> CMS, D-5/D-7) ── */
   const lead = await fetch(`${WEB}/api/contact`, {

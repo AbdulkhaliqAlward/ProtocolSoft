@@ -16,6 +16,8 @@ import {
 import { pageMetadata } from '@/lib/pageMeta';
 import { CtaBand, SectionHeading } from '@/components/ui';
 import { InitiativeCard } from '@/components/InitiativeCard';
+import { JsonLd } from '@/components/JsonLd';
+import { organizationLd, websiteLd } from '@/lib/structuredData';
 import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
 
 interface HomepageData {
@@ -129,6 +131,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <>
+      <JsonLd
+        data={[
+          organizationLd(locale, {
+            description: T(settings?.tagline, locale) || undefined,
+            email: contact?.channels.emailMain || undefined,
+            phone: contact?.channels.phone || undefined,
+          }),
+          websiteLd(locale),
+        ]}
+      />
       {/* ── Hero: deep-purple full-bleed section with geometric shapes
              for visual texture. Large editorial typography serves as the
              primary visual element. Amber accents on dark purple. ── */}

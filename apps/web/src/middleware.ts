@@ -6,7 +6,7 @@
  */
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_FILE = /\.(svg|png|jpg|jpeg|webp|ico|txt|xml|json|woff2?)$/i;
+const PUBLIC_FILE = /\.(svg|png|jpg|jpeg|webp|ico|txt|xml|json|webmanifest|woff2?)$/i;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
