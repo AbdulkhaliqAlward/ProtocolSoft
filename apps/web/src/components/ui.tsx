@@ -64,7 +64,7 @@ export const EmptyState = ({
         <a href={localePath(locale, '/services')} className="btn btn--secondary">
           {locale === 'ar' ? 'استكشف خدماتنا' : 'Explore our services'}
         </a>
-        <a href={localePath(locale, '/contact')} className="btn btn--ghost">
+        <a href={localePath(locale, '/contact')} className="btn btn--text">
           {locale === 'ar' ? 'تواصل معنا' : 'Contact us'}
         </a>
       </div>

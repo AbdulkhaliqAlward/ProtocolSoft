@@ -61,7 +61,7 @@ export default async function LocaleLayout({ children }: { children: React.React
   return (
     <>
       <a href="#main" className="skip-link">{locale === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to content'}</a>
-      <SiteHeader locale={locale} ctaLabel={locale === 'ar' ? 'ابدأ مشروعك' : 'Start a Project'} />
+      <SiteHeader locale={locale} ctaLabel={locale === 'ar' ? 'ابدأ مشروعك' : 'Start a project'} services={services} />
       <main id="main">{children}</main>
       <SiteFooter
         locale={locale}

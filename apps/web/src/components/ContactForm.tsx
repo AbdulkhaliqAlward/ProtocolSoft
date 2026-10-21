@@ -13,6 +13,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { Locale, PublicContactConfig } from '@protocol-soft/shared';
 
 import { localePath } from './siteChrome';
+import { Spark } from './Spark';
 
 export type ServiceInterest = 'custom_software' | 'digital_products' | 'cybersecurity' | 'general';
 
@@ -151,7 +152,7 @@ export const ContactForm = ({ locale, confirmationMessage, initialService = 'gen
         )}
         <button
           type="button"
-          className="btn btn--ghost"
+          className="btn btn--secondary"
           onClick={() => {
             setStatus('idle');
             setReference('');
@@ -248,7 +249,10 @@ export const ContactForm = ({ locale, confirmationMessage, initialService = 'gen
         {errors.consent && <span className="field__error" id="cf-consent-err">{errors.consent}</span>}
       </div>
 
-      <button type="submit" className="btn btn--primary btn--lg" disabled={status === 'sending'} aria-busy={status === 'sending'}>
+      {/* Busy rather than disabled while sending: the button keeps focus and
+          its label, and the sparkle cells cycle as the loading indicator. */}
+      <button type="submit" className="btn btn--primary btn--lg" aria-busy={status === 'sending' || undefined} aria-disabled={status === 'sending' || undefined}>
+        {status === 'sending' && <Spark />}
         {status === 'sending' ? labels.sending : labels.submit}
       </button>
     </form>

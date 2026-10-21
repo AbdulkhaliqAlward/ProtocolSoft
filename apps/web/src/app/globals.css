@@ -10,5 +10,6 @@
 @import "../styles/base.css" layer(base);
 @import "../styles/layout.css" layer(layout);
 @import "../styles/components.css" layer(components);
+@import "../styles/chrome.css" layer(components);
 @import "../styles/interim.css" layer(interim);
 @import "../styles/motion.css" layer(motion);

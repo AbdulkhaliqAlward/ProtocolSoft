@@ -33,7 +33,7 @@ const apply = (theme: 'light' | 'dark'): void => {
   document.documentElement.setAttribute('data-theme', theme);
 };
 
-export const ThemeToggle = ({ locale }: { locale: Locale }) => {
+export const ThemeToggle = ({ locale, showLabel = false }: { locale: Locale; showLabel?: boolean }) => {
   // Post-mount state only: the pre-hydration markup is identical on server and
   // client, so the externally-set data-theme never causes a hydration mismatch.
   const [dark, setDark] = useState(false);
@@ -51,7 +51,13 @@ export const ThemeToggle = ({ locale }: { locale: Locale }) => {
       }
     };
     media.addEventListener('change', onSystemChange);
-    return () => media.removeEventListener('change', onSystemChange);
+    // Keep every toggle instance (header + mobile menu) in sync with the page.
+    const observer = new MutationObserver(() => setDark(document.documentElement.getAttribute('data-theme') === 'dark'));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => {
+      media.removeEventListener('change', onSystemChange);
+      observer.disconnect();
+    };
   }, []);
 
   const toggle = useCallback((): void => {
@@ -95,7 +101,7 @@ export const ThemeToggle = ({ locale }: { locale: Locale }) => {
           </svg>
         )}
       </span>
-      <span className="theme-toggle__label">{label}</span>
+      {showLabel && <span className="theme-toggle__label">{label}</span>}
     </button>
   );
 };

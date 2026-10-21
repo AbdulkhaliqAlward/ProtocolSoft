@@ -27,8 +27,15 @@ const get = async (path) => {
   return { status: res.status, body };
 };
 
-const NAV_AR = ['الخدمات', 'من نحن', 'تواصل معنا'];
-const NAV_EN = ['Services', 'About', 'Contact'];
+// Approved navigation (Phase 3): Home, Services (menu of services), About, Contact.
+const NAV_AR = ['الرئيسية', 'الخدمات', 'من نحن', 'تواصل معنا'];
+const NAV_EN = ['Home', 'Services', 'About', 'Contact'];
+const SERVICE_SLUGS = ['custom-software', 'digital-products', 'cybersecurity'];
+/** The primary <nav> element's HTML only, so checks never match the footer or body. */
+const primaryNav = (body) => {
+  const start = body.indexOf('<nav id="primary-nav"');
+  return start < 0 ? '' : body.slice(start, body.indexOf('</nav>', start));
+};
 const FORBIDDEN_NAV = ['case-studies', 'المشاريع', 'Blog', 'المدونة', 'الفريق'];
 
 const main = async () => {
@@ -38,7 +45,11 @@ const main = async () => {
   const ar = await get('/');
   check('GET / -> 200', ar.status === 200);
   check('AR: html lang=ar dir=rtl', /<html lang="ar" dir="rtl"[\s>]/.test(ar.body));
-  for (const item of NAV_AR) check(`AR nav contains «${item}»`, ar.body.includes(`>${item}</a>`));
+  const arNav = primaryNav(ar.body);
+  check('AR primary nav present', arNav.length > 0);
+  for (const item of NAV_AR) check(`AR nav contains «${item}»`, arNav.includes(`>${item}<`));
+  check('AR nav: Services is a menu button listing the 3 services + all services',
+    /<button[^>]*aria-expanded="false"[^>]*aria-controls=/.test(arNav) && SERVICE_SLUGS.every((s) => arNav.includes(`href="/services/${s}"`)) && arNav.includes('href="/services"'));
   check('AR nav language switch -> /en labeled English', ar.body.includes('href="/en"') && ar.body.includes('English'));
   check('AR hero headline present', ar.body.includes('نبني أنظمة رقمية موثوقة'));
   check('AR hero CTA -> /contact', ar.body.includes('href="/contact"'));
@@ -49,13 +60,15 @@ const main = async () => {
   const en = await get('/en');
   check('GET /en -> 200', en.status === 200);
   check('EN: html lang=en dir=ltr', /<html lang="en" dir="ltr"[\s>]/.test(en.body));
-  for (const item of NAV_EN) check(`EN nav contains "${item}"`, en.body.includes(`>${item}</a>`));
+  const enNav = primaryNav(en.body);
+  for (const item of NAV_EN) check(`EN nav contains "${item}"`, enNav.includes(`>${item}<`));
+  check('EN nav: service menu links stay under /en', SERVICE_SLUGS.every((s) => enNav.includes(`href="/en/services/${s}"`)));
   check('EN nav language switch labeled العربية', en.body.includes('العربية'));
   check('EN hero headline present', en.body.includes('Trusted digital systems, built and protected'));
   check('EN services links under /en', en.body.includes('/en/services/custom-software'));
 
   /* ── 3. D-3: forbidden nav items appear NOWHERE in chrome ── */
-  for (const f of FORBIDDEN_NAV) check(`no "${f}" nav/route anywhere on home`, !ar.body.includes(f) || !ar.body.includes('nav'));
+  for (const f of FORBIDDEN_NAV) check(`no "${f}" in primary nav`, !arNav.includes(f) && !enNav.includes(f));
 
   /* ── 4. No placeholder tokens or EDR product claims on any page ── */
   const pages = ['/services', '/about', '/contact'];

@@ -26,7 +26,7 @@ export default async function NotFound() {
       <div className="empty-state__actions" style={{ marginTop: 'var(--sp-6)' }}>
         <a href={`${base}/`} className="btn btn--primary">{locale === 'ar' ? 'العودة للرئيسية' : 'Back to home'}</a>
         <a href={`${base}/services`} className="btn btn--secondary">{locale === 'ar' ? 'الخدمات' : 'Services'}</a>
-        <a href={`${base}/contact`} className="btn btn--ghost">{locale === 'ar' ? 'تواصل معنا' : 'Contact'}</a>
+        <a href={`${base}/contact`} className="btn btn--text">{locale === 'ar' ? 'تواصل معنا' : 'Contact'}</a>
       </div>
     </div>
   );

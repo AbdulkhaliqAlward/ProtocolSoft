@@ -109,31 +109,39 @@ const main = async () => {
     const mobileClosed = await cdp.eval(`(() => {
       const toggle = document.querySelector('.nav-toggle');
       const nav = document.querySelector('.site-nav');
-      const links = Array.from(nav.querySelectorAll('a'));
+      const header = document.querySelector('.site-header');
+      const cs = getComputedStyle(nav);
       return {
         toggleVisible: getComputedStyle(toggle).display !== 'none',
         toggleAriaExpanded: toggle.getAttribute('aria-expanded'),
         toggleAriaControls: toggle.getAttribute('aria-controls'),
         navId: nav.id,
-        navDisplay: getComputedStyle(nav).display,
-        navOpenClass: nav.classList.contains('site-nav--open'),
-        linkCount: links.length,
-        firstLinkHref: links[0]?.getAttribute('href'),
+        navVisibility: cs.visibility,
+        sheetOpen: header.hasAttribute('data-sheet'),
+        primaryItems: nav.querySelectorAll('.site-nav__list > li > .site-nav__link').length,
+        serviceLinks: nav.querySelectorAll('.mega__item').length,
+        hasCta: !!nav.querySelector('.site-nav__sheet-foot .btn--primary'),
+        hasLang: !!nav.querySelector('.site-nav__sheet-foot .lang-switch'),
       };
     })()`);
     check('AR mobile: toggle visible at 375px, controls the nav via aria-controls', mobileClosed.toggleVisible && mobileClosed.toggleAriaControls === 'primary-nav' && mobileClosed.navId === 'primary-nav', JSON.stringify(mobileClosed));
-    check('AR mobile: drawer hidden by default (display:none, no --open class)', mobileClosed.navDisplay === 'none' && mobileClosed.navOpenClass === false, `display=${mobileClosed.navDisplay}`);
-    check('AR mobile: drawer contains the 3 nav links + language switch (4 anchors)', mobileClosed.linkCount === 4, `links=${mobileClosed.linkCount}`);
-    // Toggle the open class directly to confirm the CSS shows the drawer.
-    await cdp.eval(`document.querySelector('.site-nav').classList.add('site-nav--open')`);
-    const mobileOpen = await cdp.eval(`(() => { const nav = document.querySelector('.site-nav'); return { display: getComputedStyle(nav).display, open: nav.classList.contains('site-nav--open') }; })()`);
-    check('AR mobile: drawer shows (display:flex) when --open class is present', mobileOpen.display === 'flex' && mobileOpen.open, JSON.stringify(mobileOpen));
-    // Navigation away closes the drawer (useEffect on pathname) — verify the
-    // source contract: a link click navigates and the drawer resets.
-    await cdp.eval(`document.querySelector('.site-nav a').click()`);
-    await cdp.waitLoad();
-    const afterNav = await cdp.eval(`document.querySelector('.site-nav').classList.contains('site-nav--open')`);
-    check('AR mobile: drawer closes on navigation (pathname effect)', afterNav === false, `open=${afterNav}`);
+    check('AR mobile: sheet hidden by default (visibility:hidden, aria-expanded=false)', mobileClosed.navVisibility === 'hidden' && !mobileClosed.sheetOpen && mobileClosed.toggleAriaExpanded === 'false', JSON.stringify(mobileClosed));
+    check('AR mobile: sheet holds the 4 primary items, the service links, the CTA and the language switch',
+      mobileClosed.primaryItems === 4 && mobileClosed.serviceLinks >= 3 && mobileClosed.hasCta && mobileClosed.hasLang, JSON.stringify(mobileClosed));
+    // Wait for hydration: the theme toggle gains its aria-label only after mount.
+    for (let i = 0; i < 80; i++) {
+      if (await cdp.eval(`!!document.querySelector('.theme-toggle[aria-label]')`)) break;
+      await sleep(150);
+    }
+    await cdp.eval(`document.querySelector('.nav-toggle').click()`);
+    await sleep(450);
+    const mobileOpen = await cdp.eval(`(() => { const nav = document.querySelector('.site-nav'); return { visibility: getComputedStyle(nav).visibility, expanded: document.querySelector('.nav-toggle').getAttribute('aria-expanded'), locked: document.documentElement.style.overflow === 'hidden', focusInside: nav.contains(document.activeElement) }; })()`);
+    check('AR mobile: toggle opens the sheet (visible, aria-expanded=true, scroll locked, focus moved in)',
+      mobileOpen.visibility === 'visible' && mobileOpen.expanded === 'true' && mobileOpen.locked && mobileOpen.focusInside, JSON.stringify(mobileOpen));
+    await cdp.eval(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+    await sleep(450);
+    const afterEsc = await cdp.eval(`({ expanded: document.querySelector('.nav-toggle').getAttribute('aria-expanded'), focusOnToggle: document.activeElement === document.querySelector('.nav-toggle'), unlocked: document.documentElement.style.overflow !== 'hidden' })`);
+    check('AR mobile: Escape closes the sheet, unlocks scroll and returns focus to the toggle', afterEsc.expanded === 'false' && afterEsc.focusOnToggle && afterEsc.unlocked, JSON.stringify(afterEsc));
     await cdp.send('Emulation.clearDeviceMetricsOverride');
 
     /* ── 6. Form labels and service selection ── (AR) */
