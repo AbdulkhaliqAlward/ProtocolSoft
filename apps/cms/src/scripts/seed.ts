@@ -260,7 +260,7 @@ const seed = async (): Promise<void> => {
         collection: 'services',
         draft: true,
         overrideAccess: true,
-        // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+        // {ar,en} objects need locale 'all' (runtime-supported, untyped for create — hence the cast), otherwise the object is stored as the ar string.
         locale: 'all',
         context: { skipAudit: true },
         data: {
@@ -275,7 +275,7 @@ const seed = async (): Promise<void> => {
           sortOrder: (index + 1) * 10,
           publishedLocales: [],
         } as never,
-      });
+      } as never);
     }
   }
 
@@ -286,7 +286,7 @@ const seed = async (): Promise<void> => {
       collection: 'technical-initiatives',
       draft: true,
       overrideAccess: true,
-      // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+      // {ar,en} objects need locale 'all' (runtime-supported, untyped for create — hence the cast), otherwise the object is stored as the ar string.
       locale: 'all',
       context: { skipAudit: true },
       data: {
@@ -303,7 +303,7 @@ const seed = async (): Promise<void> => {
         featured: false,
         publishedLocales: [],
       } as never,
-    });
+    } as never);
   }
 
   /* Delivery-platform case study — DRAFT, unpublished, placeholders intact (D4/CS1) */
@@ -313,7 +313,7 @@ const seed = async (): Promise<void> => {
       collection: 'case-studies',
       draft: true,
       overrideAccess: true,
-      // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+      // {ar,en} objects need locale 'all' (runtime-supported, untyped for create — hence the cast), otherwise the object is stored as the ar string.
       locale: 'all',
       context: { skipAudit: true },
       data: {
@@ -338,7 +338,7 @@ const seed = async (): Promise<void> => {
         featured: false,
         publishedLocales: [],
       } as never,
-    });
+    } as never);
   }
 
   /* Legal pages — DRAFT TEMPLATES (LD1): require Protocol Soft final review + legal review */
