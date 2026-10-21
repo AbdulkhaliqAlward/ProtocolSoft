@@ -7,6 +7,7 @@
  * passes its gates (case studies hidden at launch; EDR In-Development only).
  */
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
 
@@ -135,8 +136,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <h1 id="hero-title" className="home-hero__title">{headline}</h1>
               {has(sub) && <p className="lead">{sub}</p>}
               <div className="cluster home-hero__actions">
-                <a href={localePath(locale, '/contact')} className="btn btn--inverse btn--lg">{primaryCta}</a>
-                <a href={localePath(locale, '/services')} className="btn btn--outline-inverse btn--lg">{secondaryCta}</a>
+                <Link href={localePath(locale, '/contact')} className="btn btn--inverse btn--lg">{primaryCta}</Link>
+                <Link href={localePath(locale, '/services')} className="btn btn--outline-inverse btn--lg">{secondaryCta}</Link>
               </div>
             </div>
             {services.length > 0 && (
@@ -144,11 +145,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <ol role="list">
                   {services.map((svc, i) => (
                     <li key={svc.slug}>
-                      <a href={localePath(locale, `/services/${svc.slug}`)}>
+                      <Link href={localePath(locale, `/services/${svc.slug}`)}>
                         <span className="clause-no">{clause(i + 1)}</span>
                         <span className="home-hero__svc">{T(svc.title, locale)}</span>
                         <span className="btn__arrow" aria-hidden="true">→</span>
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ol>
@@ -169,14 +170,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <ol className="svc-index" role="list">
             {services.map((svc, i) => (
               <li key={svc.slug}>
-                <a href={localePath(locale, `/services/${svc.slug}`)} className="svc-index__row">
+                <Link href={localePath(locale, `/services/${svc.slug}`)} className="svc-index__row">
                   <span className="svc-index__no">{String(i + 1).padStart(2, '0')}</span>
                   <span className="svc-index__body">
                     <span className="svc-index__title">{T(svc.title, locale)}</span>
                     <span className="svc-index__summary">{T(svc.summary, locale)}</span>
                   </span>
                   <span className="svc-index__go">{ar ? 'النطاق والتفاصيل' : 'Scope & details'} <span className="btn__arrow" aria-hidden="true">→</span></span>
-                </a>
+                </Link>
               </li>
             ))}
           </ol>
@@ -227,9 +228,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
             <div className="rail__body">
               <p className="statement__text">{secure}</p>
-              <a href={localePath(locale, '/services/cybersecurity')} className="btn btn--secondary">
+              <Link href={localePath(locale, '/services/cybersecurity')} className="btn btn--secondary">
                 {ar ? 'خدمات الأمن السيبراني' : 'Cybersecurity services'} <span className="btn__arrow" aria-hidden="true">→</span>
-              </a>
+              </Link>
             </div>
           </div>
         </section>

@@ -5,6 +5,8 @@
  * present via its honest availability state), then a bottom bar with the
  * copyright, language switch and legal links (rendered only once published).
  */
+import Link from 'next/link';
+
 import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
 
 import { LogoMark } from './LogoMark';
@@ -48,10 +50,10 @@ export const SiteFooter = ({
         <div className="site-footer__plate">
           <div className="site-footer__grid">
             <div className="site-footer__brand">
-              <a href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>
+              <Link href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>
                 <LogoMark className="brand__mark" size={44} />
                 <span className="brand__name" lang={locale}>{BRAND.name[locale]}</span>
-              </a>
+              </Link>
               {description && <p>{description}</p>}
             </div>
 
@@ -59,18 +61,18 @@ export const SiteFooter = ({
               <h2 id="footer-services"><Spark size="sm" />{ar ? 'الخدمات' : 'Services'}</h2>
               <ul>
                 {services.map((s) => (
-                  <li key={s.slug}><a href={localePath(locale, `/services/${s.slug}`)}>{T(s.title, locale)}</a></li>
+                  <li key={s.slug}><Link href={localePath(locale, `/services/${s.slug}`)}>{T(s.title, locale)}</Link></li>
                 ))}
-                <li><a href={localePath(locale, '/services')}>{ar ? 'كل الخدمات' : 'All services'}</a></li>
+                <li><Link href={localePath(locale, '/services')}>{ar ? 'كل الخدمات' : 'All services'}</Link></li>
               </ul>
             </nav>
 
             <nav aria-labelledby="footer-company">
               <h2 id="footer-company"><Spark size="sm" />{ar ? 'الشركة' : 'Company'}</h2>
               <ul>
-                <li><a href={localePath(locale, '/')}>{ar ? 'الرئيسية' : 'Home'}</a></li>
-                <li><a href={localePath(locale, '/about')}>{ar ? 'من نحن' : 'About'}</a></li>
-                <li><a href={localePath(locale, '/contact')}>{ar ? 'تواصل معنا' : 'Contact'}</a></li>
+                <li><Link href={localePath(locale, '/')}>{ar ? 'الرئيسية' : 'Home'}</Link></li>
+                <li><Link href={localePath(locale, '/about')}>{ar ? 'من نحن' : 'About'}</Link></li>
+                <li><Link href={localePath(locale, '/contact')}>{ar ? 'تواصل معنا' : 'Contact'}</Link></li>
               </ul>
             </nav>
 
@@ -81,7 +83,7 @@ export const SiteFooter = ({
                 {emailSales && emailSales !== emailMain && <li><a href={`mailto:${emailSales}`} className="bidi">{emailSales}</a></li>}
                 {phone && <li><a href={`tel:${phone}`} className="bidi">{phone}</a></li>}
                 {contact && <li><WhatsAppCta whatsapp={contact.channels.whatsapp} locale={locale} /></li>}
-                <li><a href={localePath(locale, '/contact')}>{ar ? 'نموذج التواصل' : 'Contact form'}</a></li>
+                <li><Link href={localePath(locale, '/contact')}>{ar ? 'نموذج التواصل' : 'Contact form'}</Link></li>
               </ul>
             </div>
           </div>
@@ -89,8 +91,8 @@ export const SiteFooter = ({
           <div className="site-footer__bottom">
             <span>{copyright}</span>
             <span className="site-footer__meta">
-              {privacyPublished && <a href={localePath(locale, '/privacy')}>{ar ? 'سياسة الخصوصية' : 'Privacy Policy'}</a>}
-              {termsPublished && <a href={localePath(locale, '/terms')}>{ar ? 'شروط الاستخدام' : 'Terms of Use'}</a>}
+              {privacyPublished && <Link href={localePath(locale, '/privacy')}>{ar ? 'سياسة الخصوصية' : 'Privacy Policy'}</Link>}
+              {termsPublished && <Link href={localePath(locale, '/terms')}>{ar ? 'شروط الاستخدام' : 'Terms of Use'}</Link>}
               <a href={switchHref(locale, '/')} className="footer-lang" lang={ar ? 'en' : 'ar'} hrefLang={ar ? 'en' : 'ar'}>
                 {ar ? 'English' : 'العربية'}
               </a>

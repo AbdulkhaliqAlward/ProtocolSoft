@@ -3,6 +3,7 @@
  *  locales (unknown locale path → Arabic default). */
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 import type { Locale } from '@protocol-soft/shared';
 
@@ -35,7 +36,7 @@ export default async function NotFound() {
             <ul className="lost__links" role="list">
               {links.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href}><span>{l.label}</span><Spark size="sm" /></a>
+                  <Link href={l.href}><span>{l.label}</span><Spark size="sm" /></Link>
                 </li>
               ))}
             </ul>

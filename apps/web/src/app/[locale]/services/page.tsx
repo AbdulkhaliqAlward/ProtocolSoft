@@ -3,6 +3,7 @@
  *  contact form), then help choosing and one closing action. Unpublished
  *  services are omitted upstream by the API — never stubbed. */
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import type { Locale, PublicContactConfig, PublicServiceSummary } from '@protocol-soft/shared';
 
@@ -95,10 +96,10 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                     <h2 id={`${s.slug}-title`}>{T(s.title, locale)}</h2>
                     <p>{d?.heroHeadline || T(s.summary, locale)}</p>
                     <div className="cluster">
-                      <a href={href} className="btn btn--primary">{ar ? 'النطاق والتفاصيل' : 'Scope and details'}</a>
-                      <a href={`${localePath(locale, '/contact')}?service=${s.slug}`} className="btn btn--text">
+                      <Link href={href} className="btn btn--primary">{ar ? 'النطاق والتفاصيل' : 'Scope and details'}</Link>
+                      <Link href={`${localePath(locale, '/contact')}?service=${s.slug}`} className="btn btn--text">
                         {ar ? 'اطلب هذه الخدمة' : 'Request this service'} <span className="btn__arrow" aria-hidden="true">→</span>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                   {d && d.deliverables.length > 0 && (

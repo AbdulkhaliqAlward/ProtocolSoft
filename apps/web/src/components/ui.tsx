@@ -1,5 +1,7 @@
 /** Closing band shared by every page: one heading, an optional line, one
  *  primary action. Direct channels render only when real values exist (§6.9). */
+import Link from 'next/link';
+
 import type { Locale } from '@protocol-soft/shared';
 
 import { localePath } from './siteChrome';
@@ -32,7 +34,7 @@ export const CtaBand = ({
           {body && <p>{body}</p>}
         </div>
         <div className="cta-band__actions">
-          <a href={href ?? localePath(locale, '/contact')} className="btn btn--primary btn--lg">{ctaLabel}</a>
+          <Link href={href ?? localePath(locale, '/contact')} className="btn btn--primary btn--lg">{ctaLabel}</Link>
           {email && (
             <a href={`mailto:${email}`} className="btn btn--text bidi">{email}</a>
           )}

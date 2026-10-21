@@ -5,6 +5,7 @@
  * render CMS content and show a NEEDS CONFIRMATION tag on flagged lines.
  */
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 
 import type { Locale } from '@protocol-soft/shared';
 
@@ -91,7 +92,7 @@ export const Breadcrumbs = ({ items }: { items: Array<{ label: string; href?: st
     <ol className="breadcrumbs">
       {items.map((it, i) => (
         <li key={`${it.label}-${i}`}>
-          {it.href ? <a href={it.href}>{it.label}</a> : <span aria-current="page">{it.label}</span>}
+          {it.href ? <Link href={it.href}>{it.label}</Link> : <span aria-current="page">{it.label}</span>}
           {i < items.length - 1 && <span className="breadcrumbs__sep" aria-hidden="true">/</span>}
         </li>
       ))}

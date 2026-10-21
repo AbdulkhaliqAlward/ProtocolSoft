@@ -154,28 +154,26 @@ const main = async () => {
     /* Without reduced motion the entrance is JS-gated and reveals on intersection */
     await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
     await cdp.goto(`${WEB}/services`);
-    const mot = await cdp.eval(`(() => {
-      const reveal = document.querySelector('[data-reveal]');
-      return {
-        htmlHasJs: document.documentElement.classList.contains('js'),
-        initialOpacity: getComputedStyle(reveal).opacity,
-        isVisibleClass: reveal.classList.contains('is-visible'),
-      };
-    })()`);
+    // Sections stay visible; their children are the hidden-then-revealed parts.
+    // Use the LAST reveal section (below the fold) and its first animated child.
+    const LAST = `[...document.querySelectorAll('[data-reveal]')].pop()`;
+    const CHILD = `(${LAST}.querySelector('.rail__head > *, .svc-panel__head > *, .cta-band__inner > *'))`;
+    const mot = await cdp.eval(`(() => ({
+      htmlHasJs: document.documentElement.classList.contains('js'),
+      initialOpacity: getComputedStyle(${CHILD}).opacity,
+      sectionOpacity: getComputedStyle(${LAST}).opacity,
+    }))()`);
     check('JS present: entrance effect armed (html.js)', mot.htmlHasJs === true);
-    // The services page renders only ONE [data-reveal] group (the services list)
-    // and it sits below the fold until scroll. The first paint must hide it (the
-    // whole point of JS-gated entrance); scrolling into view must reveal it.
-    check('entrance hides content pre-scroll (opacity < 1)', Number(mot.initialOpacity) < 1, `opacity=${mot.initialOpacity}`);
-    // Scroll the reveal into view and confirm the observer adds .is-visible.
-    await cdp.eval(`document.querySelector('[data-reveal]').scrollIntoView({ block: 'center' })`);
+    check('entrance hides below-the-fold content pre-scroll (child opacity 0, section itself visible)',
+      Number(mot.initialOpacity) < 1 && Number(mot.sectionOpacity) === 1, JSON.stringify(mot));
+    await cdp.eval(`${LAST}.scrollIntoView({ block: 'center' })`);
     for (let i = 0; i < 20; i++) {
-      const v = await cdp.eval(`document.querySelector('[data-reveal]').classList.contains('is-visible')`);
-      if (v) break;
+      if (await cdp.eval(`${LAST}.classList.contains('is-visible')`)) break;
       await sleep(150);
     }
-    const revealed = await cdp.eval(`document.querySelector('[data-reveal]').classList.contains('is-visible')`);
-    check('entrance reveals once via observer (section in view gets .is-visible)', revealed === true, `visible=${revealed}`);
+    await sleep(900);
+    const revealed = await cdp.eval(`({ cls: ${LAST}.classList.contains('is-visible'), opacity: getComputedStyle(${CHILD}).opacity })`);
+    check('entrance reveals once via observer (section in view gets .is-visible, content opacity 1)', revealed.cls === true && Number(revealed.opacity) === 1, JSON.stringify(revealed));
 
     await cdp.close();
   } catch (e) {

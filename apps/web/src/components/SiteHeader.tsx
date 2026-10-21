@@ -15,6 +15,7 @@
  */
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 import type { Locale, PublicServiceSummary } from '@protocol-soft/shared';
 
@@ -152,10 +153,10 @@ export const SiteHeader = ({
   return (
     <header ref={headerRef} className="site-header" data-compact={compact || undefined} data-sheet={sheetOpen || undefined}>
       <div className="container site-header__inner">
-        <a href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>
+        <Link href={localePath(locale, '/')} className="brand" aria-label={ar ? `${BRAND.name.ar} — الصفحة الرئيسية` : `${BRAND.name.en} — home`}>
           <LogoMark className="brand__mark" size={44} />
           <span className="brand__name" lang={locale}>{BRAND.name[locale]}</span>
-        </a>
+        </Link>
 
         <nav id="primary-nav" ref={navRef} className="site-nav" aria-label={ar ? 'التنقل الرئيسي' : 'Primary'}>
           <ul className="site-nav__list" role="list">
@@ -180,37 +181,37 @@ export const SiteHeader = ({
                         const href = localePath(locale, `/services/${s.slug}`);
                         return (
                           <li key={s.slug}>
-                            <a href={href} className="mega__item" aria-current={current === `/services/${s.slug}` ? 'page' : undefined}>
+                            <Link href={href} className="mega__item" aria-current={current === `/services/${s.slug}` ? 'page' : undefined}>
                               <span className="clause-no">§ {String(i + 1).padStart(2, '0')} <Spark size="sm" /></span>
                               <span className="mega__title">{T(s.title, locale)}</span>
                               {T(s.summary, locale) && <span className="mega__summary">{T(s.summary, locale)}</span>}
-                            </a>
+                            </Link>
                           </li>
                         );
                       })}
                       <li className="mega__all-row">
-                        <a href={localePath(locale, '/services')} className="mega__all" aria-current={current === '/services' ? 'page' : undefined}>
+                        <Link href={localePath(locale, '/services')} className="mega__all" aria-current={current === '/services' ? 'page' : undefined}>
                           {ar ? 'كل الخدمات' : 'All services'} <span className="btn__arrow" aria-hidden="true">→</span>
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                     <div className="mega__side">
                       <p>{ar ? 'لست متأكداً أي خدمة تناسبك؟ صف لنا التحدي، ونقترح نقطة البداية المناسبة.' : 'Not sure which service fits? Describe the challenge and we will suggest where to start.'}</p>
-                      <a href={localePath(locale, '/contact')} className="btn btn--inverse btn--sm">{ar ? 'تحدث معنا' : 'Talk to us'}</a>
+                      <Link href={localePath(locale, '/contact')} className="btn btn--inverse btn--sm">{ar ? 'تحدث معنا' : 'Talk to us'}</Link>
                     </div>
                   </div>
                 </li>
               ) : (
                 <li key={item.key}>
-                  <a href={localePath(locale, item.path)} className="site-nav__link" aria-current={isActive(item.path) ? 'page' : undefined}>
+                  <Link href={localePath(locale, item.path)} className="site-nav__link" aria-current={isActive(item.path) ? 'page' : undefined}>
                     {item.label[locale]}
-                  </a>
+                  </Link>
                 </li>
               ),
             )}
           </ul>
           <div className="site-nav__sheet-foot">
-            <a href={localePath(locale, '/contact')} className="btn btn--primary btn--lg btn--block">{ctaLabel}</a>
+            <Link href={localePath(locale, '/contact')} className="btn btn--primary btn--lg btn--block">{ctaLabel}</Link>
             <div className="utils" role="group" aria-label={ar ? 'اللغة والمظهر' : 'Language and theme'}>
               {lang}
               <span className="utils__sep" aria-hidden="true" />
@@ -225,7 +226,7 @@ export const SiteHeader = ({
             <span className="utils__sep" aria-hidden="true" />
             <ThemeToggle locale={locale} />
           </div>
-          <a href={localePath(locale, '/contact')} className="btn btn--primary btn--sm site-header__cta">{ctaLabel}</a>
+          <Link href={localePath(locale, '/contact')} className="btn btn--primary btn--sm site-header__cta">{ctaLabel}</Link>
           <button
             type="button"
             ref={toggleRef}

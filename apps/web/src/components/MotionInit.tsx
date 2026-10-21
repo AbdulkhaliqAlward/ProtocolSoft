@@ -9,8 +9,11 @@
  * Renders nothing.
  */
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export const MotionInit = () => {
+  // Re-scan on every client navigation: the new page brings new sections.
+  const pathname = usePathname();
   useEffect(() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
     if (els.length === 0) return;
@@ -59,6 +62,6 @@ export const MotionInit = () => {
       window.cancelAnimationFrame(frame);
       io.disconnect();
     };
-  }, []);
+  }, [pathname]);
   return null;
 };

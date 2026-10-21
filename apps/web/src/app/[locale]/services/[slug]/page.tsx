@@ -9,6 +9,7 @@
  */
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 
 import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary } from '@protocol-soft/shared';
 
@@ -127,7 +128,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
               <h1 id="svc-title">{svc.heroHeadline || svc.title}</h1>
               {svc.heroSubhead && <p className="lead">{svc.heroSubhead}</p>}
               <div className="cluster svc-hero__actions">
-                <a href={contactHref} className="btn btn--inverse btn--lg">{ctaLabel}</a>
+                <Link href={contactHref} className="btn btn--inverse btn--lg">{ctaLabel}</Link>
                 {(svc.deliverables.length > 0 || excluded.length > 0) && (
                   <a href="#scope" className="btn btn--outline-inverse btn--lg">{ar ? 'ما الذي يشمله؟' : "What's included?"}</a>
                 )}
@@ -205,10 +206,10 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
           <ul className="related" role="list">
             {others.map((o) => (
               <li key={o.slug}>
-                <a href={localePath(locale, `/services/${o.slug}`)}>
+                <Link href={localePath(locale, `/services/${o.slug}`)}>
                   <strong>{T(o.title, locale)}</strong>
                   <span>{T(o.summary, locale)}</span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
