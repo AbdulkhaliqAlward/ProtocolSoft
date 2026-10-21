@@ -112,10 +112,10 @@ const main = async () => {
   check('contact: honeypot hidden field', contact.body.includes('cf-website') && contact.body.includes('field--hp'));
   const contactEn = await get('/en/contact');
   check('EN contact: English guidance present', contactEn.body.includes('do not submit passwords'));
-  const preselected = await get('/contact?service=custom-software');
-  check('contact ?service= preselects the matching tile', /<input[^>]*name="serviceInterest"[^>]*checked=""[^>]*value="custom_software"/.test(preselected.body.replace(/\n/g, ' ')));
+  // ?service= is applied in the browser (the page stays static and cached);
+  // the browser suite (verify-rtl-ltr) checks the preselection itself.
   const preBad = await get('/contact?service=edr');
-  check('contact ?service=edr falls back to General (no EDR)', !/value="edr"/.test(preBad.body));
+  check('contact ?service=edr: no EDR option exists', preBad.status === 200 && !/value="edr"/.test(preBad.body));
 
   /* ── 8. Published-only behavior (D-2/LD1/D-4) ── */
   const privacy = await get('/privacy');
@@ -127,10 +127,16 @@ const main = async () => {
   check('footer has NO legal links while draft', !ar.body.includes('href="/privacy"') && !en.body.includes('href="/en/privacy"'));
 
   /* ── 9. 404 page + locale fallback ── */
+  // Next 16 renders notFound() content in the browser, so the server response
+  // is checked for status + noindex; verify-rtl-ltr checks the rendered page.
   const nf = await get('/xyz-not-a-page');
-  check('unknown URL -> 404 with 404 page', nf.status === 404 && nf.body.includes('الصفحة غير موجودة'));
+  check('unknown URL -> 404 + noindex', nf.status === 404 && /<meta name="robots" content="noindex/.test(nf.body), `got ${nf.status}`);
   const nfEn = await get('/en/xyz-not-a-page');
-  check('unknown EN URL -> 404 (EN copy)', nfEn.status === 404 && nfEn.body.includes('Page not found'));
+  check('unknown EN URL -> 404 + noindex', nfEn.status === 404 && /<meta name="robots" content="noindex/.test(nfEn.body), `got ${nfEn.status}`);
+  const deep = await get('/services/not-a-service/extra');
+  check('deep unknown path -> 404', deep.status === 404, `got ${deep.status}`);
+  const arPrefix = await fetch(`${WEB}/ar/services`, { redirect: 'manual' });
+  check('/ar/... redirects to the clean Arabic URL (308)', arPrefix.status === 308 && (arPrefix.headers.get('location') ?? '').endsWith('/services'), `got ${arPrefix.status} ${arPrefix.headers.get('location')}`);
 
   /* ── 10. SEO metadata: canonical + hreflang alternates (React emits hrefLang) ── */
   // Absolute since metadataBase is set (origin = NEXT_PUBLIC_SITE_URL); the bare root has no trailing slash.

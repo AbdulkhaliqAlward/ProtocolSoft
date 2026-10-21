@@ -1,81 +1,47 @@
 /*
  * Motion — "acknowledgement sequence". Things arrive one after another, like a
  * protocol handshake: a line draws, a number lights up, the content settles.
- * Soft easing, short distances, no bounce. CSS only (0 KB of JS libraries);
- * MotionInit adds .is-visible to [data-reveal] sections as they enter.
+ * Soft easing, short distances, no bounce. CSS only (0 KB of JS libraries).
  *
- * Rules: the hero headline never animates (it is the LCP element); hidden
- * states apply only under html.js AND prefers-reduced-motion: no-preference,
- * so content is visible without JS and never hidden for reduced-motion users.
+ * MotionInit arms below-the-fold [data-reveal] sections by marking their parts
+ * with `.rv` (+ --rv-i stagger index, --rv-base delay, data-rv variant), and
+ * adds .is-visible as each section enters. Selectors here stay single-class on
+ * the right-hand side so style matching stays cheap.
+ *
+ * Rules: the hero headline never animates (it is the LCP element); nothing is
+ * hidden without JS; with reduced motion nothing is hidden or moved at all.
  */
-:root { --rv-step: 70ms; --rv-rise: 14px; --rv-start: -16px; }
-[dir="rtl"] { --rv-start: 16px; }
-
-@keyframes rv-rise { from { opacity: 0; transform: translateY(var(--rv-rise)); } to { opacity: 1; transform: none; } }
-@keyframes rv-from-start { from { opacity: 0; transform: translateX(var(--rv-start)); } to { opacity: 1; transform: none; } }
-@keyframes rv-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes rv-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes rv-ack { 0% { opacity: 0; transform: scale(.82); } 60% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: none; } }
-@keyframes rv-blink { 0%, 49% { opacity: .15; } 50%, 100% { opacity: 1; } }
-
-/* Everything below runs only when motion is welcome: with reduced motion
-   there are no hidden states at all, so nothing waits on JavaScript. */
 @media (prefers-reduced-motion: no-preference) {
-  /* Stagger index for list children (first 10). */
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(1) { --rv-i: 0; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(2) { --rv-i: 1; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(3) { --rv-i: 2; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(4) { --rv-i: 3; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(5) { --rv-i: 4; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(6) { --rv-i: 5; }
-  :is(.svc-index, .steps-line, .commitments, .scope, .exchange, .caps, .faq, .related, .principles, .svc-panel__list, .home-hero__index ol, .facts, .next-steps, .caps__list) > :nth-child(n+7) { --rv-i: 6; }
+  :root { --rv-step: 70ms; --rv-rise: 14px; --rv-start: -16px; }
+  [dir="rtl"] { --rv-start: 16px; }
 
-  /* ── Section entrances (scroll) ──────────────────────────────────────── */
-  /* Hidden until the section is acknowledged. */
-  .js [data-reveal]:not(.is-visible) :is(
-    .rail__head > *, .rail__body > :not(ol):not(ul):not(.scope):not(.caps):not(.faq):not(.exchange),
-    .svc-index > li, .steps-line > li, .commitments > li, .scope > *, .exchange > li, .caps > *, .faq > *,
-    .related > li, .principles > li, .svc-panel__head > *, .svc-panel__list > li, .cta-band__inner > *
-  ) { opacity: 0; }
+  @keyframes rv-rise { from { opacity: 0; transform: translateY(var(--rv-rise)); } to { opacity: 1; transform: none; } }
+  @keyframes rv-from-start { from { opacity: 0; transform: translateX(var(--rv-start)); } to { opacity: 1; transform: none; } }
+  @keyframes rv-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rv-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes rv-ack { 0% { opacity: 0; transform: scale(.82); } 60% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: none; } }
+  @keyframes rv-blink { 0%, 49% { opacity: .15; } 50%, 100% { opacity: 1; } }
 
-  /* Rail head: clause number, heading, lead arrive in order. */
-  .js [data-reveal].is-visible .rail__head > * { animation: rv-rise var(--dur-4) var(--ease-out) both; }
-  .js [data-reveal].is-visible .rail__head > :nth-child(2) { animation-delay: 60ms; }
-  .js [data-reveal].is-visible .rail__head > :nth-child(3) { animation-delay: 120ms; }
-  .js [data-reveal].is-visible .rail__head > .clause-no { animation-name: rv-from-start; }
+  /* ── Section entrances (armed by MotionInit) ───────────────────────── */
+  .rv { --rv-delay: calc(var(--rv-base, 0ms) + var(--rv-i, 0) * var(--rv-step)); }
+  [data-armed]:not(.is-visible) .rv { opacity: 0; }
+  [data-armed].is-visible .rv { animation: rv-rise var(--dur-4) var(--ease-out) var(--rv-delay) both; }
+  [data-armed].is-visible .rv[data-rv="start"] { animation-name: rv-from-start; }
+  [data-armed].is-visible .rv[data-rv="fade"] { animation-name: rv-fade; animation-duration: var(--dur-3); }
 
-  /* Content field follows the head. */
-  .js [data-reveal].is-visible .rail__body > :not(ol):not(ul):not(.scope):not(.caps):not(.faq):not(.exchange) { animation: rv-rise var(--dur-4) var(--ease-out) 140ms both; }
-
-  /* Lists: each item acknowledged in turn. */
-  .js [data-reveal].is-visible :is(.svc-index, .commitments, .scope, .caps, .faq, .related, .principles) > * {
-    animation: rv-rise var(--dur-4) var(--ease-out) both;
-    animation-delay: calc(160ms + var(--rv-i, 0) * var(--rv-step));
-  }
-  /* Process rows come in from the reading start (right in Arabic). */
-  .js [data-reveal].is-visible .exchange > li {
-    animation: rv-from-start var(--dur-4) var(--ease-out) both;
-    animation-delay: calc(160ms + var(--rv-i, 0) * var(--rv-step));
-  }
   /* Step line: the rail draws across, then each number lights up. */
-  .js [data-reveal].is-visible .steps-line > li { animation: rv-fade var(--dur-3) var(--ease-out) both; animation-delay: calc(260ms + var(--rv-i, 0) * 110ms); }
-  .js [data-reveal].is-visible .steps-line > li::before { transform-origin: left center; animation: rv-draw var(--dur-4) var(--ease-out) both; animation-delay: calc(160ms + var(--rv-i, 0) * 110ms); }
+  [data-armed]:not(.is-visible) .steps-line__no { opacity: 0; }
+  [data-armed].is-visible .steps-line__no { animation: rv-ack var(--dur-3) var(--ease-out) calc(320ms + var(--rv-i, 0) * 110ms) both; }
+  .steps-line > li::before { transform-origin: left center; }
   [dir="rtl"] .steps-line > li::before { transform-origin: right center; }
-  .js [data-reveal].is-visible .steps-line__no { animation: rv-ack var(--dur-3) var(--ease-out) both; animation-delay: calc(320ms + var(--rv-i, 0) * 110ms); }
-
-  /* Services overview panels: head, then its deliverables in turn. */
-  .js [data-reveal].is-visible .svc-panel__head > * { animation: rv-rise var(--dur-4) var(--ease-out) both; }
-  .js [data-reveal].is-visible .svc-panel__list > li { animation: rv-from-start var(--dur-4) var(--ease-out) both; animation-delay: calc(180ms + var(--rv-i, 0) * var(--rv-step)); }
-
-  /* Closing band. */
-  .js [data-reveal].is-visible .cta-band__inner > * { animation: rv-rise var(--dur-4) var(--ease-out) both; }
-  .js [data-reveal].is-visible .cta-band__inner > :nth-child(2) { animation-delay: 120ms; }
+  [data-armed]:not(.is-visible) .steps-line > li::before { transform: scaleX(0); }
+  [data-armed].is-visible .steps-line > li::before { animation: rv-draw var(--dur-4) var(--ease-out) calc(160ms + var(--rv-i, 0) * 110ms) both; }
 
   /* FAQ answers ease open. */
-  .faq details[open] > :not(summary) { animation: rv-rise var(--dur-3) var(--ease-out) both; --rv-rise: -4px; }
+  .faq details[open] > p { animation: rv-rise var(--dur-3) var(--ease-out) both; --rv-rise: -4px; }
 
-  /* ── Signature moment: the hero acknowledges the three services ──────── */
-  /* The headline (LCP) stays still; everything around it arrives in sequence. */
+  /* ── Signature moment: the hero acknowledges the three services ────── */
+  /* The headline (LCP) stays still; everything around it arrives in turn. */
   .js .home-hero__plate .eyebrow { animation: rv-from-start var(--dur-4) var(--ease-out) 80ms both; }
   .js .home-hero__plate .lead { animation: rv-rise var(--dur-4) var(--ease-out) 180ms both; }
   .js .home-hero__actions { animation: rv-rise var(--dur-4) var(--ease-out) 280ms both; }
@@ -83,38 +49,42 @@
   .js .home-hero__index li { position: relative; border-bottom-color: transparent; }
   .js .home-hero__index li::after {
     content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: var(--plate-line);
-    transform-origin: left center; animation: rv-draw 520ms var(--ease-out) both; animation-delay: calc(420ms + var(--rv-i, 0) * 140ms);
+    transform-origin: left center; animation: rv-draw 520ms var(--ease-out) var(--hero-d, 420ms) both;
   }
   [dir="rtl"] .home-hero__index li::after { transform-origin: right center; }
-  .js .home-hero__index li > a { animation: rv-from-start var(--dur-4) var(--ease-out) both; animation-delay: calc(480ms + var(--rv-i, 0) * 140ms); }
-  .js .home-hero__index .clause-no { animation: rv-blink 360ms steps(1) both; animation-delay: calc(560ms + var(--rv-i, 0) * 140ms); }
-  .js .home-hero__sparks .spark i { animation: rv-blink 900ms steps(1) both; }
-  .js .home-hero__sparks .spark i:nth-child(1) { animation-delay: 700ms; }
-  .js .home-hero__sparks .spark i:nth-child(3) { animation-delay: 820ms; }
-  .js .home-hero__sparks .spark i:nth-child(4) { animation-delay: 940ms; }
-  .js .home-hero__sparks .spark i:nth-child(2) { animation-delay: 1060ms; }
+  .js .home-hero__link { animation: rv-from-start var(--dur-4) var(--ease-out) calc(var(--hero-d, 420ms) + 60ms) both; }
+  .js .home-hero__num { animation: rv-blink 360ms steps(1) calc(var(--hero-d, 420ms) + 140ms) both; }
+  .home-hero__index li:nth-child(2) { --hero-d: 560ms; }
+  .home-hero__index li:nth-child(3) { --hero-d: 700ms; }
+  .js .home-hero__sparks i { animation: rv-blink 900ms steps(1) both; }
+  .js .home-hero__sparks i:nth-child(1) { animation-delay: 700ms; }
+  .js .home-hero__sparks i:nth-child(3) { animation-delay: 820ms; }
+  .js .home-hero__sparks i:nth-child(4) { animation-delay: 940ms; }
+  .js .home-hero__sparks i:nth-child(2) { animation-delay: 1060ms; }
 
   /* Service hero: the engagement facts are acknowledged row by row. */
-  .js .svc-hero__main > :not(h1) { animation: rv-rise var(--dur-4) var(--ease-out) both; }
-  .js .svc-hero__main > .lead { animation-delay: 120ms; }
-  .js .svc-hero__main > .svc-hero__actions { animation-delay: 220ms; }
-  .js .svc-hero .facts > div { animation: rv-from-start var(--dur-4) var(--ease-out) both; animation-delay: calc(260ms + var(--rv-i, 0) * 110ms); }
+  .js .svc-hero__lead { animation: rv-rise var(--dur-4) var(--ease-out) 120ms both; }
+  .js .svc-hero__actions { animation: rv-rise var(--dur-4) var(--ease-out) 220ms both; }
+  .js .svc-hero__fact { animation: rv-from-start var(--dur-4) var(--ease-out) var(--fact-d, 260ms) both; }
+  .svc-hero__fact:nth-child(2) { --fact-d: 370ms; }
+  .svc-hero__fact:nth-child(3) { --fact-d: 480ms; }
+  .svc-hero__fact:nth-child(n+4) { --fact-d: 590ms; }
 
-  /* ── Hover: small, purposeful ────────────────────────────────────────── */
+  /* ── Hover: small, purposeful ──────────────────────────────────────── */
   @media (hover: hover) {
-    .svc-index__no, .related strong { transition: color var(--dur-2) var(--ease-out); }
+    .svc-index__no { transition: color var(--dur-2) var(--ease-out); }
     .svc-index__row:hover .svc-index__no { color: var(--text); }
     .related a { transition: border-color var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-out); }
     .related a:hover { transform: translateY(-2px); }
-    .commitments li .spark, .caps__list .spark { transition: transform var(--dur-3) var(--ease-out); }
+    .commitments .spark { transition: transform var(--dur-3) var(--ease-out); }
     .commitments li:hover .spark { transform: rotate(45deg); }
   }
 
-  /* ── Route transition (client navigations only; see [locale]/template.tsx) */
+  /* ── Route transition (client navigations only; [locale]/template.tsx) ── */
   @keyframes route-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   .route[data-enter] { animation: route-in 280ms var(--ease-out) both; }
 }
 
-/* Print and the MotionInit fail-safe show everything. */
-.js.reveal-done [data-reveal] * { animation: none !important; opacity: 1 !important; }
-@media print { * { animation: none !important; opacity: 1 !important; } }
+/* Print and the beforeprint fail-safe show everything. */
+.reveal-done .rv { animation: none !important; opacity: 1 !important; }
+@media print { .rv, .steps-line__no { animation: none !important; opacity: 1 !important; } }

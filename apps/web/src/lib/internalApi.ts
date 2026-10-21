@@ -28,6 +28,35 @@ export class InternalApiError extends Error {
   }
 }
 
+/** Safety net if a publish webhook is ever missed; publishes expire tags at once. */
+const CONTENT_REVALIDATE_SECONDS = 3600;
+
+/** Cache tags per content endpoint, matching the tags the CMS sends on publish
+ *  (utilities/revalidate.ts in the cms app: collection or global slug, plus
+ *  "slug:doc-slug" for single documents). */
+const tagsFor = (path: string, params?: Record<string, string>): string[] => {
+  const endpoint = path.replace(/^\/api\/internal\/content\//, '');
+  const byEndpoint: Record<string, string[]> = {
+    'site-settings': ['site-settings'],
+    'contact-config': ['site-settings', 'form-settings'],
+    'social-links': ['social-links'],
+    navigation: ['navigation'],
+    theme: ['theme'],
+    services: ['services'],
+    'case-studies': ['case-studies'],
+    initiatives: ['technical-initiatives'],
+    team: ['team-members'],
+    pages: ['pages'],
+    redirects: ['redirects'],
+    seo: ['seo-settings'],
+    homepage: ['homepage', 'technical-initiatives', 'case-studies'],
+  };
+  const tags = ['cms', ...(byEndpoint[endpoint] ?? [])];
+  const base = byEndpoint[endpoint]?.[0];
+  if (base && params?.slug) tags.push(`${base}:${params.slug}`);
+  return tags;
+};
+
 const request = async (
   group: 'content' | 'leads',
   path: string,
@@ -50,7 +79,11 @@ const request = async (
       ...(init?.headers ?? {}),
     },
     signal: AbortSignal.timeout(10_000),
-    cache: 'no-store', // ISR/tag-based caching is layered in Phase 6; foundation reads fresh
+    // Lead submissions are never cached; published content is cached per tag
+    // and expired by the CMS publish webhook (/api/web-internal/revalidate).
+    ...(group === 'leads'
+      ? { cache: 'no-store' as const }
+      : { next: { tags: tagsFor(path, init?.params), revalidate: CONTENT_REVALIDATE_SECONDS } }),
   });
   if (!res.ok) throw new InternalApiError(res.status, `internal API ${res.status} for ${path}`);
   return res.json();
@@ -67,6 +100,21 @@ const _getContent = async <T>(path: string, locale: string, params?: Record<stri
 };
 
 export const getContent = cache(_getContent) as typeof _getContent;
+
+/**
+ * Optional content: resolves to the fallback ONLY when the CMS says the content
+ * is not published (404). Any other failure (CMS down, timeout, 5xx) throws, so
+ * a cached page is never replaced by an empty one — Next keeps serving the last
+ * good version and retries on the next request.
+ */
+export const getOptional = async <T, F = null>(path: string, locale: string, params?: Record<string, string>, fallback?: F): Promise<T | F> => {
+  try {
+    return await getContent<T>(path, locale, params);
+  } catch (e) {
+    if (e instanceof InternalApiError && e.status === 404) return (fallback ?? null) as F;
+    throw e;
+  }
+};
 
 export const postLead = async (body: unknown): Promise<{ referenceCode: string }> =>
   (await request('leads', '/api/internal/leads', { method: 'POST', body: JSON.stringify(body) })) as { referenceCode: string };

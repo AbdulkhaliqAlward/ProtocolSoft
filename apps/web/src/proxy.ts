@@ -1,8 +1,9 @@
 /**
- * Proxy (Next 16 name for middleware). Locale routing (Phase 1 §7): Arabic is the default at `/` (no prefix); the
- * complete English site lives under /en. Non-/en paths are internally rewritten
- * to /ar/... so URLs stay clean. Injects x-locale for the root layout.
- * /preview, /api, and assets bypass (preview defaults to LTR chrome).
+ * Proxy (Next 16 name for middleware). Locale routing (Phase 1 §7): Arabic is
+ * the default at `/` (no prefix); the complete English site lives under /en.
+ * Other paths are rewritten internally to /ar/... so Arabic URLs stay clean,
+ * and the [locale] root layout sets lang/dir from the segment.
+ * /preview, /api, and static files bypass.
  */
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -30,26 +31,19 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const locale = pathname === '/en' || pathname.startsWith('/en/') ? 'en' : 'ar';
-
-  if (locale === 'en') {
-    const headers = new Headers(request.headers);
-    headers.set('x-locale', 'en');
-    return NextResponse.next({ request: { headers } });
+  // English lives under /en. Arabic lives under /ar internally only: a request
+  // that arrives at /ar/... is redirected to the clean URL (one URL per page).
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    return NextResponse.next();
   }
-
   if (pathname === '/ar' || pathname.startsWith('/ar/')) {
-    const headers = new Headers(request.headers);
-    headers.set('x-locale', 'ar');
-    return NextResponse.next({ request: { headers } });
+    const clean = request.nextUrl.clone();
+    clean.pathname = pathname.slice(3) || '/';
+    return NextResponse.redirect(clean, 308);
   }
-
-  // Rewrite default locale (ar) internally: URL stays prefix-free.
   const url = request.nextUrl.clone();
   url.pathname = `/ar${pathname === '/' ? '' : pathname}`;
-  const headers = new Headers(request.headers);
-  headers.set('x-locale', 'ar');
-  return NextResponse.rewrite(url, { request: { headers } });
+  return NextResponse.rewrite(url);
 }
 
 export const config = {

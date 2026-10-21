@@ -1,22 +1,17 @@
-/** 404: a purple plate with a plain apology and the places people usually
- *  want, as a list rather than a row of buttons. Serves unknown URLs in both
- *  locales (unknown locale path → Arabic default). */
-import type { Metadata } from 'next';
-import { headers } from 'next/headers';
+'use client';
+
+/** 404 content (shared by [locale]/not-found and the global 404): a purple
+ *  plate with a plain apology and the places people usually want. Not-found
+ *  routes receive no params, so the path decides the language. */
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import type { Locale } from '@protocol-soft/shared';
+import { Spark } from './Spark';
 
-import { Spark } from '@/components/Spark';
+export const isEnglishPath = (pathname: string): boolean => pathname === '/en' || pathname.startsWith('/en/');
 
-export const metadata: Metadata = {
-  title: '404',
-  robots: { index: false, follow: false },
-};
-
-export default async function NotFound() {
-  const locale: Locale = (await headers()).get('x-locale') === 'en' ? 'en' : 'ar';
-  const ar = locale === 'ar';
+export const LostPanel = () => {
+  const ar = !isEnglishPath(usePathname() ?? '/');
   const base = ar ? '' : '/en';
   const links = [
     { href: `${base}/`, label: ar ? 'الصفحة الرئيسية' : 'Home page' },
@@ -45,4 +40,4 @@ export default async function NotFound() {
       </div>
     </section>
   );
-}
+};

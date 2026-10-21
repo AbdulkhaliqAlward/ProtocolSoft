@@ -11,7 +11,7 @@ import { PageHero, Section, clause } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { Spark } from '@/components/Spark';
 import { CtaBand } from '@/components/ui';
-import { getContent } from '@/lib/internalApi';
+import { getOptional } from '@/lib/internalApi';
 import { pageMetadata } from '@/lib/pageMeta';
 
 interface ServiceDetail {
@@ -35,13 +35,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   );
 }
 
-const safe = async <D,>(p: Promise<D>, fallback: D): Promise<D> => {
-  try {
-    return await p;
-  } catch {
-    return fallback;
-  }
-};
 
 const T = (value: { ar: string; en: string } | string | null | undefined, locale: Locale): string => {
   if (value == null) return '';
@@ -54,11 +47,11 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const ar = locale === 'ar';
 
   const [services, contact] = await Promise.all([
-    safe(getContent<PublicServiceSummary[]>('/api/internal/content/services', locale), [] as PublicServiceSummary[]),
-    safe(getContent<PublicContactConfig>('/api/internal/content/contact-config', locale), null),
+    getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
+    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
   const details = await Promise.all(
-    services.map((s) => safe(getContent<ServiceDetail>('/api/internal/content/services', locale, { slug: s.slug }), null)),
+    services.map((s) => getOptional<ServiceDetail>('/api/internal/content/services', locale, { slug: s.slug })),
   );
 
   return (

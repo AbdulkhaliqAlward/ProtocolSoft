@@ -9,7 +9,7 @@ import { PageBlocks } from '@/components/PageBlocks';
 import { PageHero } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { CtaBand } from '@/components/ui';
-import { getContent } from '@/lib/internalApi';
+import { getOptional } from '@/lib/internalApi';
 import { pageMetadata } from '@/lib/pageMeta';
 
 interface PageData {
@@ -32,13 +32,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   );
 }
 
-const safe = async <D,>(p: Promise<D>, fallback: D): Promise<D> => {
-  try {
-    return await p;
-  } catch {
-    return fallback;
-  }
-};
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: localeParam } = await params;
@@ -46,8 +39,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const ar = locale === 'ar';
 
   const [page, contact] = await Promise.all([
-    safe(getContent<PageData>('/api/internal/content/pages', locale, { slug: 'about' }), null),
-    safe(getContent<PublicContactConfig>('/api/internal/content/contact-config', locale), null),
+    getOptional<PageData>('/api/internal/content/pages', locale, { slug: 'about' }),
+    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
 
   return (

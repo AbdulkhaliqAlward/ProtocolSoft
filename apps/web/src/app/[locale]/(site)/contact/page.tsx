@@ -7,19 +7,14 @@ import type { Metadata } from 'next';
 
 import type { Locale, PublicContactConfig } from '@protocol-soft/shared';
 
-import { ContactForm, type ServiceInterest } from '@/components/ContactForm';
+import { ContactForm } from '@/components/ContactForm';
 import { PageHero, Tbc } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { Spark } from '@/components/Spark';
 import { WhatsAppCta } from '@/components/WhatsAppCta';
-import { getContent } from '@/lib/internalApi';
+import { getOptional } from '@/lib/internalApi';
 import { pageMetadata } from '@/lib/pageMeta';
 
-const SERVICE_BY_SLUG: Record<string, ServiceInterest> = {
-  'custom-software': 'custom_software',
-  'digital-products': 'digital_products',
-  cybersecurity: 'cybersecurity',
-};
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -32,27 +27,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   );
 }
 
-export default async function ContactPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: localeParam } = await params;
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
   const T = (a: string, e: string): string => (ar ? a : e);
-  const sp = await searchParams;
-  const serviceParam = typeof sp.service === 'string' ? sp.service : undefined;
-  const initialService = (serviceParam && SERVICE_BY_SLUG[serviceParam]) || 'general';
 
-  let contact: PublicContactConfig | null = null;
-  try {
-    contact = await getContent<PublicContactConfig>('/api/internal/content/contact-config', locale);
-  } catch {
-    contact = null;
-  }
+  const contact = await getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale);
 
   const c = contact?.channels;
   const emailMain = c?.emailMain ?? '';
@@ -77,7 +58,6 @@ export default async function ContactPage({
             <ContactForm
               locale={locale}
               confirmationMessage={contact?.confirmationMessage?.[locale] ?? T('تم استلام طلبك بنجاح.', 'Your request has been received.')}
-              initialService={initialService}
               directChannels={{ email: emailMain || undefined, phone: phone || undefined }}
             />
           </div>

@@ -1,25 +1,79 @@
 'use client';
 
 /**
- * Scroll-entrance enhancer (§13 motion): observes [data-reveal] elements once,
- * adds .is-visible when a group enters the viewport, then unobserves — no
- * re-animation on scroll-back. Content renders fully visible without JS (the
- * hidden state only applies under html.js, set pre-paint by the bootstrap
- * script), and prefers-reduced-motion shows everything immediately via CSS.
- * Renders nothing.
+ * Motion driver for the "acknowledgement sequence" (styles/motion.css).
+ *
+ * Sections marked [data-reveal] that start BELOW the fold are armed once: their
+ * animatable parts get the class `rv`, a stagger index (--rv-i) and a variant
+ * (data-rv: rise | start | fade). When a section enters the viewport it gets
+ * .is-visible and the CSS plays the sequence. Doing the matching here, once,
+ * keeps the stylesheet to cheap single-class selectors (long :is() lists made
+ * every element pay on every style recalc).
+ *
+ * Sections already on screen at load are never armed, so nothing visible
+ * flickers; without JS or with reduced motion nothing is ever hidden.
+ * Re-runs on every client navigation (the new page brings new sections).
  */
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+type Variant = 'rise' | 'start' | 'fade';
+
+/** Containers whose children are acknowledged one after another. */
+const LISTS: Array<[selector: string, variant: Variant]> = [
+  ['.svc-index', 'rise'],
+  ['.commitments', 'rise'],
+  ['.scope', 'rise'],
+  ['.caps', 'rise'],
+  ['.faq', 'rise'],
+  ['.related', 'rise'],
+  ['.principles', 'rise'],
+  ['.exchange', 'start'],
+  ['.svc-panel__list', 'start'],
+  ['.steps-line', 'fade'],
+];
+const LIST_SELECTOR = LISTS.map(([s]) => s).join(',');
+
+const mark = (el: Element, variant: Variant, index: number, baseMs: number): void => {
+  const node = el as HTMLElement;
+  node.classList.add('rv');
+  node.dataset.rv = variant;
+  node.style.setProperty('--rv-i', String(Math.min(index, 6)));
+  node.style.setProperty('--rv-base', `${baseMs}ms`);
+};
+
+const arm = (section: HTMLElement): void => {
+  section.querySelectorAll('.rail__head').forEach((head) =>
+    Array.from(head.children).forEach((c, i) => mark(c, c.classList.contains('clause-no') ? 'start' : 'rise', i, 0)),
+  );
+  section.querySelectorAll('.rail__body').forEach((body) =>
+    Array.from(body.children).forEach((c) => {
+      if (!c.matches(LIST_SELECTOR)) mark(c, 'rise', 0, 140);
+    }),
+  );
+  for (const [selector, variant] of LISTS) {
+    section.querySelectorAll(selector).forEach((list) => Array.from(list.children).forEach((c, i) => mark(c, variant, i, 160)));
+  }
+  section.querySelectorAll('.svc-panel__head, .cta-band__inner').forEach((group) =>
+    Array.from(group.children).forEach((c, i) => mark(c, 'rise', i, 0)),
+  );
+  section.dataset.armed = '';
+};
+
 export const MotionInit = () => {
-  // Re-scan on every client navigation: the new page brings new sections.
   const pathname = usePathname();
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
-    if (els.length === 0) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-      els.forEach((el) => el.classList.add('is-visible'));
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+    if (sections.length === 0) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !('IntersectionObserver' in window)) {
+      sections.forEach((s) => s.classList.add('is-visible'));
       return;
+    }
+    // Arm only what is still below the fold; on-screen sections show as they are.
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top >= window.innerHeight) arm(s);
+      else s.classList.add('is-visible');
     }
     const io = new IntersectionObserver(
       (entries) => {
@@ -32,28 +86,29 @@ export const MotionInit = () => {
       },
       { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
     );
-    els.forEach((el) => io.observe(el));
-    // Fail-safe: anything already above the viewport bottom is revealed even if
-    // the observer never saw it intersect (anchor jumps, fast scroll, find-in-
-    // page skip straight past it). Printing reveals everything.
-    const revealPassed = () => {
-      for (const el of els) {
-        if (!el.classList.contains('is-visible') && el.getBoundingClientRect().top < window.innerHeight) {
-          el.classList.add('is-visible');
-          io.unobserve(el);
+    sections.forEach((s) => {
+      if (!s.classList.contains('is-visible')) io.observe(s);
+    });
+    // Fail-safe: anything above the viewport bottom is revealed even if the
+    // observer never saw it intersect (anchor jumps, fast scroll, find-in-page).
+    const revealPassed = (): void => {
+      for (const s of sections) {
+        if (!s.classList.contains('is-visible') && s.getBoundingClientRect().top < window.innerHeight) {
+          s.classList.add('is-visible');
+          io.unobserve(s);
         }
       }
     };
     let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        revealPassed();
-      });
+    const onScroll = (): void => {
+      if (!frame) {
+        frame = window.requestAnimationFrame(() => {
+          frame = 0;
+          revealPassed();
+        });
+      }
     };
-    revealPassed(); // deep links / restored scroll positions load mid-page
-    const revealAll = () => document.documentElement.classList.add('reveal-done');
+    const revealAll = (): void => document.documentElement.classList.add('reveal-done');
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('beforeprint', revealAll);
     return () => {

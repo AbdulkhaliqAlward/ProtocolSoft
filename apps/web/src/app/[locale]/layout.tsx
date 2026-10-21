@@ -1,77 +1,42 @@
+/**
+ * Root layout of the public site: the document only (<html lang dir>, fonts,
+ * global CSS, pre-paint theme). The locale comes from the URL segment (Arabic
+ * is served at "/" through the proxy rewrite to /ar), never from request
+ * headers, so every page can be rendered once and cached. Site chrome (header,
+ * footer, data) lives one level down in (site)/layout.tsx so that
+ * (site)/not-found.tsx can catch notFound() inside both layouts — a not-found
+ * file in the root layout's own segment would render outside it.
+ */
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
+import type { ReactNode } from 'react';
 
-import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
+import { LOCALE_DIR, type Locale } from '@protocol-soft/shared';
 
-import { getContent } from '@/lib/internalApi';
-import { MotionInit } from '@/components/MotionInit';
-import { SiteFooter } from '@/components/SiteFooter';
-import { SiteHeader } from '@/components/SiteHeader';
-import { BRAND } from '@/components/siteChrome';
+import { DocumentShell } from '@/components/DocumentShell';
+import { siteUrl } from '@/lib/env';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'بروتوكول سوفت | Protocol Soft',
-    template: '%s | بروتوكول سوفت',
-  },
-  description: 'تطوير الأنظمة المخصصة، بناء المنتجات والمنصات الرقمية، وخدمات الأمن السيبراني.',
-};
+/** No build-time render (the CMS is not reachable while the image builds):
+ *  every page renders on its first request and is then served from cache. */
+export async function generateStaticParams(): Promise<Array<{ locale: string }>> {
+  return [];
+}
 
-/** Legal pages stay 404 while draft (D-2/LD1) — the footer mirrors that: links
- *  appear only once the pages actually publish. */
-const legalPublished = async (): Promise<{ privacy: boolean; terms: boolean }> => {
-  const probe = async (slug: string, locale: Locale): Promise<boolean> => {
-    try {
-      await getContent<unknown>('/api/internal/content/pages', locale, { slug });
-      return true;
-    } catch {
-      return false;
-    }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const en = locale === 'en';
+  return {
+    metadataBase: new URL(siteUrl()),
+    robots: { index: true, follow: true },
+    title: { default: en ? 'Protocol Soft' : 'بروتوكول سوفت', template: en ? '%s | Protocol Soft' : '%s | بروتوكول سوفت' },
+    description: en
+      ? 'Custom systems, digital products and platforms, and defensive cybersecurity.'
+      : 'تطوير الأنظمة المخصصة، بناء المنتجات والمنصات الرقمية، وخدمات الأمن السيبراني.',
   };
-  const locale = (((await headers()).get('x-locale')) === 'en' ? 'en' : 'ar') as Locale;
-  const [privacy, terms] = await Promise.all([probe('privacy', locale), probe('terms', locale)]);
-  return { privacy, terms };
-};
+}
 
-export default async function LocaleLayout({ children }: { children: React.ReactNode }) {
-  const locale = (((await headers()).get('x-locale')) === 'en' ? 'en' : 'ar') as Locale;
-
-  let settings: PublicSiteSettings | null = null;
-  let contact: PublicContactConfig | null = null;
-  let services: PublicServiceSummary[] = [];
-  try {
-    settings = await getContent<PublicSiteSettings>('/api/internal/content/site-settings', locale);
-  } catch {
-    settings = null;
-  }
-  try {
-    contact = await getContent<PublicContactConfig>('/api/internal/content/contact-config', locale);
-  } catch {
-    contact = null;
-  }
-  // Published services for the footer (§11: informative footer). Unpublished
-  // services are omitted upstream — never stubbed.
-  try {
-    services = await getContent<PublicServiceSummary[]>('/api/internal/content/services', locale);
-  } catch {
-    services = [];
-  }
-  const legal = await legalPublished();
-
-  return (
-    <>
-      <a href="#main" className="skip-link">{locale === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to content'}</a>
-      <SiteHeader locale={locale} ctaLabel={locale === 'ar' ? 'ابدأ مشروعك' : 'Start a project'} services={services} />
-      <main id="main">{children}</main>
-      <SiteFooter
-        locale={locale}
-        settings={settings ?? { companyName: { ar: BRAND.name.ar, en: BRAND.name.en }, tagline: { ar: '', en: '' }, emailMain: '', footerCopyright: { ar: `© {year} ${BRAND.name.ar}`, en: `© {year} ${BRAND.name.en}` } }}
-        contact={contact}
-        services={services}
-        privacyPublished={legal.privacy}
-        termsPublished={legal.terms}
-      />
-      <MotionInit />
-    </>
-  );
+export default async function LocaleRootLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
+  // The proxy only routes /ar or /en here; never notFound() in a root layout.
+  const { locale: param } = await params;
+  const locale: Locale = param === 'en' ? 'en' : 'ar';
+  return <DocumentShell lang={locale} dir={LOCALE_DIR[locale]}>{children}</DocumentShell>;
 }

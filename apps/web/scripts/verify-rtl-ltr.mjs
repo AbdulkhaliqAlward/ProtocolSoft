@@ -224,6 +224,27 @@ const main = async () => {
     const enOrder = await order(`${WEB}/en/services`);
     check('EN services: panel head at the start (left), deliverables at the end (right)', enOrder.headLeft < enOrder.listLeft, JSON.stringify(enOrder));
 
+    /* ── 9b. Contact ?service= preselection (applied in the browser) ── */
+    await cdp.goto(`${WEB}/contact?service=custom-software`);
+    let pre = false;
+    for (let i = 0; i < 60 && !pre; i++) {
+      pre = await cdp.eval(`document.querySelector('input[name="serviceInterest"][value="custom_software"]')?.checked === true`);
+      if (!pre) await sleep(150);
+    }
+    check('contact ?service=custom-software preselects the matching tile', pre === true, `checked=${pre}`);
+
+    /* ── 9c. 404 page renders the branded panel in both languages ── */
+    for (const [url, heading] of [[`${WEB}/xyz-not-a-page`, 'الصفحة غير موجودة'], [`${WEB}/en/xyz-not-a-page`, 'Page not found']]) {
+      await cdp.goto(url);
+      let ok = false;
+      for (let i = 0; i < 60 && !ok; i++) {
+        ok = await cdp.eval(`document.querySelector('.lost__plate h1')?.textContent === ${JSON.stringify(heading)}`);
+        if (!ok) await sleep(150);
+      }
+      const chrome = await cdp.eval(`({ header: !!document.querySelector('.site-header'), footer: !!document.querySelector('.site-footer') })`);
+      check(`404 (${url.replace(WEB, '')}): branded panel with header and footer`, ok && chrome.header && chrome.footer, JSON.stringify({ ok, ...chrome }));
+    }
+
     /* ── 10. No horizontal scroll at 375px in either locale ── */
     for (const url of [`${WEB}/`, `${WEB}/en/contact`]) {
       await cdp.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 800, mobile: true, deviceScaleFactor: 2 });

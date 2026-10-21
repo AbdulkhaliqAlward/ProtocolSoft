@@ -20,7 +20,7 @@ import { Breadcrumbs, CapabilityGroups, Exchange, Faq, Scope, Section, Tbc, clau
 import { localePath } from '@/components/siteChrome';
 import { Spark } from '@/components/Spark';
 import { CtaBand } from '@/components/ui';
-import { getContent } from '@/lib/internalApi';
+import { getOptional } from '@/lib/internalApi';
 import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
 import { breadcrumbLd, faqLd, serviceLd } from '@/lib/structuredData';
 
@@ -44,24 +44,18 @@ interface ServiceDetail {
   seo: { title?: string | null; description?: string | null; noindex?: boolean } | null;
 }
 
+/** Rendered on first request, then cached until a CMS publish expires it. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  return [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale: localeParam, slug } = await params;
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
-  try {
-    const svc = await getContent<ServiceDetail>('/api/internal/content/services', locale, { slug });
-    return pageMetadata(locale, svc.seo?.title || svc.title, svc.seo?.description || svc.summary, `/services/${slug}`);
-  } catch {
-    return notFoundMetadata();
-  }
+  const svc = await getOptional<ServiceDetail>('/api/internal/content/services', locale, { slug });
+  return svc ? pageMetadata(locale, svc.seo?.title || svc.title, svc.seo?.description || svc.summary, `/services/${slug}`) : notFoundMetadata();
 }
 
-const safe = async <D,>(p: Promise<D>, fallback: D): Promise<D> => {
-  try {
-    return await p;
-  } catch {
-    return fallback;
-  }
-};
 
 const T = (value: { ar: string; en: string } | string | null | undefined, locale: Locale): string => {
   if (value == null) return '';
@@ -74,18 +68,14 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
   const ar = locale === 'ar';
   if (!SLUGS.includes(slug as (typeof SLUGS)[number])) notFound();
 
-  let svc: ServiceDetail;
-  try {
-    svc = await getContent<ServiceDetail>('/api/internal/content/services', locale, { slug });
-  } catch {
-    notFound();
-  }
+  const svc = await getOptional<ServiceDetail>('/api/internal/content/services', locale, { slug });
+  if (!svc) notFound();
 
   const [all, initiatives, contact] = await Promise.all([
-    safe(getContent<PublicServiceSummary[]>('/api/internal/content/services', locale), [] as PublicServiceSummary[]),
+    getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
     // Initiative card: published initiatives, card-safe fields only (EDR stays draft at launch).
-    safe(getContent<PublicInitiativeCard[]>('/api/internal/content/initiatives', locale), [] as PublicInitiativeCard[]),
-    safe(getContent<PublicContactConfig>('/api/internal/content/contact-config', locale), null),
+    getOptional<PublicInitiativeCard[], PublicInitiativeCard[]>('/api/internal/content/initiatives', locale, undefined, []),
+    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
   const index = Math.max(0, all.findIndex((s) => s.slug === slug));
   const others = all.filter((s) => s.slug !== slug);
@@ -126,7 +116,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
               />
               <span className="clause-no">{clause(index + 1)} <Spark size="sm" /></span>
               <h1 id="svc-title">{svc.heroHeadline || svc.title}</h1>
-              {svc.heroSubhead && <p className="lead">{svc.heroSubhead}</p>}
+              {svc.heroSubhead && <p className="lead svc-hero__lead">{svc.heroSubhead}</p>}
               <div className="cluster svc-hero__actions">
                 <Link href={contactHref} className="btn btn--inverse btn--lg">{ctaLabel}</Link>
                 {(svc.deliverables.length > 0 || excluded.length > 0) && (
@@ -137,7 +127,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
             {facts.length > 0 && (
               <dl className="facts" aria-label={ar ? 'حقائق الارتباط' : 'Engagement facts'}>
                 {facts.map((f) => (
-                  <div key={f.label}>
+                  <div key={f.label} className="svc-hero__fact">
                     <dt>{f.label}</dt>
                     <dd>{f.value} {f.needsConfirmation && <Tbc />}</dd>
                   </div>

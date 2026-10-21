@@ -8,7 +8,7 @@
  * with the confirmation panel (reference code in mono); nothing is stored
  * client-side. Direct channels repeat on failure (CMS-down path).
  */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Locale, PublicContactConfig } from '@protocol-soft/shared';
 
@@ -44,6 +44,13 @@ type Props = {
 
 const T = (locale: Locale, ar: string, en: string): string => (locale === 'ar' ? ar : en);
 
+/** Service slugs (as used in URLs) mapped to the form's service values. */
+const SERVICE_BY_SLUG: Record<string, ServiceInterest> = {
+  'custom-software': 'custom_software',
+  'digital-products': 'digital_products',
+  cybersecurity: 'cybersecurity',
+};
+
 export const ContactForm = ({ locale, confirmationMessage, initialService = 'general', directChannels }: Props) => {
   const [form, setForm] = useState<FormState>({
     fullName: '',
@@ -55,6 +62,13 @@ export const ContactForm = ({ locale, confirmationMessage, initialService = 'gen
     consent: false,
     honeypot: '',
   });
+  // ?service=<slug> preselects a tile. Read in the browser (not on the server)
+  // so the contact page itself stays static and cacheable.
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get('service');
+    const preset = slug ? SERVICE_BY_SLUG[slug] : undefined;
+    if (preset) setForm((f) => (f.serviceInterest === 'general' ? { ...f, serviceInterest: preset } : f));
+  }, []);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [reference, setReference] = useState('');

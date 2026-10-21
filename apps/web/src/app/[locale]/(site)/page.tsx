@@ -17,7 +17,7 @@ import { Faq, Section, clause } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { Spark } from '@/components/Spark';
 import { CtaBand } from '@/components/ui';
-import { getContent } from '@/lib/internalApi';
+import { getOptional } from '@/lib/internalApi';
 import { pageMetadata } from '@/lib/pageMeta';
 import { organizationLd, websiteLd } from '@/lib/structuredData';
 
@@ -74,13 +74,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   );
 }
 
-const safe = async <D,>(p: Promise<D>, fallback: D): Promise<D> => {
-  try {
-    return await p;
-  } catch {
-    return fallback;
-  }
-};
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: localeParam } = await params;
@@ -88,10 +81,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const ar = locale === 'ar';
 
   const [settings, homepage, services, contact] = await Promise.all([
-    safe(getContent<PublicSiteSettings>('/api/internal/content/site-settings', locale), null),
-    safe(getContent<HomepageData>('/api/internal/content/homepage', locale), null),
-    safe(getContent<PublicServiceSummary[]>('/api/internal/content/services', locale), [] as PublicServiceSummary[]),
-    safe(getContent<PublicContactConfig>('/api/internal/content/contact-config', locale), null),
+    getOptional<PublicSiteSettings>('/api/internal/content/site-settings', locale),
+    getOptional<HomepageData>('/api/internal/content/homepage', locale),
+    getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
+    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
 
   const hero = homepage?.hero;
@@ -145,8 +138,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <ol role="list">
                   {services.map((svc, i) => (
                     <li key={svc.slug}>
-                      <Link href={localePath(locale, `/services/${svc.slug}`)}>
-                        <span className="clause-no">{clause(i + 1)}</span>
+                      <Link href={localePath(locale, `/services/${svc.slug}`)} className="home-hero__link">
+                        <span className="clause-no home-hero__num">{clause(i + 1)}</span>
                         <span className="home-hero__svc">{T(svc.title, locale)}</span>
                         <span className="btn__arrow" aria-hidden="true">→</span>
                       </Link>

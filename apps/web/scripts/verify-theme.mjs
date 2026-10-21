@@ -157,7 +157,12 @@ const main = async () => {
     // Sections stay visible; their children are the hidden-then-revealed parts.
     // Use the LAST reveal section (below the fold) and its first animated child.
     const LAST = `[...document.querySelectorAll('[data-reveal]')].pop()`;
-    const CHILD = `(${LAST}.querySelector('.rail__head > *, .svc-panel__head > *, .cta-band__inner > *'))`;
+    const CHILD = `(${LAST}.querySelector('.rv'))`;
+    // MotionInit arms below-the-fold sections (marks parts with .rv) after hydration.
+    for (let i = 0; i < 80; i++) {
+      if (await cdp.eval(`!!document.querySelector('[data-armed] .rv')`)) break;
+      await sleep(150);
+    }
     const mot = await cdp.eval(`(() => ({
       htmlHasJs: document.documentElement.classList.contains('js'),
       initialOpacity: getComputedStyle(${CHILD}).opacity,
