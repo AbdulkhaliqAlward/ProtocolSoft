@@ -15,11 +15,14 @@ const seed = async (): Promise<void> => {
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
+      // Required fields included so this also succeeds against an empty database.
+      companyName: { ar: 'بروتوكول سوفت', en: 'Protocol Soft' },
       description: {
         ar: 'شركة هندسة برمجيات وأمن سيبراني نبني أنظمة رقمية موثوقة ونحميها لتعمل بثقة.',
         en: 'A software engineering and cybersecurity company building reliable digital systems and protecting them to run with confidence.',
       },
       tagline: { ar: 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.', en: 'Trusted digital systems, built and protected to run with confidence.' },
+      footerCopyright: { ar: '© {year} بروتوكول سوفت', en: '© {year} Protocol Soft' },
     },
     overrideAccess: true,
     locale: 'all',
@@ -52,7 +55,7 @@ const seed = async (): Promise<void> => {
     slug: 'theme-settings',
     // Phase 5 visual revision: controlled variants only (no raw hex in the CMS).
     data: {
-      colorPreset: 'purple_cream_v1',
+      colorPreset: 'ink_stone_v1',
       buttonStyle: 'filled',
       borderRadius: 'md',
       animationsEnabled: true,
@@ -257,6 +260,8 @@ const seed = async (): Promise<void> => {
         collection: 'services',
         draft: true,
         overrideAccess: true,
+        // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+        locale: 'all',
         context: { skipAudit: true },
         data: {
           slug: s.slug,
@@ -281,6 +286,8 @@ const seed = async (): Promise<void> => {
       collection: 'technical-initiatives',
       draft: true,
       overrideAccess: true,
+      // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+      locale: 'all',
       context: { skipAudit: true },
       data: {
         title: { ar: 'مبادرة EDR مفتوحة المصدر', en: 'Open-Source EDR Initiative' },
@@ -306,6 +313,8 @@ const seed = async (): Promise<void> => {
       collection: 'case-studies',
       draft: true,
       overrideAccess: true,
+      // {ar,en} objects need locale 'all', otherwise the object is stored as the ar string.
+      locale: 'all',
       context: { skipAudit: true },
       data: {
         slug: 'delivery-platform',

@@ -60,7 +60,10 @@ export default buildConfig({
       // Pooled connections (serverless-safe sizing; private network only — §11.3)
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
     },
-    push: process.env.NODE_ENV !== 'production', // dev: auto-push schema; production: migrations
+    // Schema changes go through committed migrations in every environment, so dev
+    // exercises exactly what production runs (`npm run migrate:create` / `migrate`).
+    push: false,
+    migrationDir: path.resolve(dirname, 'migrations'),
   }),
 
   collections: [
