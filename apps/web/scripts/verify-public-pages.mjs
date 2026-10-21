@@ -37,7 +37,7 @@ const main = async () => {
   /* ── 1. Arabic home (default locale, unprefixed) ── */
   const ar = await get('/');
   check('GET / -> 200', ar.status === 200);
-  check('AR: html lang=ar dir=rtl', ar.body.includes('<html lang="ar" dir="rtl">'));
+  check('AR: html lang=ar dir=rtl', /<html lang="ar" dir="rtl"[\s>]/.test(ar.body));
   for (const item of NAV_AR) check(`AR nav contains «${item}»`, ar.body.includes(`>${item}</a>`));
   check('AR nav language switch -> /en labeled English', ar.body.includes('href="/en"') && ar.body.includes('English'));
   check('AR hero headline present', ar.body.includes('نبني أنظمة رقمية موثوقة'));
@@ -48,7 +48,7 @@ const main = async () => {
   /* ── 2. English home (/en) ── */
   const en = await get('/en');
   check('GET /en -> 200', en.status === 200);
-  check('EN: html lang=en dir=ltr', en.body.includes('<html lang="en" dir="ltr">'));
+  check('EN: html lang=en dir=ltr', /<html lang="en" dir="ltr"[\s>]/.test(en.body));
   for (const item of NAV_EN) check(`EN nav contains "${item}"`, en.body.includes(`>${item}</a>`));
   check('EN nav language switch labeled العربية', en.body.includes('العربية'));
   check('EN hero headline present', en.body.includes('Trusted digital systems, built and protected'));

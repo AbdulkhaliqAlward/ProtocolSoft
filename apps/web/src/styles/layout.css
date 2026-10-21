@@ -1,0 +1,59 @@
+/* Layout primitives. One container, one section rhythm, one 12-column grid.
+   Sections never leave a narrow text column floating beside empty space:
+   long text sits in the 8-column field of a .rail, its heading in the
+   4-column rail beside it, so the full width is always composed. */
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--pad-x));
+  margin-inline: auto;
+  padding-left: var(--pad-x);
+  padding-right: max(var(--pad-x), env(safe-area-inset-right, 0px));
+}
+
+.section { padding-block: var(--section-y); }
+.section + .section:not(.section--band):not(.section--plate) { border-top: 1px solid var(--line); }
+.section--tight { padding-block: calc(var(--section-y) * 0.66); }
+.section--flush-top { padding-top: 0; }
+.section--band { background: var(--surface-sunken); }
+
+/* 12-column grid; .rail = heading rail (4) + content field (8). */
+.grid-12 { display: grid; gap: var(--s-6) var(--gutter); grid-template-columns: minmax(0, 1fr); }
+.rail { display: grid; gap: var(--s-6); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) {
+  .grid-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .rail { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s-7) var(--gutter); }
+  .rail__head { grid-column: span 4; }
+  .rail__body { grid-column: span 8; }
+  .rail--sticky .rail__head { position: sticky; top: calc(var(--header-h-compact) + var(--s-6)); align-self: start; }
+  .rail--even .rail__head, .rail--even .rail__body { grid-column: span 6; }
+}
+.rail__head { display: grid; gap: var(--s-3); align-content: start; min-width: 0; }
+.rail__head p { color: var(--text-muted); max-width: 40ch; }
+.rail__body { min-width: 0; }
+
+/* Auto-fill card grid: columns fill the row, nothing stretches alone. */
+.cards { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min, 280px)), 1fr)); }
+.cards--3 { --card-min: 260px; }
+@media (min-width: 960px) { .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.stack { display: flex; flex-direction: column; gap: var(--stack, var(--s-4)); }
+.cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cluster, var(--s-3)); }
+.measure { max-width: var(--measure); }
+.prose { max-width: var(--measure); }
+.prose > * + * { margin-top: var(--s-4); }
+.prose h2, .prose h3 { margin-top: var(--s-6); }
+.prose ul, .prose ol { padding-inline-start: 1.25em; display: grid; gap: var(--s-2); }
+.prose a { color: var(--text); text-decoration-color: var(--line-strong); }
+
+/* Section opener: clause number, heading, lead. Same shape on every page. */
+.clause-no {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 500;
+  color: var(--text-muted); letter-spacing: 0.02em; direction: ltr; unicode-bidi: isolate;
+  /* Shrink to content and sit at the reading start (right in Arabic): the
+     forced LTR would otherwise stretch it and pin the number to the left. */
+  width: fit-content; justify-self: start; align-self: flex-start;
+}
+.lead { font-size: var(--fs-lead); color: var(--text-muted); line-height: var(--lh-body); }
+.muted { color: var(--text-muted); }
+.mono { font-family: var(--font-mono); font-size: 0.92em; font-weight: 500; }

@@ -1,0 +1,11 @@
+/* Motion baseline: one-time section entrance (choreography arrives in the
+   motion step). Hidden state applies only under html.js, so content is
+   always visible without JS; MotionInit adds .reveal-done before printing. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out);
+}
+.js [data-reveal].is-visible, .js.reveal-done [data-reveal] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js [data-reveal] { opacity: 1; transform: none; transition: none; } }
+@media print { .js [data-reveal] { opacity: 1 !important; transform: none !important; } }

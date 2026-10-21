@@ -1,0 +1,177 @@
+/*
+ * Design tokens — direction B, softened ("The Protocol, written by hand").
+ * Brand pair from the logo: ink #2E0661 + cream #FEF0E1. Everything else is a
+ * paper tone or graphite. Rules:
+ *   - Purple appears at full strength or not at all: no tints, gradients,
+ *     glows or lighter violets. Depth comes from deeper ink (#1E0342).
+ *   - No brand accent colour; the logo's pixel sparkle is the accent.
+ *   - Status colours are functional (forms only) and always paired with text.
+ * Components use the semantic tokens (--bg, --text, --action-*) only.
+ */
+:root {
+  /* ── Brand + paper palette (raw) ───────────────────────────── */
+  --ink: #2E0661;
+  --ink-deep: #1E0342;
+  --cream: #FEF0E1;
+  --paper: #FFF8F0;
+  --sand: #F5E4CF;
+  --line-raw: #E6D2BC;
+  --line-strong-raw: #8F7C6E;
+  --graphite: #4E4448;
+  --plate-muted-raw: #EBDDCB;
+
+  /* ── Semantic: light theme ─────────────────────────────────── */
+  --bg: var(--cream);              /* page ground */
+  --surface: var(--paper);         /* cards, inputs, menus */
+  --surface-sunken: var(--sand);   /* bands, hover, table heads */
+  --text: var(--ink);              /* 14.3:1 on cream */
+  --text-muted: var(--graphite);   /* 8.4:1 on cream */
+  --line: var(--line-raw);         /* hairlines */
+  --line-strong: var(--line-strong-raw); /* control borders, 3.5:1 */
+  --plate: var(--ink);             /* purple plates set into the page */
+  --plate-text: var(--cream);
+  --plate-muted: var(--plate-muted-raw);
+  --plate-line: rgba(254, 240, 225, .22);
+  --action: var(--ink);            /* primary button */
+  --action-text: var(--cream);
+  --action-hover: var(--ink-deep);
+  --focus: var(--ink);
+  --ok: #1F6B4A;
+  --ok-bg: #E4EFE6;
+  --err: #B3261E;
+  --err-bg: #FBE3DD;
+  --header-bg: rgba(254, 240, 225, .9);
+
+  /* Keycap depth: soft top light + darker base (convex), sinks when pressed */
+  --key-primary: inset 0 1px 0 rgba(254, 240, 225, .22), inset 0 -2px 0 rgba(0, 0, 0, .28), 0 1px 2px rgba(30, 3, 66, .18), 0 6px 14px -6px rgba(30, 3, 66, .45);
+  --key-primary-pressed: inset 0 2px 3px rgba(0, 0, 0, .35);
+  --key-secondary: inset 0 -2px 0 rgba(46, 6, 97, .12), 0 1px 2px rgba(46, 6, 97, .08);
+  --key-secondary-pressed: inset 0 2px 3px rgba(46, 6, 97, .16);
+  --lift: 0 24px 48px -24px rgba(30, 3, 66, .35);   /* menus, popovers only */
+
+  /* ── Type ──────────────────────────────────────────────────── */
+  --font-display: var(--ff-readex), "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-ar: var(--ff-plex-ar), var(--ff-plex), "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-en: var(--ff-plex), var(--ff-plex-ar), "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--ff-mono), ui-monospace, Consolas, monospace;
+  --font-body: var(--font-ar);
+
+  --fs-display: clamp(2.5rem, 1.75rem + 3vw, 4rem);      /* 40 → 64 */
+  --fs-h1: clamp(2.125rem, 1.7rem + 1.7vw, 2.75rem);      /* 34 → 44 */
+  --fs-h2: clamp(1.625rem, 1.4rem + 0.9vw, 2rem);         /* 26 → 32 */
+  --fs-h3: 1.375rem;                                      /* 22 */
+  --fs-h4: 1.125rem;                                      /* 18 */
+  --fs-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);   /* 18 → 20 */
+  --fs-body: 1.125rem;                                    /* 18 (Arabic) */
+  --fs-small: 0.9375rem;                                  /* 15 */
+  --fs-label: 0.8125rem;                                  /* 13 */
+  --lh-display: 1.3;  /* Arabic needs room for diacritics */
+  --lh-heading: 1.35;
+  --lh-body: 1.85;
+  --fw-heading: 500;  /* softer than 700: most of the warm feel */
+  --fw-strong: 600;
+
+  /* ── Shape: five radii, one job each (inner = outer − padding) ─ */
+  --r-xs: 6px;    /* check marks, small tags */
+  --r-sm: 10px;   /* inputs, chips, small buttons */
+  --r-md: 14px;   /* buttons, menu items */
+  --r-lg: 22px;   /* cards, menus, panels */
+  --r-xl: 32px;   /* purple plates, images, section fields */
+  --r-pill: 999px;
+
+  /* ── Space (4-based) ───────────────────────────────────────── */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px;
+  --section-y: clamp(64px, 5rem + 2vw, 96px);
+  --gutter: 24px;
+
+  /* ── Layout ────────────────────────────────────────────────── */
+  --container: 1280px;
+  --pad-x: max(16px, env(safe-area-inset-left, 0px));
+  --measure: 68ch;
+  --header-h: 72px;
+  --header-h-compact: 56px;
+
+  /* ── Motion ────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --dur-1: 120ms;  /* press */
+  --dur-2: 200ms;  /* hover, colour */
+  --dur-3: 320ms;  /* menus, accordions */
+  --dur-4: 560ms;  /* section entrances */
+
+  color-scheme: light;
+}
+
+html[lang="en"] {
+  --font-body: var(--font-en);
+  --fs-body: 1.0625rem;  /* 17 */
+  --lh-display: 1.1;
+  --lh-heading: 1.2;
+  --lh-body: 1.65;
+}
+@media (min-width: 720px) { :root { --pad-x: max(24px, env(safe-area-inset-left, 0px)); } }
+@media (min-width: 1100px) { :root { --pad-x: max(32px, env(safe-area-inset-left, 0px)); } }
+@media (max-width: 719px) { :root { --fs-body: 1.0625rem; } html[lang="en"] { --fs-body: 1rem; } }
+
+/* ── Dark theme: deep-ink ground, brand-purple plates, cream type ─────
+   Applied by the explicit toggle, or by the OS when no choice is stored
+   (the pre-paint bootstrap writes data-theme; the media block covers no-JS). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--ink-deep);
+    --surface: var(--ink);
+    --surface-sunken: #26044F;
+    --text: var(--cream);
+    --text-muted: #D9C7B4;
+    --line: #4B3462;
+    --line-strong: var(--line-strong-raw);
+    --plate: var(--ink);
+    --plate-text: var(--cream);
+    --plate-muted: #D9C7B4;
+    --plate-line: #4B3462;
+    --action: var(--cream);
+    --action-text: var(--ink);
+    --action-hover: #FFFFFF;
+    --focus: var(--cream);
+    --ok: #8FD6AE;
+    --ok-bg: #173A2C;
+    --err: #FFB4A9;
+    --err-bg: #4A1A1F;
+    --header-bg: rgba(30, 3, 66, .9);
+    --key-primary: inset 0 -2px 0 rgba(46, 6, 97, .25), 0 6px 14px -6px rgba(0, 0, 0, .6);
+    --key-primary-pressed: inset 0 2px 3px rgba(46, 6, 97, .35);
+    --key-secondary: inset 0 -2px 0 rgba(0, 0, 0, .3);
+    --key-secondary-pressed: inset 0 2px 3px rgba(0, 0, 0, .4);
+    --lift: 0 24px 48px -20px rgba(0, 0, 0, .7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: var(--ink-deep);
+  --surface: var(--ink);
+  --surface-sunken: #26044F;
+  --text: var(--cream);
+  --text-muted: #D9C7B4;
+  --line: #4B3462;
+  --line-strong: var(--line-strong-raw);
+  --plate: var(--ink);
+  --plate-text: var(--cream);
+  --plate-muted: #D9C7B4;
+  --plate-line: #4B3462;
+  --action: var(--cream);
+  --action-text: var(--ink);
+  --action-hover: #FFFFFF;
+  --focus: var(--cream);
+  --ok: #8FD6AE;
+  --ok-bg: #173A2C;
+  --err: #FFB4A9;
+  --err-bg: #4A1A1F;
+  --header-bg: rgba(30, 3, 66, .9);
+  --key-primary: inset 0 -2px 0 rgba(46, 6, 97, .25), 0 6px 14px -6px rgba(0, 0, 0, .6);
+  --key-primary-pressed: inset 0 2px 3px rgba(46, 6, 97, .35);
+  --key-secondary: inset 0 -2px 0 rgba(0, 0, 0, .3);
+  --key-secondary-pressed: inset 0 2px 3px rgba(0, 0, 0, .4);
+  --lift: 0 24px 48px -20px rgba(0, 0, 0, .7);
+  color-scheme: dark;
+}

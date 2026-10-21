@@ -6,6 +6,8 @@ import { LOCALE_DIR, type Locale } from '@protocol-soft/shared';
 
 import { siteUrl } from '@/lib/env';
 
+import { fontVariables } from './fonts';
+
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -31,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     // suppressHydrationWarning: the bootstrap script may set data-theme before
     // hydration (same pattern as next-themes; React never manages this attr).
-    <html lang={locale} dir={dir} suppressHydrationWarning>
+    <html lang={locale} dir={dir} className={fontVariables} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         {children}

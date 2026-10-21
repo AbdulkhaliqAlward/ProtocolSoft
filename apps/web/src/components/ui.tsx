@@ -72,7 +72,8 @@ export const EmptyState = ({
   </div>
 );
 
-/** CTA band — direct channels render only when real values exist (§6.9). */
+/** Closing band (one per page): heading + optional line, one primary action.
+ *  Direct channels render only when real values exist (§6.9). */
 export const CtaBand = ({
   locale,
   heading,
@@ -89,17 +90,21 @@ export const CtaBand = ({
   phone?: string;
 }) => (
   <section className="cta-band" data-reveal aria-label={locale === 'ar' ? 'دعوة للتواصل' : 'Call to action'}>
-    <div className="container cta-band__inner">
-      <h2>{heading}</h2>
-      {body && <p>{body}</p>}
-      <div className="cta-band__actions">
-        <a href={localePath(locale, '/contact')} className="btn btn--primary btn--lg">{ctaLabel}</a>
-        {email && (
-          <a href={`mailto:${email}`} className="btn btn--secondary bidi">{email}</a>
-        )}
-        {phone && (
-          <a href={`tel:${phone}`} className="btn btn--secondary bidi">{phone}</a>
-        )}
+    <div className="container">
+      <div className="cta-band__inner">
+        <div>
+          <h2>{heading}</h2>
+          {body && <p>{body}</p>}
+        </div>
+        <div className="cta-band__actions">
+          <a href={localePath(locale, '/contact')} className="btn btn--primary btn--lg">{ctaLabel}</a>
+          {email && (
+            <a href={`mailto:${email}`} className="btn btn--text bidi">{email}</a>
+          )}
+          {phone && (
+            <a href={`tel:${phone}`} className="btn btn--text bidi">{phone}</a>
+          )}
+        </div>
       </div>
     </div>
   </section>
