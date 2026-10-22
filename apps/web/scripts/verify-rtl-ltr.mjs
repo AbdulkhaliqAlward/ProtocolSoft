@@ -74,16 +74,25 @@ const main = async () => {
     check('EN header: brand on the start (left) edge, controls on the end (right) edge',
       enHeader.brandLeft && enHeader.endRight, `brandLeft=${enHeader.brandLeft} endRight=${enHeader.endRight}`);
 
-    /* ── 4. Locale switch preserves the path and flips direction ── */
+    /* ── 4. Locale switch preserves the path and flips direction ──
+       The click starts a navigation; wait until the new page has rendered
+       (path and lang updated) instead of reading the old document. */
+    const waitForPath = async (path) => {
+      for (let i = 0; i < 100; i++) {
+        const ok = await cdp.eval(`location.pathname === ${JSON.stringify(path)} && document.readyState === 'complete' && document.documentElement.getAttribute('lang') === ${JSON.stringify(path.startsWith('/en') ? 'en' : 'ar')}`).catch(() => false);
+        if (ok) return;
+        await sleep(100);
+      }
+    };
     await cdp.goto(`${WEB}/services/cybersecurity`);
     await cdp.eval(`document.querySelector('a.lang-switch').click()`);
-    await cdp.waitLoad();
+    await waitForPath('/en/services/cybersecurity');
     const switched = await cdp.eval(`({ url: location.pathname, lang: document.documentElement.getAttribute('lang'), dir: document.documentElement.getAttribute('dir') })`);
     check('locale switch AR->EN preserves the path and flips to LTR',
       switched.url === '/en/services/cybersecurity' && switched.lang === 'en' && switched.dir === 'ltr',
       `url=${switched.url} lang=${switched.lang} dir=${switched.dir}`);
     await cdp.eval(`document.querySelector('a.lang-switch').click()`);
-    await cdp.waitLoad();
+    await waitForPath('/services/cybersecurity');
     const switchedBack = await cdp.eval(`({ url: location.pathname, lang: document.documentElement.getAttribute('lang'), dir: document.documentElement.getAttribute('dir') })`);
     check('locale switch EN->AR preserves the path and flips to RTL',
       switchedBack.url === '/services/cybersecurity' && switchedBack.lang === 'ar' && switchedBack.dir === 'rtl',

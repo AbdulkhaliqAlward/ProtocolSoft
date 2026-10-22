@@ -184,6 +184,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {steps.length > 0 && (
         <Section
           id="method"
+          wide
           no={next()}
           title={ar ? 'طريقة عملنا' : 'How we work'}
           lead={ar ? 'خمس خطوات ثابتة في كل مشروع، ولكل خطوة مخرج مكتوب تراجعه قبل أن ننتقل.' : 'Five steps on every project, each ending in a written output you review before we move on.'}

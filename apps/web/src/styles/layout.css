@@ -21,6 +21,7 @@
   .rail { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s-7) var(--gutter); }
   .rail__head { grid-column: span 4; }
   .rail__body { grid-column: span 8; }
+  .rail--stacked .rail__head, .rail--stacked .rail__body { grid-column: 1 / -1; }
   .rail--sticky .rail__head { position: sticky; top: calc(var(--header-h) + var(--s-6)); align-self: start; }
 }
 .rail__head { display: grid; gap: var(--s-3); align-content: start; min-width: 0; }

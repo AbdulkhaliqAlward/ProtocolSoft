@@ -34,12 +34,14 @@ export const SectionHead = ({ no, title, lead, as = 'h2', id, children }: {
 };
 
 /** Standard section: rail head + content field. */
-export const Section = ({ no, title, lead, id, sticky, band, flushTop, reveal = true, children, headExtra }: {
+export const Section = ({ no, title, lead, id, sticky, wide, band, flushTop, reveal = true, children, headExtra }: {
   no?: string;
   title: string;
   lead?: string;
   id?: string;
   sticky?: boolean;
+  /** Heading above, content across the full container width. */
+  wide?: boolean;
   band?: boolean;
   flushTop?: boolean;
   reveal?: boolean;
@@ -54,7 +56,7 @@ export const Section = ({ no, title, lead, id, sticky, band, flushTop, reveal = 
       aria-labelledby={headingId}
       data-reveal={reveal || undefined}
     >
-      <div className={`container rail${sticky ? ' rail--sticky' : ''}`}>
+      <div className={`container rail${sticky ? ' rail--sticky' : ''}${wide ? ' rail--stacked' : ''}`}>
         <SectionHead no={no} title={title} lead={lead} id={headingId}>{headExtra}</SectionHead>
         <div className="rail__body">{children}</div>
       </div>

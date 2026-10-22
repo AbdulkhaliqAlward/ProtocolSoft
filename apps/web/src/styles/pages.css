@@ -72,15 +72,23 @@ html[lang="en"] .home-hero__title { letter-spacing: -0.015em; }
 @media (min-width: 760px) { .svc-index__go { grid-column: auto; } }
 
 /* ── Steps on a line (home methodology) ──────────────────────────────── */
-.steps-line { list-style: none; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); counter-reset: none; }
-.steps-line li { position: relative; display: grid; gap: var(--s-2); align-content: start; padding-top: 56px; }
-.steps-line li::before { content: ""; position: absolute; top: 18px; inset-inline: 0; height: 4px; border-radius: var(--r-pill); background: var(--surface-sunken); }
+/* Phones and tablets: a vertical list, number beside the text, joined by a
+   line. Desktop: one row across the full width, joined by a horizontal line. */
+.steps-line { list-style: none; padding: 0; display: grid; gap: var(--s-5); counter-reset: none; }
+.steps-line li { position: relative; display: grid; gap: var(--s-2); align-content: start; min-height: 40px; padding-top: 8px; padding-inline-start: 60px; }
+.steps-line li::before { content: ""; position: absolute; top: 48px; bottom: calc(var(--s-5) * -1 + 8px); inset-inline-start: 18px; width: 4px; border-radius: var(--r-pill); background: var(--surface-sunken); }
+.steps-line li:last-child::before { display: none; }
+@media (min-width: 1024px) {
+  .steps-line { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--s-6); }
+  .steps-line li { padding-top: 56px; padding-inline-start: 0; }
+  .steps-line li::before, .steps-line li:last-child::before { display: block; top: 18px; bottom: auto; inset-inline: 0; width: auto; height: 4px; }
+}
 .steps-line__no { position: absolute; top: 0; inset-inline-start: 0; width: 40px; height: 40px; border-radius: var(--r-pill); display: grid; place-items: center; background: var(--text); color: var(--bg); font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: 0.875rem; font-weight: 500; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .3); }
 .steps-line h3 { font-size: 1.0625rem; }
 .steps-line p { font-size: var(--fs-small); color: var(--text-muted); line-height: 1.7; }
 
 /* ── Commitments (why us) ────────────────────────────────────────────── */
-.commitments { list-style: none; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.commitments { list-style: none; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
 .commitments li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s-4); padding: var(--s-5); border-radius: var(--r-lg); background: var(--surface) var(--sheen); border: 1px solid var(--line-soft); box-shadow: var(--convex); }
 .commitments .spark { margin-top: 10px; }
 .commitments h3 { font-size: 1.125rem; }

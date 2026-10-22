@@ -46,6 +46,17 @@ h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); line-height: 1.4; }
 h4 { font-size: var(--fs-h4); line-height: 1.45; }
 p, li, dd { text-wrap: pretty; overflow-wrap: break-word; }
+/* Reading text is justified with the last line at the start edge, so blocks
+   have clean edges on both sides. Arabic justifies by widening word gaps, so
+   this applies to paragraphs and list text only, never to headings, labels,
+   buttons or figures. */
+main :is(p, .svc-index__summary, .scope__desc, .scope__list li, .prose li) {
+  text-align: justify;
+  text-align-last: start;
+  /* Plain wrapping: "pretty" moves words down to avoid a short last line,
+     and justification would then stretch the shortened line above it. */
+  text-wrap: wrap;
+}
 strong, b { font-weight: var(--fw-strong); }
 small { font-size: var(--fs-small); }
 
