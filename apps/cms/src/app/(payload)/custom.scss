@@ -1,2 +1,233 @@
-/* Admin panel visual overrides are applied in Phase 5/8 (RTL-first admin styling).
-   This file reserves the import path used by the Payload admin root. */
+/*
+ * Admin theme: the Protocol Soft brand in Payload's own variables.
+ * Paper and cream grounds, brand ink (#2E0661) for text and primary actions,
+ * deep ink grounds in dark mode. Fonts come from admin/fonts.ts. Only
+ * variables and light-touch component rules: no layout overrides that a
+ * Payload upgrade could break.
+ */
+:root {
+  /* Generated: warm paper (0) -> brand ink (800) -> deep ink (1000), OKLab. */
+  --color-base-0: #FFFCF8;
+  --color-base-50: #FDF5EB;
+  --color-base-100: #FBEEDF;
+  --color-base-150: #F2E3D2;
+  --color-base-200: #E9D8C6;
+  --color-base-250: #D6C5B9;
+  --color-base-300: #C4B2AB;
+  --color-base-350: #B1A09E;
+  --color-base-400: #A08E91;
+  --color-base-450: #8E7C85;
+  --color-base-500: #7D6B78;
+  --color-base-550: #6E5C76;
+  --color-base-600: #604E73;
+  --color-base-650: #523F6F;
+  --color-base-700: #452F6B;
+  --color-base-750: #391E66;
+  --color-base-800: #2E0661;
+  --color-base-850: #260451;
+  --color-base-900: #1E0342;
+  --color-base-950: #160232;
+  --color-base-1000: #0F0122;
+  --color-success-0: #F1F8F3;
+  --color-success-50: #DCE9E1;
+  --color-success-100: #C7DBCF;
+  --color-success-150: #B3CCBD;
+  --color-success-200: #9FBEAC;
+  --color-success-250: #8AB09B;
+  --color-success-300: #76A28A;
+  --color-success-350: #629479;
+  --color-success-400: #4E8669;
+  --color-success-450: #387859;
+  --color-success-500: #1F6B4A;
+  --color-success-550: #1D6345;
+  --color-success-600: #1B5C3F;
+  --color-success-650: #19543A;
+  --color-success-700: #174D35;
+  --color-success-750: #154630;
+  --color-success-800: #123F2B;
+  --color-success-850: #103826;
+  --color-success-900: #0E3121;
+  --color-success-950: #0C2B1D;
+  --color-success-1000: #0A2418;
+  --color-error-0: #FDF2EF;
+  --color-error-50: #F8DFDA;
+  --color-error-100: #F3CCC4;
+  --color-error-150: #EDB8AF;
+  --color-error-200: #E6A59B;
+  --color-error-250: #DF9286;
+  --color-error-300: #D77F72;
+  --color-error-350: #CF6B5E;
+  --color-error-400: #C6574A;
+  --color-error-450: #BD4135;
+  --color-error-500: #B3261E;
+  --color-error-550: #A6241C;
+  --color-error-600: #99211A;
+  --color-error-650: #8C1F18;
+  --color-error-700: #801C16;
+  --color-error-750: #741A14;
+  --color-error-800: #681712;
+  --color-error-850: #5C1510;
+  --color-error-900: #50120E;
+  --color-error-950: #45100C;
+  --color-error-1000: #3A0D0A;
+  --style-radius-s: 6px;
+  --style-radius-m: 10px;
+  --style-radius-l: 16px;
+  --ps-ink: #2E0661;
+  --ps-cream: #FEF0E1;
+  --mark-ink: #2E0661;
+  --mark-paper: #FEF0E1;
+  --ps-shadow: 0 1px 2px rgba(46, 6, 97, .06), 0 10px 24px -16px rgba(46, 6, 97, .35);
+}
+html[data-theme='dark'] {
+  --mark-ink: #FEF0E1;
+  --mark-paper: #2E0661;
+  --ps-shadow: 0 1px 0 rgba(254, 240, 225, .06), 0 12px 28px -16px rgba(0, 0, 0, .7);
+}
+
+/* Type: headings and titles in the brand display face */
+h1, h2, h3, h4,
+.doc-header__title, .list-header h1, .dashboard__label, .nav-group__label, .ps-logo__name {
+  font-family: var(--ps-font-display);
+  font-weight: 500;
+  letter-spacing: normal;
+}
+html[lang='ar'] body { line-height: 1.7; }
+html[lang='ar'] :is(h1, h2, h3, h4, label, .field-label) { letter-spacing: normal; text-transform: none; }
+
+/* Brand graphics */
+.ps-logo { display: flex; align-items: center; gap: 16px; }
+.ps-logo__text { display: grid; gap: 2px; }
+.ps-logo__name { font-size: 1.75rem; color: var(--theme-elevation-800); line-height: 1.2; }
+.ps-logo__sub { font-size: .875rem; color: var(--theme-elevation-500); }
+.ps-icon { display: block; }
+.ps-before-login { display: grid; gap: 2px; margin: 0 0 24px; color: var(--theme-elevation-500); font-size: .875rem; }
+html[lang='ar'] .ps-before-login [lang='en'], html:not([lang='ar']) .ps-before-login [lang='ar'] { display: none; }
+
+/* Login: a centred paper card on the cream ground */
+.template-minimal { background: var(--theme-elevation-50); }
+.template-minimal__wrap {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: var(--ps-shadow);
+}
+
+/* Buttons: pill-shaped, brand ink primary */
+.btn { border-radius: 999px; font-weight: 500; }
+.btn--style-primary { box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .18); }
+.btn--style-primary:hover { box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .25), var(--ps-shadow); }
+
+/* Fields: softer inputs, visible focus in brand ink */
+.field-type input, .field-type textarea, .react-select .rs__control, .rich-text-lexical .editor-container {
+  border-radius: var(--style-radius-m);
+}
+.field-type input:focus, .field-type textarea:focus, .react-select .rs__control--is-focused {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-elevation-800) 18%, transparent);
+}
+.field-description { color: var(--theme-elevation-500); line-height: 1.6; }
+
+/* Cards (dashboard, collections) */
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--theme-elevation-100);
+  background: var(--theme-elevation-0);
+  box-shadow: var(--ps-shadow);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover { transform: translateY(-1px); }
+
+/* Navigation */
+.nav { background: var(--theme-elevation-50); border-inline-end: 1px solid var(--theme-elevation-100); }
+.nav-group__label { font-size: .8125rem; color: var(--theme-elevation-500); }
+.nav__link { border-radius: var(--style-radius-m); }
+.nav__link.active, .nav__link:hover { background: var(--theme-elevation-100); }
+
+/* Tables (list views) */
+.table table { border-collapse: separate; border-spacing: 0; }
+.table th { font-weight: 500; color: var(--theme-elevation-500); }
+.table tbody tr:hover td { background: var(--theme-elevation-50); }
+
+/* Dashboard welcome (admin/Welcome.tsx) */
+.ps-welcome { display: grid; gap: 20px; margin-bottom: 40px; }
+.ps-welcome__head {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px;
+  padding: 28px 32px; border-radius: 24px;
+  background: var(--ps-ink); color: var(--ps-cream);
+  box-shadow: inset 0 -60px 90px -50px rgba(10, 1, 24, .55);
+}
+.ps-welcome__eyebrow { margin: 0 0 6px; font-size: .875rem; opacity: .8; }
+.ps-welcome__title { margin: 0; font-size: 2rem; color: var(--ps-cream); }
+.ps-welcome__site {
+  color: var(--ps-cream); text-decoration: none; font-weight: 500;
+  padding: 10px 18px; border-radius: 999px; border: 1px solid rgba(254, 240, 225, .5);
+}
+.ps-welcome__site:hover { background: rgba(254, 240, 225, .1); }
+.ps-welcome__status { display: flex; flex-wrap: wrap; gap: 12px; }
+.ps-stat {
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px;
+  background: var(--theme-elevation-50); border: 1px solid var(--theme-elevation-100);
+  color: var(--theme-elevation-800); text-decoration: none;
+}
+.ps-stat__num { font-family: var(--ps-font-display); font-size: 1.25rem; font-weight: 600; }
+.ps-stat--alert { background: var(--theme-warning-100); border-color: var(--theme-warning-250); }
+.ps-welcome__grid { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1100px) { .ps-welcome__grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+.ps-shortcuts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); }
+.ps-shortcut {
+  display: grid; gap: 4px; align-content: start; padding: 16px 18px; border-radius: 16px;
+  background: var(--theme-elevation-0); border: 1px solid var(--theme-elevation-100);
+  box-shadow: var(--ps-shadow); color: var(--theme-elevation-800); text-decoration: none;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.ps-shortcut:hover { transform: translateY(-1px); border-color: var(--theme-elevation-300); }
+.ps-shortcut strong { font-family: var(--ps-font-display); font-weight: 500; font-size: 1.0625rem; }
+.ps-shortcut span { font-size: .8125rem; color: var(--theme-elevation-500); line-height: 1.5; }
+.ps-steps {
+  padding: 20px 22px; border-radius: 16px;
+  background: var(--theme-elevation-50); border: 1px solid var(--theme-elevation-100);
+}
+.ps-steps h2 { margin: 0 0 12px; font-size: 1.125rem; }
+.ps-steps ol { margin: 0 0 12px; padding-inline-start: 20px; display: grid; gap: 8px; line-height: 1.6; }
+.ps-steps p { margin: 0; font-size: .8125rem; color: var(--theme-elevation-500); }
+
+/* Content fields follow the direction of what is typed in them, so Arabic
+   reads right-to-left even in the English admin (and vice versa). */
+.field-type input[type='text'], .field-type input[type='email'], .field-type textarea,
+.rich-text-lexical .ContentEditable__root, .rich-text-lexical p, .rich-text-lexical li, .rich-text-lexical h2, .rich-text-lexical h3 {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* Publish-per-language panel (components/PublishPanel.tsx) */
+.ps-publish {
+  display: grid; gap: 12px; margin-bottom: 28px; padding: 16px;
+  border-radius: 16px; background: var(--theme-elevation-50); border: 1px solid var(--theme-elevation-100);
+}
+.ps-publish__title { margin: 0; font-size: 1rem; }
+.ps-publish__note { margin: 0; font-size: .8125rem; line-height: 1.6; color: var(--theme-elevation-500); }
+.ps-publish__row {
+  display: grid; gap: 10px; padding: 12px; border-radius: 12px;
+  background: var(--theme-elevation-0); border: 1px solid var(--theme-elevation-100);
+}
+.ps-publish__state { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ps-publish__lang { font-weight: 600; }
+.ps-publish__pill {
+  font-size: .75rem; padding: 2px 10px; border-radius: 999px;
+  background: var(--theme-elevation-100); color: var(--theme-elevation-600);
+}
+.ps-publish__pill--live { background: var(--theme-success-100); color: var(--theme-success-750); }
+.ps-publish__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ps-publish__btn {
+  font: inherit; font-size: .8125rem; font-weight: 500; cursor: pointer;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid var(--theme-elevation-300);
+  background: transparent; color: var(--theme-elevation-800);
+}
+.ps-publish__btn:hover:not(:disabled) { background: var(--theme-elevation-100); }
+.ps-publish__btn--primary { background: var(--theme-elevation-800); color: var(--theme-elevation-0); border-color: transparent; }
+.ps-publish__btn--primary:hover:not(:disabled) { background: var(--theme-elevation-900); }
+.ps-publish__btn:disabled { opacity: .5; cursor: progress; }
+.ps-publish__msg { margin: 0; font-size: .8125rem; line-height: 1.6; }
+.ps-publish__msg--ok { color: var(--theme-success-650); }
+.ps-publish__msg--err { color: var(--theme-error-600); }

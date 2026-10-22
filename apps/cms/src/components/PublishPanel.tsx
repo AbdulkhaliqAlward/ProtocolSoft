@@ -5,42 +5,95 @@
  * and preview actions (POST /api/publish/... and /api/internal/preview/issue).
  * All rules stay on the server (Arabic first, completeness, legal and
  * readiness gates); this panel only explains the server's answer in words.
+ * It speaks the admin's language (Arabic or English). Styles: custom.scss.
  */
-import { useDocumentInfo, useField } from '@payloadcms/ui';
+import { useDocumentInfo, useField, useTranslation } from '@payloadcms/ui';
 import { useState } from 'react';
 
 type Locale = 'ar' | 'en';
-const NAMES: Record<Locale, string> = { ar: 'العربية', en: 'الإنجليزية' };
+type Lang = 'ar' | 'en';
 
-const explain = (body: { error?: string; missing?: string[]; failingChecks?: string[] }): string => {
-  switch (body.error) {
-    case 'incomplete_locale':
-      return `لا يمكن النشر قبل تعبئة هذه الحقول بهذه اللغة: ${(body.missing ?? []).join('، ')}`;
-    case 'requires_arabic_published':
-      return 'انشر النسخة العربية أولاً، ثم الإنجليزية.';
-    case 'legal_publish_requires_super_admin':
-      return 'نشر الصفحات القانونية متاح لمدير النظام (Super Admin) فقط.';
-    case 'legal_review_required':
-      return 'سجّل المراجعة القانونية أولاً: املأ «legalReviewedBy» و«legalReviewedAt» في الشريط الجانبي واحفظ، ثم انشر.';
-    case 'public_readiness_gate_failed':
-      return `لم يجتز المحتوى شروط الجاهزية للنشر: ${(body.failingChecks ?? []).join('، ')}`;
-    case 'forbidden':
-      return 'ليست لديك صلاحية النشر.';
-    default:
-      return 'تعذّر تنفيذ الطلب. حدّث الصفحة وحاول مرة أخرى.';
-  }
-};
+const COPY = {
+  ar: {
+    title: 'النشر حسب اللغة',
+    intro: 'احفظ تعديلاتك أولاً. تُنشر العربية قبل الإنجليزية، ولا يظهر على الموقع إلا ما نُشر هنا. لتحديث نسخة منشورة اضغط «نشر التغييرات» أعلى الصفحة.',
+    saveFirst: 'احفظ المستند أولاً، ثم تظهر هنا أزرار المعاينة والنشر لكل لغة.',
+    names: { ar: 'العربية', en: 'الإنجليزية' },
+    live: 'منشورة على الموقع',
+    notLive: 'غير منشورة',
+    preview: 'معاينة',
+    publish: 'نشر',
+    unpublish: 'إلغاء النشر',
+    published: (n: string) => `نُشرت النسخة ${n}. يجري تحديث الصفحة…`,
+    unpublished: (n: string) => `أُلغي نشر النسخة ${n}. يجري تحديث الصفحة…`,
+    previewFailed: 'تعذّر إنشاء رابط المعاينة. احفظ المسودة ثم حاول مرة أخرى.',
+    sep: '، ',
+    errors: {
+      incomplete_locale: 'لا يمكن النشر قبل تعبئة هذه الحقول بهذه اللغة: ',
+      requires_arabic_published: 'انشر النسخة العربية أولاً، ثم الإنجليزية.',
+      legal_publish_requires_super_admin: 'نشر الصفحات القانونية متاح لمدير النظام فقط.',
+      legal_review_required: 'سجّل المراجعة القانونية أولاً: املأ «المراجِع القانوني» و«تاريخ المراجعة القانونية» واحفظ، ثم انشر.',
+      public_readiness_gate_failed: 'لم يجتز المحتوى شروط الجاهزية للنشر: ',
+      forbidden: 'ليست لديك صلاحية النشر.',
+      default: 'تعذّر تنفيذ الطلب. حدّث الصفحة وحاول مرة أخرى.',
+    },
+  },
+  en: {
+    title: 'Publish per language',
+    intro: 'Save your changes first. Arabic is published before English, and only languages published here appear on the site. To update a live version, use “Publish changes” at the top.',
+    saveFirst: 'Save the document first; preview and publish buttons for each language then appear here.',
+    names: { ar: 'Arabic', en: 'English' },
+    live: 'Live on the site',
+    notLive: 'Not published',
+    preview: 'Preview',
+    publish: 'Publish',
+    unpublish: 'Unpublish',
+    published: (n: string) => `${n} version published. Refreshing…`,
+    unpublished: (n: string) => `${n} version unpublished. Refreshing…`,
+    previewFailed: 'Could not create a preview link. Save the draft and try again.',
+    sep: ', ',
+    errors: {
+      incomplete_locale: 'Fill these fields in this language before publishing: ',
+      requires_arabic_published: 'Publish the Arabic version first, then English.',
+      legal_publish_requires_super_admin: 'Only the system admin can publish legal pages.',
+      legal_review_required: 'Record the legal review first (reviewer and review date), save, then publish.',
+      public_readiness_gate_failed: 'The content does not pass the publishing checks yet: ',
+      forbidden: 'You do not have permission to publish.',
+      default: 'The request failed. Refresh the page and try again.',
+    },
+  },
+} as const;
+
+type ErrorBody = { error?: string; missing?: string[]; failingChecks?: string[] };
 
 export const PublishPanel = ({ path }: { path: string }) => {
   const { id, collectionSlug } = useDocumentInfo();
   const { value } = useField<string[]>({ path });
+  const { i18n } = useTranslation();
+  const lang: Lang = i18n.language === 'en' ? 'en' : 'ar';
+  const c = COPY[lang];
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const live = (Array.isArray(value) ? value : []) as Locale[];
 
-  if (!id) {
-    return <p style={{ fontSize: 13, opacity: 0.8 }}>احفظ المستند أولاً، ثم تظهر هنا أزرار المعاينة والنشر لكل لغة.</p>;
-  }
+  const explain = (body: ErrorBody): string => {
+    const e = c.errors;
+    switch (body.error) {
+      case 'incomplete_locale':
+        return e.incomplete_locale + (body.missing ?? []).join(c.sep);
+      case 'public_readiness_gate_failed':
+        return e.public_readiness_gate_failed + (body.failingChecks ?? []).join(c.sep);
+      case 'requires_arabic_published':
+      case 'legal_publish_requires_super_admin':
+      case 'legal_review_required':
+      case 'forbidden':
+        return e[body.error];
+      default:
+        return e.default;
+    }
+  };
+
+  if (!id) return <p className="ps-publish__note" dir={lang === 'ar' ? 'rtl' : 'ltr'}>{c.saveFirst}</p>;
 
   const setStatus = async (action: 'publish' | 'unpublish', locale: Locale): Promise<void> => {
     setBusy(true);
@@ -52,12 +105,12 @@ export const PublishPanel = ({ path }: { path: string }) => {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ action, locale }),
       });
-      const body = await res.json().catch(() => ({}));
+      const body = (await res.json().catch(() => ({}))) as ErrorBody;
       if (!res.ok) {
         setMessage({ ok: false, text: explain(body) });
         return;
       }
-      setMessage({ ok: true, text: action === 'publish' ? `نُشرت النسخة ${NAMES[locale]}. يجري تحديث الصفحة…` : `أُلغي نشر النسخة ${NAMES[locale]}. يجري تحديث الصفحة…` });
+      setMessage({ ok: true, text: action === 'publish' ? c.published(c.names[locale]) : c.unpublished(c.names[locale]) });
       window.setTimeout(() => window.location.reload(), 900);
     } finally {
       setBusy(false);
@@ -77,42 +130,39 @@ export const PublishPanel = ({ path }: { path: string }) => {
     const body = (await res.json().catch(() => ({}))) as { url?: string };
     if (!res.ok || !body.url) {
       tab?.close();
-      setMessage({ ok: false, text: 'تعذّر إنشاء رابط المعاينة. احفظ المسودة ثم حاول مرة أخرى.' });
+      setMessage({ ok: false, text: c.previewFailed });
       return;
     }
     if (tab) tab.location.href = body.url;
     else window.location.href = body.url;
   };
 
-  const button = { padding: '6px 10px', borderRadius: 6, border: '1px solid currentColor', background: 'transparent', cursor: 'pointer', fontSize: 13 } as const;
-
   return (
-    <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
-      <strong style={{ fontSize: 14 }}>النشر حسب اللغة / Publish per language</strong>
-      <p style={{ fontSize: 12, opacity: 0.8, margin: 0 }}>
-        احفظ تعديلاتك أولاً. تُنشر العربية قبل الإنجليزية، ولا يظهر على الموقع إلا اللغة المنشورة هنا. لتحديث نسخة منشورة، اضغط «نشر التغييرات» (Publish changes) أعلى الصفحة.
-      </p>
+    <section className="ps-publish" dir={lang === 'ar' ? 'rtl' : 'ltr'} aria-label={c.title}>
+      <h3 className="ps-publish__title">{c.title}</h3>
+      <p className="ps-publish__note">{c.intro}</p>
       {(['ar', 'en'] as const).map((locale) => {
         const isLive = live.includes(locale);
         return (
-          <div key={locale} style={{ display: 'grid', gap: 6, padding: 10, borderRadius: 8, border: '1px solid var(--theme-elevation-150)' }}>
-            <span style={{ fontSize: 13 }}>
-              {NAMES[locale]}: <b>{isLive ? 'منشورة على الموقع' : 'غير منشورة'}</b>
-            </span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              <button type="button" style={button} disabled={busy} onClick={() => void preview(locale)}>معاينة</button>
+          <div key={locale} className="ps-publish__row">
+            <div className="ps-publish__state">
+              <span className="ps-publish__lang">{c.names[locale]}</span>
+              <span className={`ps-publish__pill${isLive ? ' ps-publish__pill--live' : ''}`}>{isLive ? c.live : c.notLive}</span>
+            </div>
+            <div className="ps-publish__actions">
+              <button type="button" className="ps-publish__btn" disabled={busy} onClick={() => void preview(locale)}>{c.preview}</button>
               {isLive ? (
-                <button type="button" style={button} disabled={busy} onClick={() => void setStatus('unpublish', locale)}>إلغاء النشر</button>
+                <button type="button" className="ps-publish__btn" disabled={busy} onClick={() => void setStatus('unpublish', locale)}>{c.unpublish}</button>
               ) : (
-                <button type="button" style={{ ...button, fontWeight: 600 }} disabled={busy} onClick={() => void setStatus('publish', locale)}>نشر</button>
+                <button type="button" className="ps-publish__btn ps-publish__btn--primary" disabled={busy} onClick={() => void setStatus('publish', locale)}>{c.publish}</button>
               )}
             </div>
           </div>
         );
       })}
       {message && (
-        <p role="status" style={{ fontSize: 13, margin: 0, color: message.ok ? 'var(--theme-success-500)' : 'var(--theme-error-500)' }}>{message.text}</p>
+        <p role="status" className={`ps-publish__msg${message.ok ? ' ps-publish__msg--ok' : ' ps-publish__msg--err'}`}>{message.text}</p>
       )}
-    </div>
+    </section>
   );
 };

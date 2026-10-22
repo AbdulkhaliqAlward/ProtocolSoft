@@ -1,14 +1,14 @@
 /** SEO settings (Phase 2 §5.1.5): templates valid in both languages; sitemap covers the public domain only. */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles';
+import { requireCapability, roleOf } from '../access/roles';
 import { auditGlobalChange } from '../utilities/audit';
 import { revalidateGlobal } from '../utilities/revalidate';
 
 export const SeoSettings: GlobalConfig = {
   slug: 'seo-settings',
   label: 'إعدادات SEO / SEO Settings',
-  admin: { group: 'الإعدادات / Settings' },
+  admin: { group: 'متقدم / Advanced', hidden: ({ user }) => roleOf(user) !== 'super_admin' },
   access: { read: requireCapability('content_edit'), update: requireCapability('settings_manage') },
   hooks: { afterChange: [auditGlobalChange('settings_changed'), revalidateGlobal('seo-settings')] },
   fields: [

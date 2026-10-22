@@ -4,6 +4,8 @@ import type { ServerFunctionClient } from 'payload';
 import React from 'react';
 import configPromise from '@payload-config';
 
+import { ADMIN_FONT_CSS } from '../../admin/fonts';
+
 import { importMap } from './admin/importMap';
 
 import '@payloadcms/next/css';
@@ -24,6 +26,7 @@ const serverFunction: ServerFunctionClient = async function serverFunction(args)
 
 const Layout = ({ children }: Args) => (
   <RootLayout config={configPromise} importMap={importMap} serverFunction={serverFunction}>
+    <style dangerouslySetInnerHTML={{ __html: ADMIN_FONT_CSS }} />
     {children}
   </RootLayout>
 );

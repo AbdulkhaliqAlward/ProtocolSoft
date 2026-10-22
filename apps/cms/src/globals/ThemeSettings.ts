@@ -17,7 +17,7 @@
  */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles';
+import { requireCapability, roleOf } from '../access/roles';
 import { auditGlobalChange } from '../utilities/audit';
 import { revalidateGlobal } from '../utilities/revalidate';
 
@@ -26,7 +26,7 @@ export const COLOR_PRESETS = ['ink_stone_v1'] as const;
 export const ThemeSettings: GlobalConfig = {
   slug: 'theme-settings',
   label: 'الهوية البصرية / Theme Tokens',
-  admin: { group: 'الإعدادات / Settings' },
+  admin: { group: 'متقدم / Advanced', hidden: ({ user }) => roleOf(user) !== 'super_admin' },
   access: { read: requireCapability('content_edit'), update: requireCapability('theme_manage') },
   hooks: { afterChange: [auditGlobalChange('theme_changed'), revalidateGlobal('theme')] },
   fields: [

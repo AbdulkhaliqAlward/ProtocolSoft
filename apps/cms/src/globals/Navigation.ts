@@ -1,14 +1,14 @@
 /** Navigation (Phase 2 §5.1.3): header items + single CTA + footer columns. */
 import type { GlobalConfig } from 'payload';
 
-import { requireCapability } from '../access/roles';
+import { requireCapability, roleOf } from '../access/roles';
 import { auditGlobalChange } from '../utilities/audit';
 import { revalidateGlobal } from '../utilities/revalidate';
 
 export const Navigation: GlobalConfig = {
   slug: 'navigation',
   label: 'القوائم / Navigation',
-  admin: { group: 'الإعدادات / Settings' },
+  admin: { group: 'متقدم / Advanced', hidden: ({ user }) => roleOf(user) !== 'super_admin' },
   access: { read: requireCapability('content_edit'), update: requireCapability('navigation_manage') },
   hooks: { afterChange: [auditGlobalChange('settings_changed'), revalidateGlobal('navigation')] },
   fields: [

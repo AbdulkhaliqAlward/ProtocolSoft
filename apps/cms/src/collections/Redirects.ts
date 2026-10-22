@@ -1,13 +1,13 @@
 /** Redirects (Phase 2 §5.3.6): launch safety net. */
 import type { CollectionConfig } from 'payload';
 
-import { requireCapability } from '../access/roles';
+import { requireCapability, roleOf } from '../access/roles';
 import { auditAfterChange } from '../utilities/audit';
 
 export const Redirects: CollectionConfig = {
   slug: 'redirects',
   labels: { singular: 'تحويل / Redirect', plural: 'التحويلات / Redirects' },
-  admin: { group: 'الإعدادات / Settings', useAsTitle: 'from', defaultColumns: ['from', 'to', 'statusCode', 'active'] },
+  admin: { group: 'متقدم / Advanced', hidden: ({ user }) => roleOf(user) !== 'super_admin', useAsTitle: 'from', defaultColumns: ['from', 'to', 'statusCode', 'active'] },
   access: {
     read: requireCapability('content_edit'),
     create: requireCapability('settings_manage'),

@@ -10,6 +10,15 @@ import { hasCapability } from '@protocol-soft/shared';
 import { writeAudit } from '../utilities/audit';
 
 const LEAD_STATUSES = ['new', 'contacted', 'qualified', 'proposal_sent', 'won', 'lost', 'archived'] as const;
+const STATUS_LABELS: Record<(typeof LEAD_STATUSES)[number], { ar: string; en: string }> = {
+  new: { ar: 'جديد', en: 'New' },
+  contacted: { ar: 'تم التواصل', en: 'Contacted' },
+  qualified: { ar: 'مؤهَّل', en: 'Qualified' },
+  proposal_sent: { ar: 'أُرسل العرض', en: 'Proposal sent' },
+  won: { ar: 'تم التعاقد', en: 'Won' },
+  lost: { ar: 'لم يتم', en: 'Lost' },
+  archived: { ar: 'مؤرشف', en: 'Archived' },
+};
 
 export const Leads: CollectionConfig = {
   slug: 'leads',
@@ -61,7 +70,7 @@ export const Leads: CollectionConfig = {
       required: true,
       defaultValue: 'new',
       index: true,
-      options: LEAD_STATUSES.map((value) => ({ label: value, value })),
+      options: LEAD_STATUSES.map((value) => ({ label: STATUS_LABELS[value], value })),
     },
     { name: 'assignedTo', type: 'relationship', relationTo: 'users', index: true },
     {

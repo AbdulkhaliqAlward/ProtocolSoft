@@ -7,7 +7,7 @@ import type { CollectionConfig } from 'payload';
 
 import { requireAnyAdmin, requireCapability, requireCapabilityForField, roleOf, type AdminUser } from '../access/roles';
 import { writeAudit } from '../utilities/audit';
-import { ROLES } from '@protocol-soft/shared';
+import { ROLE_LABELS, ROLES } from '@protocol-soft/shared';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -47,7 +47,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'editor',
-      options: ROLES.map((r) => ({ label: r, value: r })),
+      options: ROLES.map((r) => ({ label: ROLE_LABELS[r], value: r })),
       saveToJWT: true,
       access: {
         // Field-level rule (Phase 2 §2): only Super Admin may read/write the role field.

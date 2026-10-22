@@ -9,6 +9,8 @@
  *    Access-protected admin domain (admin.protosoftdev.com).
  */
 import { postgresAdapter } from '@payloadcms/db-postgres';
+import { ar } from '@payloadcms/translations/languages/ar';
+import { en } from '@payloadcms/translations/languages/en';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import path from 'node:path';
@@ -40,6 +42,7 @@ import { leadsEndpoint } from './endpoints/internal/leads';
 import { mediaEndpoint } from './endpoints/internal/media';
 import { previewEndpoints } from './endpoints/internal/preview';
 import { publishEndpoints } from './endpoints/publish';
+import { adminLabels } from './admin/labels';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -66,31 +69,35 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
 
+  // Order = admin menu order (groups appear in the order first met):
+  // content, leads, media, settings, advanced, system.
   collections: [
-    Users,
-    Media,
     Services,
-    CaseStudies,
-    TechnicalInitiatives,
-    TeamMembers,
     Pages,
-    Leads,
+    TeamMembers,
     SocialLinks,
+    TechnicalInitiatives,
+    CaseStudies,
+    Leads,
+    Media,
     Redirects,
+    Users,
     AuditLogs,
     BackupRecords,
     PreviewCodes,
   ],
 
   globals: [
-    SiteSettings,
-    ThemeSettings,
-    Navigation,
     Homepage,
-    SeoSettings,
+    SiteSettings,
     FormSettings,
+    Navigation,
+    SeoSettings,
+    ThemeSettings,
     BackupSettings,
   ],
+
+  plugins: [adminLabels],
 
   endpoints: [...contentEndpoints, mediaEndpoint, leadsEndpoint, ...previewEndpoints, ...backupEndpoints, ...publishEndpoints],
 
@@ -100,11 +107,19 @@ export default buildConfig({
     meta: {
       titleSuffix: '| بروتوكول سوفت',
       robots: 'noindex, nofollow', // never indexed (Phase 1 §7)
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/icon.svg' }],
+    },
+    components: {
+      graphics: { Logo: '/admin/Graphics#Logo', Icon: '/admin/Graphics#Icon' },
+      beforeLogin: ['/admin/BeforeLogin#BeforeLogin'],
+      beforeDashboard: ['/admin/Welcome#Welcome'],
     },
   },
 
   i18n: {
-    fallbackLanguage: 'en',
+    // The admin speaks Arabic by default (RTL); English is a switch away in the account page.
+    supportedLanguages: { ar, en },
+    fallbackLanguage: 'ar',
     // Admin UI languages; content locales are defined per-collection (ar default).
     translations: {
       en: {
