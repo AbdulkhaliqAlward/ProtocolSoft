@@ -9,6 +9,10 @@ const nextConfig = {
   outputFileTracingExcludes: {
     '*': ['../media/**', '../backups/**', './media/**', './backups/**'],
   },
+  // The CMS has no page of its own at "/": send visitors to the admin.
+  async redirects() {
+    return [{ source: '/', destination: '/admin', permanent: false }];
+  },
   async headers() {
     return [
       {
@@ -27,4 +31,4 @@ const nextConfig = {
   },
 };
 
-export default withPayload(nextConfig, { importMapUrl: new URL('src/app/(payload)/importMap.js', import.meta.url) });
+export default withPayload(nextConfig, { importMapUrl: new URL('src/app/(payload)/admin/importMap.js', import.meta.url) });
