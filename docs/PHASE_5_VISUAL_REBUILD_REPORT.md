@@ -1,5 +1,7 @@
 # Phase 5 Visual Rebuild — Final Report
 
+> Note (2026-10-22): the screenshots, `capture-screenshots.mjs` and `contrast-audit.mjs` referenced in this report were removed in the launch cleanup; they showed a design that has since been replaced.
+
 **Date:** 2026-09-18
 **Environment:** Local development only (web: http://localhost:3000, cms: http://localhost:3001)
 **Status:** Complete — ready for Protocol Soft visual review

@@ -76,15 +76,20 @@ docker compose --profile debug up -d postgres postgres-debug
 # 2. Apply schema migrations (create the DB first if it does not exist)
 npm run migrate -w @protocol-soft/cms
 
-# 3. Seed structural content (drafts only), local review publish, first admin
+# 3. Seed structure, load + publish the site copy locally, first admin
 npm run seed:cms
-npm run publish:local-review -w @protocol-soft/cms
+npm run publish:local-review -w @protocol-soft/cms   # local only; refuses production
 npm run bootstrap:superadmin
 
 # 4. Start the apps (two terminals)
 npm run dev:cms   # CMS Admin at http://localhost:3001/admin
 npm run dev:web   # Public site at http://localhost:3000
 ```
+
+Site copy lives in `apps/cms/src/scripts/review-content/` and
+`publish-local-review.ts`. In production, load it as drafts with
+`npm run content:load-drafts -w @protocol-soft/cms`, then review and publish each
+item from the admin's "publish per language" panel.
 
 Schema changes: edit collections/globals, then `npm run migrate:create -w @protocol-soft/cms`
 and commit the generated file in `apps/cms/src/migrations/`. Auto-push is disabled in
@@ -103,6 +108,10 @@ docker compose up -d --build
 ## 📄 Documentation
 
 For in-depth architectural design, strategy, and verification reports, explore the [`docs/`](./docs) folder:
+- [Content guide (Arabic, for editors)](./docs/CONTENT-GUIDE.md)
+- [Company facts still needed](./docs/FACTS-NEEDED.md)
+- [Launch checklist](./docs/LAUNCH-CHECKLIST.md)
+- [Performance measurements](./docs/PERFORMANCE.md)
 - [Phase 1: Strategy & Brand Identity](./docs/PHASE_1_STRATEGY.md)
 - [Phase 2: CMS Architecture & Data Modeling](./docs/PHASE_2_CMS_ARCHITECTURE.md)
 - [Phase 3: Design System & UI/UX](./docs/PHASE_3_DESIGN_SYSTEM_UI_UX.md)

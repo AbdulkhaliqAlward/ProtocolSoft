@@ -103,6 +103,8 @@ The currently rendered hero is **Option A**, implemented at neutral placeholder 
 
 ## 5. Screenshot index — `docs/screenshots/phase5/`
 
+> Note (2026-10-22): the screenshots, `capture-screenshots.mjs` and `contrast-audit.mjs` referenced in this report were removed in the launch cleanup; they showed a design that has since been replaced.
+
 Viewport-only captures (IAB fullPage stitching was unreliable with the sticky header; all captures visually reviewed correct).
 
 | File | Route |
