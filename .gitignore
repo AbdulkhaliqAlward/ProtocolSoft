@@ -27,9 +27,9 @@ secrets/
 credentials/
 certs/
 
-# Payload generated / media
-packages/shared/src/payload-types.ts
-apps/cms/src/payload-types.ts
+# Payload media. apps/cms/src/payload-types.ts is generated from the schema but
+# TRACKED: the CMS build type-checks against it, so a clean clone needs it.
+# Regenerate with `npx payload generate:types` (in apps/cms) after schema changes.
 apps/cms/media/
 apps/cms/media-staging/
 apps/cms/backups/
