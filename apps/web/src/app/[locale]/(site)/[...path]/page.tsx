@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 
 import type { Locale } from '@protocol-soft/shared';
 
+import { LegalDocument, legalClauses } from '@/components/LegalDocument';
 import { PageBlocks } from '@/components/PageBlocks';
 import { PageHero } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
@@ -44,6 +45,7 @@ export default async function CatchAllPage({ params }: { params: Params }) {
 
   const page = await getOptional<PageData>('/api/internal/content/pages', locale, { slug: legal });
   if (!page) notFound(); // draft-only: a real public 404
+  const clauses = legalClauses(page.blocks);
 
   return (
     <>
@@ -51,7 +53,11 @@ export default async function CatchAllPage({ params }: { params: Params }) {
         title={page.title}
         crumbs={[{ label: locale === 'ar' ? 'الرئيسية' : 'Home', href: localePath(locale, '/') }, { label: page.title }]}
       />
-      <PageBlocks blocks={page.blocks} locale={locale} fallbackHeading={page.title} />
+      {clauses ? (
+        <LegalDocument clauses={clauses} locale={locale} />
+      ) : (
+        <PageBlocks blocks={page.blocks} locale={locale} fallbackHeading={page.title} />
+      )}
     </>
   );
 }
