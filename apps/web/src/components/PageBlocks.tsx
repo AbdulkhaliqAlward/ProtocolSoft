@@ -52,7 +52,7 @@ export const PageBlocks = ({ blocks, locale, fallbackHeading }: { blocks: unknow
         if (faqs.length === 0) break;
         out.push(
           <Section key={i} no={clause(++n)} title={str(raw.heading) || (ar ? 'أسئلة شائعة' : 'Common questions')}>
-            <Faq items={faqs} locale={locale} />
+            <Faq items={faqs} />
           </Section>,
         );
         break;

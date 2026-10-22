@@ -67,6 +67,17 @@ export interface PublicSiteSettings {
   country?: string;
   workingHours?: { ar: string; en: string };
   footerCopyright: { ar: string; en: string };
+  /** Empty string until the registered facts are entered in the CMS. */
+  legalCompanyName?: { ar: string; en: string };
+  commercialRegistration?: string;
+}
+
+export interface PublicTeamMember {
+  name: string;
+  jobTitle: string;
+  bio: unknown;
+  photo: unknown;
+  linkedinUrl: string | null;
 }
 
 export interface PublicSocialLink {

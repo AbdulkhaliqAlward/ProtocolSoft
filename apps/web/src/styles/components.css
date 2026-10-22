@@ -91,7 +91,7 @@ a.card:hover { box-shadow: var(--convex-hover); transform: translateY(-2px); }
   padding: clamp(28px, 4vw + 8px, 64px); position: relative; overflow: hidden;
 }
 :root[data-theme="dark"] .plate { border: 1px solid var(--plate-line); }
-.plate .muted, .plate .lead, .plate p { color: var(--plate-muted); }
+.plate .lead, .plate p { color: var(--plate-muted); }
 .plate h1, .plate h2, .plate h3 { color: var(--plate-text); }
 .plate .clause-no { color: var(--plate-muted); }
 .plate :focus-visible { outline-color: var(--cream); }
@@ -102,19 +102,14 @@ a.card:hover { box-shadow: var(--convex-hover); transform: translateY(-2px); }
 .facts > div:first-child { border-top: 0; }
 .facts dt { font-size: var(--fs-small); color: var(--text-muted); }
 .facts dd { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 0.9375rem; text-align: end; }
-.facts dd .tbc { display: table; margin-inline-start: auto; margin-top: 6px; }
 .plate .facts { background: rgba(254, 240, 225, .06); border-color: var(--plate-line); }
 .plate .facts > div { border-top-color: rgba(254, 240, 225, .16); }
 .plate .facts dt { color: var(--plate-muted); }
 
-/* Placeholder tag for facts awaiting confirmation */
-.tbc { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; font-family: var(--font-display); font-size: 0.75rem; font-weight: 500; line-height: 1.4; padding: 3px 10px 3px 9px; border-radius: var(--r-pill); background: var(--surface-sunken); color: var(--warning-text, var(--text)); border: 1px dashed var(--line-strong); white-space: nowrap; }
-.tbc__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
-.plate .tbc { background: rgba(254, 240, 225, .14); color: var(--cream); }
 
 /* Tags (small labels) */
 .tag { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: var(--r-sm); background: var(--surface-sunken); font-size: var(--fs-label); font-weight: 500; font-family: var(--font-display); }
-.badge, .badge--info { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); font-size: var(--fs-label); font-family: var(--font-display); font-weight: 500; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); font-size: var(--fs-label); font-family: var(--font-display); font-weight: 500; }
 
 /* ── Spec-sheet blocks ───────────────────────────────────────────────── */
 /* Included / not included */
@@ -180,15 +175,15 @@ a.card:hover { box-shadow: var(--convex-hover); transform: translateY(-2px); }
 .field__error { font-size: var(--fs-small); color: var(--err); display: flex; gap: 6px; align-items: baseline; }
 .field__error::before { content: "!"; flex: none; width: 18px; height: 18px; border-radius: 6px; background: var(--err); color: var(--bg); display: inline-grid; place-items: center; font-size: 12px; font-weight: 700; translate: 0 2px; }
 .field--hp { position: absolute !important; inset-inline-start: -9999px; width: 1px; height: 1px; overflow: hidden; }
-.input, .textarea, .select {
+.input, .textarea {
   width: 100%; min-height: 52px; padding: 13px 16px; border-radius: var(--r-sm);
   background: var(--surface); color: var(--text); border: 1px solid var(--line-strong); box-shadow: var(--concave);
   font-size: 1rem; line-height: 1.5;
   transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .textarea { min-height: 160px; resize: vertical; }
-.input:hover, .textarea:hover, .select:hover { border-color: var(--text); }
-.input:focus-visible, .textarea:focus-visible, .select:focus-visible { outline: none; border-color: var(--text); box-shadow: var(--concave), 0 0 0 4px color-mix(in srgb, var(--focus) 18%, transparent); }
+.input:hover, .textarea:hover { border-color: var(--text); }
+.input:focus-visible, .textarea:focus-visible { outline: none; border-color: var(--text); box-shadow: var(--concave), 0 0 0 4px color-mix(in srgb, var(--focus) 18%, transparent); }
 .input[aria-invalid="true"], .textarea[aria-invalid="true"] { border-color: var(--err); }
 .form-cols { display: grid; gap: 0 var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
 
@@ -231,7 +226,6 @@ a.card:hover { box-shadow: var(--convex-hover); transform: translateY(-2px); }
 .empty-state, .error-panel { border: 1.5px dashed var(--line-strong); border-radius: var(--r-lg); padding: var(--s-6); display: grid; gap: var(--s-3); justify-items: start; }
 .empty-state p, .error-panel p { color: var(--text-muted); }
 .empty-state__actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-2); }
-.error-panel__code { font-family: var(--font-mono); font-size: var(--fs-label); color: var(--text-muted); }
 
 /* Closing band: one action, consistent everywhere */
 .cta-band { padding-block: var(--section-y); }
@@ -250,12 +244,9 @@ a.card:hover { box-shadow: var(--convex-hover); transform: translateY(-2px); }
 .channel-list a { font-family: var(--font-display); font-weight: 500; text-decoration: none; color: var(--text); }
 .channel-list a:hover { text-decoration: underline; text-underline-offset: 0.3em; }
 .channel-label { display: block; font-size: var(--fs-label); color: var(--text-muted); }
-/* WhatsApp: always present; an honest "not yet available" state until configured */
-.wa-cta { display: inline-flex; flex-direction: column; gap: 4px; padding: var(--s-3) var(--s-4); border-radius: var(--r-md); font-family: var(--font-display); font-weight: 500; text-decoration: none; min-height: 44px; justify-content: center; font-size: var(--fs-small); }
-.wa-cta--active { background: var(--surface); color: var(--text); border: 1px solid var(--text); }
-.wa-cta--active:hover { background: var(--surface-sunken); }
-.wa-cta--unavailable { border: 1px dashed var(--line-strong); color: var(--text-muted); cursor: default; }
-.wa-cta--unavailable small { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-label); line-height: 1.6; }
+/* WhatsApp: rendered only once a number is configured in the CMS */
+.wa-cta { display: inline-flex; align-items: center; justify-content: center; padding: var(--s-3) var(--s-4); min-height: 44px; border-radius: var(--r-md); background: var(--surface); color: var(--text); border: 1px solid var(--text); font-family: var(--font-display); font-weight: 500; font-size: var(--fs-small); text-decoration: none; }
+.wa-cta:hover { background: var(--surface-sunken); }
 
 /* Draft preview banner (/preview) */
 .preview-frame { border: 1.5px dashed var(--line-strong); border-radius: var(--r-lg); padding: var(--s-5); font-size: var(--fs-small); }

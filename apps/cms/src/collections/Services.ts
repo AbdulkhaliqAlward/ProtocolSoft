@@ -60,17 +60,15 @@ export const Services: CollectionConfig = {
       fields: [
         { name: 'label', type: 'text', required: true },
         { name: 'value', type: 'text', required: true },
-        { name: 'needsConfirmation', type: 'checkbox', defaultValue: false, admin: { description: 'يُظهر وسم «يحتاج تأكيداً» على الموقع / shows a NEEDS CONFIRMATION tag on the site' } },
       ],
     },
     {
       name: 'notIncluded',
       type: 'array',
       localized: true,
-      admin: { description: 'ما لا يشمله هذا الارتباط (يُعرض بجانب المخرجات) / what this engagement does not cover (shown beside the deliverables)' },
+      admin: { description: 'ما لا يشمله هذا الارتباط (يُعرض بجانب المخرجات؛ يُخفى القسم إن كان فارغاً) / what this engagement does not cover (hidden when empty)' },
       fields: [
         { name: 'item', type: 'text', required: true },
-        { name: 'needsConfirmation', type: 'checkbox', defaultValue: true, admin: { description: 'أزِل العلامة بعد المراجعة / untick once reviewed' } },
       ],
     },
     {

@@ -5,7 +5,6 @@
  *   exchange · 04 capabilities by stage · 05 questions · related services
  *   · one closing action (contact form preselected with this service).
  * Only published, per-locale content renders; empty sections hide themselves.
- * Lines flagged needsConfirmation in the CMS show a NEEDS CONFIRMATION tag.
  */
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -16,9 +15,8 @@ import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSu
 import { InitiativeCard } from '@/components/InitiativeCard';
 import { JsonLd } from '@/components/JsonLd';
 import { RichText } from '@/components/RichText';
-import { Breadcrumbs, CapabilityGroups, Exchange, Faq, Scope, Section, Tbc, clause } from '@/components/sections';
+import { Breadcrumbs, CapabilityGroups, Exchange, Faq, Scope, Section, clause } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
-import { Spark } from '@/components/Spark';
 import { CtaBand } from '@/components/ui';
 import { getOptional } from '@/lib/internalApi';
 import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
@@ -34,8 +32,8 @@ interface ServiceDetail {
   summary: string;
   overview: unknown;
   deliverables: Array<{ title: string; description?: string | null }>;
-  engagementFacts?: Array<{ label: string; value: string; needsConfirmation?: boolean | null }>;
-  notIncluded?: Array<{ item: string; needsConfirmation?: boolean | null }>;
+  engagementFacts?: Array<{ label: string; value: string }>;
+  notIncluded?: Array<{ item: string }>;
   capabilityGroups?: Array<{ stage: string; title: string; items?: Array<{ label: string }> | null }>;
   capabilities: string[];
   processSteps: Array<{ title: string; description?: string | null; clientProvides?: string | null; weDeliver?: string | null }>;
@@ -132,7 +130,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
               {facts.map((f) => (
                 <div key={f.label} className="svc-hero__fact">
                   <dt>{f.label}</dt>
-                  <dd>{f.value} {f.needsConfirmation && <Tbc locale={locale} />}</dd>
+                  <dd>{f.value}</dd>
                 </div>
               ))}
             </dl>
@@ -183,7 +181,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
 
       {svc.faqs.length > 0 && (
         <Section id="faq" no={next()} title={ar ? 'أسئلة شائعة' : 'Common questions'}>
-          <Faq items={svc.faqs} locale={locale} />
+          <Faq items={svc.faqs} />
         </Section>
       )}
 

@@ -1,18 +1,23 @@
 /**
  * Site footer: a full-width purple band with rounded top corners. Brand (mark + name +
  * positioning line), Services (published services only), Company, Contact
- * (every empty channel is hidden, never placeholder text; WhatsApp is always
- * present via its honest availability state), then a bottom bar with the
- * copyright, language switch and legal links (rendered only once published).
+ * (every empty channel is hidden, never placeholder text; the contact form
+ * link is always there), then a bottom bar with the copyright, the registered
+ * name and CR number (once entered), language switch and legal links
+ * (rendered only once published). Social links sit under the brand, once added.
  */
 import Link from 'next/link';
 
-import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
+import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings, PublicSocialLink } from '@protocol-soft/shared';
 
 import { LogoMark } from './LogoMark';
 import { BRAND, localePath, switchHref } from './siteChrome';
 import { Spark } from './Spark';
 import { WhatsAppCta } from './WhatsAppCta';
+
+const SOCIAL_NAMES: Record<string, string> = {
+  linkedin: 'LinkedIn', x: 'X', instagram: 'Instagram', facebook: 'Facebook', youtube: 'YouTube', whatsapp: 'WhatsApp', github: 'GitHub',
+};
 
 const T = (value: { ar: string; en: string } | string | null | undefined, locale: Locale): string => {
   if (value == null) return '';
@@ -25,6 +30,7 @@ export const SiteFooter = ({
   settings,
   contact,
   services,
+  social,
   privacyPublished,
   termsPublished,
 }: {
@@ -32,6 +38,7 @@ export const SiteFooter = ({
   settings: PublicSiteSettings | null;
   contact: PublicContactConfig | null;
   services: PublicServiceSummary[];
+  social: PublicSocialLink[];
   privacyPublished: boolean;
   termsPublished: boolean;
 }) => {
@@ -43,6 +50,8 @@ export const SiteFooter = ({
   const emailSales = contact?.channels.emailSales ?? '';
   const phone = contact?.channels.phone ?? '';
   const copyright = (settings?.footerCopyright ? T(settings.footerCopyright, locale) : `© {year} ${company}`).replace('{year}', String(year));
+  const legalName = settings?.legalCompanyName ? T(settings.legalCompanyName, locale) : '';
+  const cr = settings?.commercialRegistration ?? '';
 
   return (
     <footer className="site-footer">
@@ -55,6 +64,15 @@ export const SiteFooter = ({
                 <span className="brand__name" lang={locale}>{BRAND.name[locale]}</span>
               </Link>
               {description && <p>{description}</p>}
+              {social.length > 0 && (
+                <ul className="footer-social" role="list" aria-label={ar ? 'حساباتنا' : 'Our accounts'}>
+                  {social.map((s) => (
+                    <li key={s.url}>
+                      <a href={s.url} target="_blank" rel="noopener noreferrer me">{T(s.label, locale) || SOCIAL_NAMES[s.platform] || s.platform}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <nav aria-labelledby="footer-services">
@@ -82,14 +100,20 @@ export const SiteFooter = ({
                 {emailMain && <li><a href={`mailto:${emailMain}`} className="bidi">{emailMain}</a></li>}
                 {emailSales && emailSales !== emailMain && <li><a href={`mailto:${emailSales}`} className="bidi">{emailSales}</a></li>}
                 {phone && <li><a href={`tel:${phone}`} className="bidi">{phone}</a></li>}
-                {contact && <li><WhatsAppCta whatsapp={contact.channels.whatsapp} locale={locale} /></li>}
+                {contact?.channels.whatsapp.status === 'configured' && contact.channels.whatsapp.url && (
+                  <li><WhatsAppCta url={contact.channels.whatsapp.url} locale={locale} /></li>
+                )}
                 <li><Link href={localePath(locale, '/contact')}>{ar ? 'نموذج التواصل' : 'Contact form'}</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="site-footer__bottom">
-            <span>{copyright}</span>
+            <span className="site-footer__legal">
+              <span>{copyright}</span>
+              {legalName && <span>{legalName}</span>}
+              {cr && <span>{ar ? 'السجل التجاري' : 'CR'} <span className="bidi">{cr}</span></span>}
+            </span>
             <span className="site-footer__meta">
               {privacyPublished && <Link href={localePath(locale, '/privacy')}>{ar ? 'سياسة الخصوصية' : 'Privacy Policy'}</Link>}
               {termsPublished && <Link href={localePath(locale, '/terms')}>{ar ? 'شروط الاستخدام' : 'Terms of Use'}</Link>}

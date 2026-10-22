@@ -1,12 +1,13 @@
 /** About: who we are and how we work, from the published "about" page in the
  *  CMS. A draft-only page shows an honest empty state, never placeholder copy.
- *  The team section stays out until published team content exists. */
+ *  The team section appears only once team members are published and visible. */
 import type { Metadata } from 'next';
 
-import type { Locale, PublicContactConfig } from '@protocol-soft/shared';
+import type { Locale, PublicContactConfig, PublicTeamMember } from '@protocol-soft/shared';
 
 import { PageBlocks } from '@/components/PageBlocks';
-import { PageHero } from '@/components/sections';
+import { RichText } from '@/components/RichText';
+import { PageHero, Section } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { CtaBand } from '@/components/ui';
 import { getOptional } from '@/lib/internalApi';
@@ -38,10 +39,13 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
 
-  const [page, contact] = await Promise.all([
+  const [page, contact, team] = await Promise.all([
     getOptional<PageData>('/api/internal/content/pages', locale, { slug: 'about' }),
     getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
+    getOptional<PublicTeamMember[], PublicTeamMember[]>('/api/internal/content/team', locale, undefined, []),
   ]);
+  const photoId = (photo: unknown): number | string | null =>
+    photo != null && typeof photo === 'object' ? ((photo as { id?: number | string }).id ?? null) : (photo as number | string | null);
 
   return (
     <>
@@ -64,6 +68,31 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </div>
           </div>
         </section>
+      )}
+
+      {team.length > 0 && (
+        <Section id="team" title={ar ? 'فريقنا' : 'Our team'}>
+          <ul className="team" role="list">
+            {team.map((m) => {
+              const id = photoId(m.photo);
+              return (
+                <li key={m.name} className="team__member">
+                  {id != null && (
+                    // Gated media proxy: unscreened or private media 404s.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={`/api/media/${id}`} alt="" loading="lazy" decoding="async" className="team__photo" />
+                  )}
+                  <h3>{m.name}</h3>
+                  <p className="team__role">{m.jobTitle}</p>
+                  {m.bio != null && <RichText data={m.bio} className="prose team__bio" />}
+                  {m.linkedinUrl && (
+                    <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="team__link">LinkedIn</a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </Section>
       )}
 
       <CtaBand

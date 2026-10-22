@@ -70,12 +70,15 @@ const main = async () => {
   /* ── 3. D-3: forbidden nav items appear NOWHERE in chrome ── */
   for (const f of FORBIDDEN_NAV) check(`no "${f}" in primary nav`, !arNav.includes(f) && !enNav.includes(f));
 
-  /* ── 4. No placeholder tokens or EDR product claims on any page ── */
-  const pages = ['/services', '/about', '/contact'];
+  /* ── 4. No placeholder tokens, confirmation tags or EDR product claims on any page ── */
+  const UNFINISHED = ['[PLACEHOLDER]', 'NEEDS CONFIRMATION', 'بحاجة إلى تأكيد', 'class="tbc', 'wa-cta--unavailable'];
+  const pages = ['/', '/en', '/services', '/en/services', '/about', '/en/about', '/contact', '/en/contact',
+    ...SERVICE_SLUGS.flatMap((s) => [`/services/${s}`, `/en/services/${s}`])];
   for (const p of pages) {
     const r = await get(p);
     check(`GET ${p} -> 200`, r.status === 200, `got ${r.status}`);
-    check(`${p}: no [PLACEHOLDER]`, !r.body.includes('[PLACEHOLDER]'));
+    const found = UNFINISHED.filter((t) => r.body.includes(t));
+    check(`${p}: no placeholder or confirmation tag`, found.length === 0, found.join(', '));
     check(`${p}: no EDR product claims`, !r.body.includes('كشف ومنع التهديدات على الأجهزة الطرفية') && !/EDR (protects|detects)/.test(r.body));
   }
 
@@ -118,13 +121,21 @@ const main = async () => {
   check('contact ?service=edr: no EDR option exists', preBad.status === 200 && !/value="edr"/.test(preBad.body));
 
   /* ── 8. Published-only behavior (D-2/LD1/D-4) ── */
+  // Privacy follows its publish state: published -> 200 + footer link; draft -> 404 + no link.
   const privacy = await get('/privacy');
-  check('/privacy -> 404 while legal template is draft', privacy.status === 404, `got ${privacy.status}`);
+  const privacyLive = privacy.status === 200;
+  check('/privacy -> 200 when published, 404 while draft', [200, 404].includes(privacy.status), `got ${privacy.status}`);
+  check('footer privacy link matches publish state', ar.body.includes('href="/privacy"') === privacyLive && en.body.includes('href="/en/privacy"') === privacyLive);
+  if (privacyLive) {
+    const found = UNFINISHED.filter((t) => privacy.body.includes(t));
+    check('/privacy: no placeholder or confirmation tag', found.length === 0, found.join(', '));
+    check('/privacy: no draft-template note', !privacy.body.includes('مسودة أولية'));
+  }
   const terms = await get('/en/terms');
   check('/en/terms -> 404 while draft', terms.status === 404, `got ${terms.status}`);
   const cases = await get('/case-studies');
   check('/case-studies -> 404 (no public route, D-4)', cases.status === 404, `got ${cases.status}`);
-  check('footer has NO legal links while draft', !ar.body.includes('href="/privacy"') && !en.body.includes('href="/en/privacy"'));
+  check('footer has NO terms link while draft', !ar.body.includes('href="/terms"') && !en.body.includes('href="/en/terms"'));
 
   /* ── 9. 404 page + locale fallback ── */
   // Next 16 renders notFound() content in the browser, so the server response

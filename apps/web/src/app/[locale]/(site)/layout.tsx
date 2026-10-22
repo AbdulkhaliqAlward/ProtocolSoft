@@ -6,7 +6,7 @@
  */
 import type { ReactNode } from 'react';
 
-import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
+import type { Locale, PublicContactConfig, PublicServiceSummary, PublicSiteSettings, PublicSocialLink } from '@protocol-soft/shared';
 
 import { MotionInit } from '@/components/MotionInit';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -19,10 +19,11 @@ export default async function SiteLayout({ children, params }: { children: React
   const locale: Locale = param === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
 
-  const [settings, contact, services, privacy, terms] = await Promise.all([
+  const [settings, contact, services, social, privacy, terms] = await Promise.all([
     getOptional<PublicSiteSettings>('/api/internal/content/site-settings', locale),
     getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
     getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
+    getOptional<PublicSocialLink[], PublicSocialLink[]>('/api/internal/content/social-links', locale, undefined, []),
     // Legal links appear only once the pages are published (drafts 404 upstream).
     getOptional<unknown>('/api/internal/content/pages', locale, { slug: 'privacy' }),
     getOptional<unknown>('/api/internal/content/pages', locale, { slug: 'terms' }),
@@ -38,6 +39,7 @@ export default async function SiteLayout({ children, params }: { children: React
         settings={settings ?? { companyName: { ar: BRAND.name.ar, en: BRAND.name.en }, tagline: { ar: '', en: '' }, emailMain: '', footerCopyright: { ar: `© {year} ${BRAND.name.ar}`, en: `© {year} ${BRAND.name.en}` } }}
         contact={contact}
         services={services}
+        social={social}
         privacyPublished={privacy != null}
         termsPublished={terms != null}
       />

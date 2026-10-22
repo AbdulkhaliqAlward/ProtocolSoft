@@ -134,7 +134,6 @@ export const Homepage: GlobalConfig = {
               fields: [
                 { name: 'question', type: 'text', required: true },
                 { name: 'answer', type: 'textarea', required: true },
-                { name: 'needsConfirmation', type: 'checkbox', defaultValue: false },
               ],
             },
           ],

@@ -2,7 +2,7 @@
  * Page building blocks shared by every page, so sections open the same way
  * everywhere: clause number, heading and lead in the 4-column rail; content in
  * the 8-column field. Spec-sheet blocks (scope, exchange, capabilities, FAQ)
- * render CMS content and show a NEEDS CONFIRMATION tag on flagged lines.
+ * render CMS content; a block whose content is empty renders nothing.
  */
 import type { ReactNode } from 'react';
 import Link from 'next/link';
@@ -13,33 +13,6 @@ import { Spark } from './Spark';
 
 /** Section number: two digits, Western numerals in both languages (approved). */
 export const clause = (n: number | string): string => (typeof n === 'number' ? String(n).padStart(2, '0') : n);
-
-/** Visible marker for content Protocol Soft still has to confirm, in the page
- *  language. data-tbc lets scripts/list-confirmations.mjs collect every one. */
-export const Tbc = ({ locale, detail }: { locale: Locale; detail?: string }) => (
-  <span className="tbc" data-tbc="">
-    <span className="tbc__dot" aria-hidden="true" />
-    {locale === 'ar' ? 'بحاجة إلى تأكيد' : 'Needs confirmation'}
-    {detail ? `: ${detail}` : ''}
-  </span>
-);
-
-/** Turns inline CMS markers like "[⚠️ NEEDS CONFIRMATION: reply time]" into
- *  the same tag, so editors can flag a phrase inside running text. */
-const INLINE_TBC = /\[\s*⚠️?\s*NEEDS CONFIRMATION:?\s*([^\]]*)\]/gu;
-export const withTbc = (text: string, locale: Locale): ReactNode => {
-  const parts: ReactNode[] = [];
-  let last = 0;
-  for (const m of text.matchAll(INLINE_TBC)) {
-    const at = m.index ?? 0;
-    if (at > last) parts.push(text.slice(last, at).trimEnd(), ' ');
-    parts.push(<Tbc key={at} locale={locale} detail={m[1]?.trim() || undefined} />);
-    last = at + m[0].length;
-  }
-  if (parts.length === 0) return text;
-  if (last < text.length) parts.push(text.slice(last));
-  return <>{parts}</>;
-};
 
 export const SectionHead = ({ no, title, lead, as = 'h2', id, children }: {
   no?: string;
@@ -136,7 +109,7 @@ const Cross = () => (
 export const Scope = ({ locale, included, excluded }: {
   locale: Locale;
   included: Array<{ title: string; description?: string | null }>;
-  excluded: Array<{ item: string; needsConfirmation?: boolean | null }>;
+  excluded: Array<{ item: string }>;
 }) => {
   const ar = locale === 'ar';
   return (
@@ -161,7 +134,7 @@ export const Scope = ({ locale, included, excluded }: {
             {excluded.map((x) => (
               <li key={x.item}>
                 <span aria-hidden="true" />
-                <span>{x.item} {x.needsConfirmation && <Tbc locale={locale} />}</span>
+                <span>{x.item}</span>
               </li>
             ))}
           </ul>
@@ -227,7 +200,7 @@ export const CapabilityGroups = ({ groups }: { groups: Array<{ stage: string; ti
   </div>
 );
 
-export const Faq = ({ items, locale }: { items: Array<{ question: string; answer: string; needsConfirmation?: boolean | null }>; locale: Locale }) => (
+export const Faq = ({ items }: { items: Array<{ question: string; answer: string }> }) => (
   <div className="faq">
     {items.map((f, i) => (
       <details key={f.question} open={i === 0}>
@@ -237,7 +210,7 @@ export const Faq = ({ items, locale }: { items: Array<{ question: string; answer
             <svg width="12" height="12" viewBox="0 0 12 12" focusable="false"><path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </span>
         </summary>
-        <p>{withTbc(f.answer, locale)} {f.needsConfirmation && <Tbc locale={locale} />}</p>
+        <p>{f.answer}</p>
       </details>
     ))}
   </div>

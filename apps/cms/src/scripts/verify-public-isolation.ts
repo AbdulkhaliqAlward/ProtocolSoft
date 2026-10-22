@@ -77,7 +77,9 @@ const main = async (): Promise<void> => {
   const allPublic = bodies.join('\n');
   check('no "[PLACEHOLDER]" token in ANY public response', !allPublic.includes('[PLACEHOLDER]'));
   check('no lead PII (sink@example.invalid) in ANY public response', !allPublic.includes('sink@example.invalid'));
-  check('no legalCompanyName in public site-settings', !bodies[0]!.includes('legalCompanyName'));
+  // The registered name is public once real; an unset or placeholder value arrives as ''.
+  const reg = (JSON.parse(bodies[0]!) as { data?: { legalCompanyName?: { ar?: string; en?: string } } }).data?.legalCompanyName;
+  check('legal name in public site-settings is real or empty', !JSON.stringify(reg ?? {}).includes('PLACEHOLDER'));
   check('no notificationRecipients in contact-config', !bodies[1]!.includes('ecipients'));
 
   /* 2. Phase 5 local-review state (D-2): ONLY the approved services may be
@@ -104,7 +106,8 @@ const main = async (): Promise<void> => {
   check('team list omits DRAFT members (expect 0)', (team.data?.length ?? -1) === 0, `got ${team.data?.length}`);
 
   const page = await get('/internal/content/pages?locale=ar&slug=privacy');
-  check('draft legal page returns 404 publicly', page.status === 404, `got ${page.status}`);
+  // Privacy may be published once its legal review is recorded (checked against the DB below).
+  check('privacy page: 200 when published, 404 while draft', [200, 404].includes(page.status), `got ${page.status}`);
   const terms = await get('/internal/content/pages?locale=en&slug=terms');
   check('draft legal page (terms/en) returns 404 publicly', terms.status === 404, `got ${terms.status}`);
   const aboutEn = await get('/internal/content/pages?locale=en&slug=about');
@@ -294,8 +297,13 @@ const main = async (): Promise<void> => {
   const csDraft = cs.docs.every((d) => (d as { _status?: string })._status === 'draft');
   check('DB: case study still draft (D-2/D-4)', cs.totalDocs >= 1 && csDraft, `total=${cs.totalDocs}`);
   const legal = await leadPayload.find({ collection: 'pages', draft: true, limit: 10, overrideAccess: true, where: { slug: { in: ['privacy', 'terms'] } } as never });
-  const legalDraft = legal.docs.every((d) => (d as { _status?: string })._status === 'draft');
-  check('DB: legal templates still draft (LD1/D-2)', legal.totalDocs === 2 && legalDraft, `total=${legal.totalDocs}`);
+  type LegalDoc = { slug?: string; _status?: string; legalReviewedBy?: string | null; legalReviewedAt?: string | null };
+  const legalDocs = legal.docs as unknown as LegalDoc[];
+  check('DB: both legal pages exist', legal.totalDocs === 2, `total=${legal.totalDocs}`);
+  check('DB: terms still draft', legalDocs.find((d) => d.slug === 'terms')?._status === 'draft');
+  check('DB: every published legal page has a recorded legal review', legalDocs.filter((d) => d._status === 'published').every((d) => Boolean(d.legalReviewedBy && d.legalReviewedAt)));
+  const privacyPublished = legalDocs.find((d) => d.slug === 'privacy')?._status === 'published';
+  check('privacy public status matches DB publish state', (page.status === 200) === privacyPublished, `public=${page.status} published=${privacyPublished}`);
   const audits = await leadPayload.find({ collection: 'audit-logs' as never, limit: 1, overrideAccess: true } as never);
   check('DB: audit log rows exist (admin-only surface)', audits.totalDocs >= 1, `total=${audits.totalDocs}`);
 

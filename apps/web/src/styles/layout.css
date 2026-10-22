@@ -11,34 +11,25 @@
 }
 
 .section { padding-block: var(--section-y); }
-.section + .section:not(.section--band):not(.section--plate) { border-top: 1px solid var(--line); }
-.section--tight { padding-block: calc(var(--section-y) * 0.66); }
+.section + .section:not(.section--band) { border-top: 1px solid var(--line); }
 .section--flush-top { padding-top: 0; }
 .section--band { background: var(--surface-sunken); }
 
-/* 12-column grid; .rail = heading rail (4) + content field (8). */
-.grid-12 { display: grid; gap: var(--s-6) var(--gutter); grid-template-columns: minmax(0, 1fr); }
+/* .rail = heading rail (4 columns) + content field (8). */
 .rail { display: grid; gap: var(--s-6); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 960px) {
-  .grid-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
   .rail { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s-7) var(--gutter); }
   .rail__head { grid-column: span 4; }
   .rail__body { grid-column: span 8; }
   .rail--sticky .rail__head { position: sticky; top: calc(var(--header-h) + var(--s-6)); align-self: start; }
-  .rail--even .rail__head, .rail--even .rail__body { grid-column: span 6; }
 }
 .rail__head { display: grid; gap: var(--s-3); align-content: start; min-width: 0; }
 .rail__head p { color: var(--text-muted); }
 .rail__body { min-width: 0; }
 
-/* Auto-fill card grid: columns fill the row, nothing stretches alone. */
-.cards { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min, 280px)), 1fr)); }
-.cards--3 { --card-min: 260px; }
-@media (min-width: 960px) { .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-
 .stack { display: flex; flex-direction: column; gap: var(--stack, var(--s-4)); }
 .cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cluster, var(--s-3)); }
-.measure, .prose { max-width: none; }
+.prose { max-width: none; }
 .prose > * + * { margin-top: var(--s-4); }
 .prose h2, .prose h3 { margin-top: var(--s-6); }
 .prose ul, .prose ol { padding-inline-start: 1.25em; display: grid; gap: var(--s-2); }
@@ -60,5 +51,4 @@
 .eyebrow { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-small); color: var(--text-muted); }
 .plate .eyebrow { color: var(--plate-muted); }
 .lead { font-size: var(--fs-lead); color: var(--text-muted); line-height: var(--lh-body); }
-.muted { color: var(--text-muted); }
 .mono { font-family: var(--font-mono); font-size: 0.92em; font-weight: 500; }

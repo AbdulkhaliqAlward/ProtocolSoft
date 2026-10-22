@@ -12,7 +12,7 @@ const NAMES = { ar: 'بروتوكول سوفت', en: 'Protocol Soft' } as const;
 
 export const organizationLd = (
   locale: Locale,
-  opts: { description?: string; email?: string; phone?: string; sameAs?: string[] } = {},
+  opts: { description?: string; email?: string; phone?: string; sameAs?: string[]; legalName?: string } = {},
 ) => ({
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
@@ -22,6 +22,7 @@ export const organizationLd = (
   url: `${siteUrl()}${localePathname(locale, '/')}`,
   logo: `${siteUrl()}/brand/icon-512.png`,
   image: `${siteUrl()}/opengraph-image.png`,
+  ...(opts.legalName ? { legalName: opts.legalName } : {}),
   ...(opts.description ? { description: opts.description } : {}),
   ...(opts.email ? { email: opts.email } : {}),
   ...(opts.phone ? { telephone: opts.phone } : {}),

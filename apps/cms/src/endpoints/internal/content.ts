@@ -15,12 +15,16 @@ import type { PayloadRequest } from 'payload';
 import { isLocale, type Locale, type PublicContactConfig, type PublicInitiativeCard } from '@protocol-soft/shared';
 
 import { guardInternalKey, ok } from './guard';
-import { evaluatePublicReadiness } from '../../utilities/publicReadiness';
+import { PLACEHOLDER_TOKEN, evaluatePublicReadiness } from '../../utilities/publicReadiness';
 
 type Doc = Record<string, unknown>;
 
 const localizedOf = (value: unknown, locale: Locale): unknown =>
   value != null && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>)[locale] : value;
+
+/** A filled, non-placeholder string, else '' (so the site hides the field). */
+const realValue = (value: unknown): string =>
+  typeof value === 'string' && value.trim() !== '' && !value.toUpperCase().includes(PLACEHOLDER_TOKEN) ? value.trim() : '';
 
 const idOf = (value: unknown): number | string | null => {
   if (value == null) return null;
@@ -132,6 +136,9 @@ export const contentEndpoints = [
         country: s.country ?? null,
         workingHours: { ar: localizedOf(s.workingHours, 'ar'), en: localizedOf(s.workingHours, 'en') },
         footerCopyright: { ar: localizedOf(s.footerCopyright, 'ar'), en: localizedOf(s.footerCopyright, 'en') },
+        // Registration facts: public only once real values exist (never a placeholder).
+        legalCompanyName: { ar: realValue(localizedOf(s.legalCompanyName, 'ar')), en: realValue(localizedOf(s.legalCompanyName, 'en')) },
+        commercialRegistration: realValue(s.commercialRegistration),
       });
     },
   },

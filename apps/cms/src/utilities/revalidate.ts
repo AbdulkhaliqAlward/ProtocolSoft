@@ -3,7 +3,7 @@
  * the web service's /api/web-internal/revalidate with CMS_TO_WEB_REVALIDATE_KEY over
  * the private Docker network. Failures are logged, never blocking.
  */
-import type { CollectionAfterChangeHook, GlobalAfterChangeHook } from 'payload';
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload';
 
 const tagsFor = (slug: string, doc?: Record<string, unknown>): string[] => {
   const tags = [slug];
@@ -38,6 +38,18 @@ export const revalidateOnPublish =
     }
     return doc;
   };
+
+/** For collections without drafts (e.g. social links): every save or delete is live. */
+export const revalidateOnSave = (slug: string): { afterChange: CollectionAfterChangeHook; afterDelete: CollectionAfterDeleteHook } => ({
+  afterChange: async ({ doc }) => {
+    await pushRevalidation([slug]);
+    return doc;
+  },
+  afterDelete: async ({ doc }) => {
+    await pushRevalidation([slug]);
+    return doc;
+  },
+});
 
 export const revalidateGlobal =
   (slug: string): GlobalAfterChangeHook =>

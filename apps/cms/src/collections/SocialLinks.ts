@@ -3,6 +3,9 @@ import type { CollectionConfig } from 'payload';
 
 import { requireCapability } from '../access/roles';
 import { auditAfterChange } from '../utilities/audit';
+import { revalidateOnSave } from '../utilities/revalidate';
+
+const revalidate = revalidateOnSave('social-links');
 
 export const SocialLinks: CollectionConfig = {
   slug: 'social-links',
@@ -26,6 +29,6 @@ export const SocialLinks: CollectionConfig = {
     { name: 'visible', type: 'checkbox', defaultValue: true },
     { name: 'sortOrder', type: 'number', required: true, defaultValue: 100 },
   ],
-  hooks: { afterChange: [auditAfterChange()] },
+  hooks: { afterChange: [auditAfterChange(), revalidate.afterChange], afterDelete: [revalidate.afterDelete] },
   timestamps: true,
 };

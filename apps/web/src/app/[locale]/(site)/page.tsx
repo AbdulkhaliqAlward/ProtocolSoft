@@ -9,7 +9,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary, PublicSiteSettings } from '@protocol-soft/shared';
+import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary, PublicSiteSettings, PublicSocialLink } from '@protocol-soft/shared';
 
 import { InitiativeCard } from '@/components/InitiativeCard';
 import { JsonLd } from '@/components/JsonLd';
@@ -49,7 +49,7 @@ interface HomepageData {
     secureByDesignEnabled: boolean;
     secureByDesign: L10n;
     faqEnabled?: boolean;
-    faqs?: Array<{ question: string; answer: string; needsConfirmation?: boolean | null }>;
+    faqs?: Array<{ question: string; answer: string }>;
   };
   finalCta: { enabled: boolean; heading: L10n; body: L10n; ctaLabel: L10n };
 }
@@ -80,11 +80,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
 
-  const [settings, homepage, services, contact] = await Promise.all([
+  const [settings, homepage, services, contact, social] = await Promise.all([
     getOptional<PublicSiteSettings>('/api/internal/content/site-settings', locale),
     getOptional<HomepageData>('/api/internal/content/homepage', locale),
     getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
     getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
+    getOptional<PublicSocialLink[], PublicSocialLink[]>('/api/internal/content/social-links', locale, undefined, []),
   ]);
 
   const hero = homepage?.hero;
@@ -115,6 +116,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             description: T(settings?.tagline, locale) || undefined,
             email: contact?.channels.emailMain || undefined,
             phone: contact?.channels.phone || undefined,
+            sameAs: social.map((l) => l.url),
+            legalName: T(settings?.legalCompanyName, locale) || undefined,
           }),
           websiteLd(locale),
         ]}
@@ -238,7 +241,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {faqs.length > 0 && (
         <Section id="faq" no={next()} title={ar ? 'أسئلة قبل أن تتواصل' : 'Before you get in touch'} lead={ar ? 'إجابات مختصرة عن أكثر ما يُسأل في البداية.' : 'Short answers to what people usually ask first.'}>
-          <Faq items={faqs} locale={locale} />
+          <Faq items={faqs} />
         </Section>
       )}
 

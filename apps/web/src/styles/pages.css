@@ -132,6 +132,15 @@ html[lang="en"] .statement__text { line-height: 1.4; }
 .principles li::before { content: counter(p, upper-alpha); font-family: var(--font-display); font-weight: 500; font-size: var(--fs-label); color: var(--text-muted); }
 .principles h3 { font-size: 1.125rem; }
 .principles p { color: var(--text-muted); font-size: var(--fs-small); line-height: 1.75; }
+
+/* Team (about): appears only once members are published */
+.team { list-style: none; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.team__member { display: grid; gap: var(--s-2); padding: var(--s-5); border-radius: var(--r-lg); background: var(--surface) var(--sheen); border: 1px solid var(--line-soft); box-shadow: var(--convex); align-content: start; }
+.team__photo { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-md); margin-bottom: var(--s-2); }
+.team__member h3 { font-size: 1.125rem; }
+.team__role { color: var(--text-muted); font-size: var(--fs-small); }
+.team__bio { font-size: var(--fs-small); color: var(--text-muted); }
+.team__link { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-small); justify-self: start; }
 .media-text { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); align-items: center; }
 .media-text img { border-radius: var(--r-xl); border: 1px solid var(--line); }
 
@@ -150,9 +159,6 @@ html[lang="en"] .statement__text { line-height: 1.4; }
 .next-steps { list-style: none; padding: 0; display: grid; gap: var(--s-3); counter-reset: n; }
 .next-steps li { counter-increment: n; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s-3); font-size: var(--fs-small); line-height: 1.7; }
 .next-steps li::before { content: counter(n, decimal-leading-zero); font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: var(--fs-label); color: var(--text-muted); padding-top: 3px; }
-
-/* ── Legal ───────────────────────────────────────────────────────────── */
-.legal-body { max-width: none; }
 
 /* ── 404 / error ─────────────────────────────────────────────────────── */
 .lost { padding-block: var(--section-y); }

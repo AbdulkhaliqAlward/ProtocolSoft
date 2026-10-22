@@ -13,7 +13,8 @@ export const SiteSettings: GlobalConfig = {
   hooks: { afterChange: [auditGlobalChange('settings_changed'), revalidateGlobal('site-settings')] },
   fields: [
     { name: 'companyName', type: 'text', required: true, localized: true },
-    { name: 'legalCompanyName', type: 'text', localized: true },
+    { name: 'legalCompanyName', type: 'text', localized: true, admin: { description: 'الاسم النظامي كما في السجل التجاري؛ يظهر أسفل الموقع عند تعبئته / Registered legal name; shown in the footer once filled' } },
+    { name: 'commercialRegistration', type: 'text', admin: { description: 'رقم السجل التجاري؛ يظهر أسفل الموقع عند تعبئته / Commercial registration number; shown in the footer once filled' } },
     { name: 'description', type: 'textarea', localized: true, maxLength: 300 },
     { name: 'tagline', type: 'text', localized: true },
     // Leave empty until Protocol Soft supplies the official address (§6.9); the

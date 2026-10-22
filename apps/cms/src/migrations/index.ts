@@ -2,6 +2,8 @@ import * as migration_20261021_200851_initial from './20261021_200851_initial';
 import * as migration_20261021_205731_payload_3_91_upgrade from './20261021_205731_payload_3_91_upgrade';
 import * as migration_20261021_213023_services_spec_sheet from './20261021_213023_services_spec_sheet';
 import * as migration_20261021_213355_page_block_headings from './20261021_213355_page_block_headings';
+import * as migration_20261021_235806_remove_confirmation_flags from './20261021_235806_remove_confirmation_flags';
+import * as migration_20261022_002420_add_commercial_registration from './20261022_002420_add_commercial_registration';
 
 export const migrations = [
   {
@@ -22,6 +24,16 @@ export const migrations = [
   {
     up: migration_20261021_213355_page_block_headings.up,
     down: migration_20261021_213355_page_block_headings.down,
-    name: '20261021_213355_page_block_headings'
+    name: '20261021_213355_page_block_headings',
+  },
+  {
+    up: migration_20261021_235806_remove_confirmation_flags.up,
+    down: migration_20261021_235806_remove_confirmation_flags.down,
+    name: '20261021_235806_remove_confirmation_flags',
+  },
+  {
+    up: migration_20261022_002420_add_commercial_registration.up,
+    down: migration_20261022_002420_add_commercial_registration.down,
+    name: '20261022_002420_add_commercial_registration'
   },
 ];
