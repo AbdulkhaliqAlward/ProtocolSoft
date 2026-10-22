@@ -23,7 +23,8 @@ const PUBLISHABLE: Record<string, { arabicFirst: boolean; readinessGate: boolean
 
 export const publishEndpoints = [
   {
-    path: '/publish/{collection}/{id}',
+    // Payload matches endpoint paths with path-to-regexp 6: parameters are ':name'.
+    path: '/publish/:collection/:id',
     method: 'post' as const,
     handler: async (req: PayloadRequest): Promise<Response> => {
       // Admin-session endpoints (Cloudflare Access -> Payload session -> RBAC).
