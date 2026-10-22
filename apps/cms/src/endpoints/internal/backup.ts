@@ -137,7 +137,6 @@ export const backupEndpoints = [
     handler: async (req: PayloadRequest): Promise<Response> => {
       const denied = requireSuperAdmin(req);
       if (denied) return denied;
-      const settings = (await req.payload.findGlobal({ slug: 'backup-settings', overrideAccess: true })) as unknown as BackupSettingsDoc;
       const now = new Date().toISOString();
       const record = await req.payload.create({
         collection: 'backup-records',

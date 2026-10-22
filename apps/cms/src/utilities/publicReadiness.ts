@@ -62,7 +62,6 @@ export const evaluatePublicReadiness = (
   ctx: ReadinessContext,
 ): GateResult => {
   const failing: string[] = [];
-  const slug = String(doc.slug ?? '<unknown>');
 
   // 1+2. Per-locale completeness
   for (const locale of intendedLocales) {

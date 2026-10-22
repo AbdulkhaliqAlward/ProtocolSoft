@@ -21,7 +21,6 @@ import type { Locale, PublicServiceSummary } from '@protocol-soft/shared';
 
 import { LogoMark } from './LogoMark';
 import { BRAND, barePath, localePath, PRIMARY_NAV, switchHref } from './siteChrome';
-import { Spark } from './Spark';
 import { ThemeToggle } from './ThemeToggle';
 
 const T = (value: { ar: string; en: string } | string | null | undefined, locale: Locale): string => {

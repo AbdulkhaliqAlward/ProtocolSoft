@@ -4,7 +4,7 @@
  * including field-level rules and the backup-control restriction (BD1).
  * Output: PASS/FAIL per cell — no DB required (pure function verification).
  */
-import { hasCapability, ROLES, type AdminCapability, type Role } from '@protocol-soft/shared';
+import { ROLES, type AdminCapability, type Role } from '@protocol-soft/shared';
 
 import { requireCapability, roleOf, type AdminUser } from '../access/roles';
 

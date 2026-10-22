@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { Locale, PublicContactConfig } from '@protocol-soft/shared';
+import type { Locale } from '@protocol-soft/shared';
 
 import { localePath } from './siteChrome';
 import { Spark } from './Spark';

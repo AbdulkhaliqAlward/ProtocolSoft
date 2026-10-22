@@ -9,7 +9,6 @@
 import type { GlobalConfig } from 'payload';
 
 import { requireCapability } from '../access/roles';
-import { auditGlobalChange } from '../utilities/audit';
 
 export const BackupSettings: GlobalConfig = {
   slug: 'backup-settings',
