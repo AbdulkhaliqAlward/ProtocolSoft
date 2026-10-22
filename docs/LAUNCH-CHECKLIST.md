@@ -9,7 +9,7 @@
 - [ ] نفق Cloudflare (Tunnel) يوجّه `admin.protosoftdev.com` إلى `cms:3001`، ورمزه في `CLOUDFLARE_TUNNEL_TOKEN`. خدمة CMS لا تفتح أي منفذ.
 - [ ] تطبيق **Cloudflare Access** على `admin.protosoftdev.com`، يسمح فقط ببريد فريق الإدارة.
 - [ ] قواعد Rate limiting في Cloudflare WAF على `POST /api/contact` وعلى مسار تسجيل الدخول للوحة التحكم.
-- [ ] قيمة `ACME_EMAIL` لشهادات Caddy.
+- [ ] شهادة Cloudflare Origin في `certs/` على الخادم، ووضع SSL في Cloudflare = Full (strict). الخطوات في [`DEPLOY.md`](DEPLOY.md).
 
 ## 2. الأسرار ومتغيرات البيئة
 

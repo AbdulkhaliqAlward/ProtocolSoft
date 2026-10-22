@@ -2,9 +2,8 @@
 # Creates the production .env for docker-compose.production.yml with fresh,
 # random secrets. Run ONCE on the server, from the repository root:
 #
-#   sh scripts/server/generate-env.sh you@example.com
+#   sh scripts/server/generate-env.sh
 #
-# The argument is the e-mail Caddy registers with Let's Encrypt for TLS.
 # Afterwards, edit .env and fill the two values only you can provide:
 #   CLOUDFLARE_TUNNEL_TOKEN  (Cloudflare Zero Trust > Tunnels)
 #   RESEND_API_KEY           (optional; without it, lead e-mails are not sent)
@@ -14,11 +13,6 @@ set -eu
 cd "$(dirname "$0")/../.."
 if [ -f .env ]; then
   echo ".env already exists; refusing to overwrite it (secrets would change and break the database login)." >&2
-  exit 1
-fi
-ACME_EMAIL="${1:-}"
-if [ -z "$ACME_EMAIL" ]; then
-  echo "Usage: sh scripts/server/generate-env.sh <email-for-TLS-certificates>" >&2
   exit 1
 fi
 command -v openssl >/dev/null || { echo "openssl is required" >&2; exit 1; }
@@ -57,7 +51,6 @@ LEAD_IP_HASH_SECRET=$(rand)
 PREVIEW_SIGNING_PRIVATE_KEY='${PREVIEW_PRIVATE}'
 PREVIEW_VERIFY_PUBLIC_KEY='${PREVIEW_PUBLIC}'
 
-ACME_EMAIL=${ACME_EMAIL}
 CLOUDFLARE_TUNNEL_TOKEN=
 RESEND_API_KEY=
 EMAIL_SINK_ADDRESS=notifications-sink@example.invalid

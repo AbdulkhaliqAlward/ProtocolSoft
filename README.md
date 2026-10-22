@@ -111,6 +111,7 @@ For in-depth architectural design, strategy, and verification reports, explore t
 - [Content guide (Arabic, for editors)](./docs/CONTENT-GUIDE.md)
 - [Company facts still needed](./docs/FACTS-NEEDED.md)
 - [Launch checklist](./docs/LAUNCH-CHECKLIST.md)
+- [Deploying to a server with Cloudflare (Arabic)](./docs/DEPLOY.md)
 - [Performance measurements](./docs/PERFORMANCE.md)
 - [Phase 1: Strategy & Brand Identity](./docs/PHASE_1_STRATEGY.md)
 - [Phase 2: CMS Architecture & Data Modeling](./docs/PHASE_2_CMS_ARCHITECTURE.md)

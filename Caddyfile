@@ -1,20 +1,37 @@
-# Caddy reverse proxy (Phase 1 §11.3) — the ONLY public entry point (80/443).
-# - protosoftdev.com  -> web service (public site)
-# - admin.protosoftdev.com is served through the Cloudflare Tunnel (cloudflared),
-#   NOT through Caddy: the CMS has no inbound port. If the tunnel is ever replaced,
-#   a hardened vhost restricted to Cloudflare IP ranges + Authenticated Origin
-#   Pulls would be required instead (Phase 1 §11.5 alternative).
+# Caddy reverse proxy — the ONLY public entry point (80/443).
+#
+# Traffic path: visitor --HTTPS--> Cloudflare --HTTPS--> Caddy --HTTP (private
+# Docker network)--> web:3000. Cloudflare's SSL mode must be "Full (strict)".
+#
+# TLS at the origin uses a Cloudflare Origin Certificate (Cloudflare dashboard >
+# SSL/TLS > Origin Server), saved on the server only, never in Git:
+#   certs/origin.pem   certificate      certs/origin.key   private key
+# Issue it for:  protosoftdev.com, *.protosoftdev.com
+#
+# admin.protosoftdev.com is NOT served here: it reaches the CMS through the
+# Cloudflare Tunnel (cloudflared), and the CMS has no inbound port.
 
 {
-	email {$ACME_EMAIL}
+	servers {
+		# Requests arrive from Cloudflare's edge. Trust the client IP it reports
+		# (Cf-Connecting-Ip) ONLY when the connection really comes from one of
+		# Cloudflare's published ranges (https://www.cloudflare.com/ips/), so the
+		# app's per-visitor rate limit sees real visitors, not Cloudflare nodes.
+		trusted_proxies static 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+		client_ip_headers Cf-Connecting-Ip X-Forwarded-For
+	}
 }
 
-protosoftdev.com, www.protosoftdev.com {
+(origin_tls) {
+	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+}
+
+protosoftdev.com {
+	import origin_tls
 	encode zstd gzip
 
-	# Security headers (Phase 1 §11.4)
 	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
@@ -22,14 +39,17 @@ protosoftdev.com, www.protosoftdev.com {
 		-Server
 	}
 
-	# Rate limiting for sensitive routes is enforced at the Cloudflare edge
-	# (WAF rate-limiting rules on /contact submissions and login paths); the
-	# application layers add their own limits (Phase 2 §6.6, §7).
-
 	reverse_proxy web:3000
 }
 
-# Explicit block: admin hostname must never be served by this proxy.
-admin.protosoftdev.com {
+# One canonical address: www redirects to the bare domain, keeping the path.
+www.protosoftdev.com {
+	import origin_tls
+	redir https://protosoftdev.com{uri} permanent
+}
+
+# Requests by the server's raw IP or any other host name get nothing.
+:443 {
+	import origin_tls
 	respond 421
 }

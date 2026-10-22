@@ -16,10 +16,10 @@ services:
     ports:
       - '80:80'
       - '443:443' # the ONLY public ports
-    environment:
-      ACME_EMAIL: ${ACME_EMAIL}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Cloudflare Origin Certificate (origin.pem + origin.key), server-only, never in Git
+      - ./certs:/etc/caddy/certs:ro
       - caddy_data:/data
       - caddy_config:/config
     networks: [edge, app]

@@ -25,6 +25,7 @@ out/
 *.pfx
 secrets/
 credentials/
+certs/
 
 # Payload generated / media
 packages/shared/src/payload-types.ts
