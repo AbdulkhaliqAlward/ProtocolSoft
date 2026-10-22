@@ -34,6 +34,20 @@ const Chevron = () => (
   </svg>
 );
 
+/** Line icons for the services menu, keyed by the service's CMS icon field. */
+const ServiceIcon = ({ name }: { name?: string }) => {
+  const paths: Record<string, string> = {
+    code: 'M8 7 3 12l5 5M16 7l5 5-5 5M13.5 4l-3 16',
+    layers: 'M12 3 2.5 8 12 13l9.5-5L12 3ZM2.5 12.5 12 17.5l9.5-5M2.5 17 12 22l9.5-5',
+    shield: 'M12 2.5 4 5.5v6c0 5 3.4 8.8 8 10 4.6-1.2 8-5 8-10v-6l-8-3ZM8.5 12l2.5 2.5 4.5-5',
+  };
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={paths[name ?? ''] ?? paths.code} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
 export const SiteHeader = ({
   locale,
   ctaLabel,
@@ -174,30 +188,26 @@ export const SiteHeader = ({
                     {item.label[locale]}
                     <Chevron />
                   </button>
+                  {/* A compact card under the trigger: names only; each
+                      service's description lives on its own page. */}
                   <div id={menuId} className="mega" data-open={menuOpen || undefined}>
                     <ul className="mega__list" role="list">
-                      {services.map((s, i) => {
+                      {services.map((s) => {
                         const href = localePath(locale, `/services/${s.slug}`);
                         return (
                           <li key={s.slug}>
                             <Link href={href} className="mega__item" aria-current={current === `/services/${s.slug}` ? 'page' : undefined}>
-                              <span className="clause-no">{String(i + 1).padStart(2, '0')}</span>
+                              <span className="mega__icon"><ServiceIcon name={s.icon} /></span>
                               <span className="mega__title">{T(s.title, locale)}</span>
-                              {T(s.summary, locale) && <span className="mega__summary">{T(s.summary, locale)}</span>}
+                              <span className="btn__arrow mega__arrow" aria-hidden="true">→</span>
                             </Link>
                           </li>
                         );
                       })}
-                      <li className="mega__all-row">
-                        <Link href={localePath(locale, '/services')} className="mega__all" aria-current={current === '/services' ? 'page' : undefined}>
-                          {ar ? 'كل الخدمات' : 'All services'} <span className="btn__arrow" aria-hidden="true">→</span>
-                        </Link>
-                      </li>
                     </ul>
-                    <div className="mega__side">
-                      <p>{ar ? 'لست متأكداً أي خدمة تناسبك؟ صف لنا التحدي، ونقترح نقطة البداية المناسبة.' : 'Not sure which service fits? Describe the challenge and we will suggest where to start.'}</p>
-                      <Link href={localePath(locale, '/contact')} className="btn btn--inverse btn--sm">{ar ? 'تحدث معنا' : 'Talk to us'}</Link>
-                    </div>
+                    <Link href={localePath(locale, '/services')} className="mega__all" aria-current={current === '/services' ? 'page' : undefined}>
+                      {ar ? 'كل الخدمات' : 'All services'} <span className="btn__arrow" aria-hidden="true">→</span>
+                    </Link>
                   </div>
                 </li>
               ) : (
