@@ -113,6 +113,7 @@ export default buildConfig({
       graphics: { Logo: '/admin/Graphics#Logo', Icon: '/admin/Graphics#Icon' },
       beforeLogin: ['/admin/BeforeLogin#BeforeLogin'],
       beforeDashboard: ['/admin/Welcome#Welcome'],
+      actions: ['/admin/HeaderToggles#HeaderToggles'],
     },
   },
 
