@@ -93,7 +93,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const finalCta = homepage?.finalCta;
 
   const kicker = T(hero?.kicker, locale) || (ar ? 'هندسة البرمجيات والأمن السيبراني' : 'Software engineering & cybersecurity');
-  const headline = T(hero?.headline, locale) || T(settings?.tagline, locale) || (ar ? 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.' : 'Trusted digital systems, built and protected to run with confidence.');
+  // Fallback is the positioning line itself, not the site tagline (the tagline is the footer's brand line).
+  const headline = T(hero?.headline, locale) || (ar ? 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.' : 'Trusted digital systems, built and protected to run with confidence.');
   const sub = T(hero?.subheadline, locale);
   // Distinct from the header's "start a project", which sits beside the hero.
   const primaryCta = T(hero?.primaryCtaLabel, locale) || (ar ? 'تحدّث مع فريقنا' : 'Talk to our team');
