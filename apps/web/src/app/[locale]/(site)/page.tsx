@@ -68,8 +68,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     l,
     l === 'en' ? 'Protocol Soft — Software Engineering & Cybersecurity' : 'بروتوكول سوفت — هندسة البرمجيات والأمن السيبراني',
     l === 'en'
-      ? 'Custom systems, digital products and platforms, and defensive cybersecurity for businesses in Saudi Arabia and the GCC.'
-      : 'تطوير الأنظمة المخصصة، بناء المنتجات والمنصات الرقمية، وخدمات الأمن السيبراني الدفاعية للأعمال في السعودية والخليج.',
+      ? 'Custom systems, digital products and platforms, and defensive cybersecurity for organisations anywhere in the world.'
+      : 'تطوير الأنظمة المخصصة، بناء المنتجات والمنصات الرقمية، وخدمات الأمن السيبراني الدفاعية للجهات في أي مكان في العالم.',
     '/',
   );
 }
