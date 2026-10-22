@@ -30,12 +30,13 @@ const COPY = {
     sep: '، ',
     errors: {
       incomplete_locale: 'لا يمكن النشر قبل تعبئة هذه الحقول بهذه اللغة: ',
+      validation_failed: 'لم يُنشر المحتوى لأن هذه الحقول ناقصة أو غير صحيحة بهذه اللغة. عبّئها واحفظ ثم انشر: ',
       requires_arabic_published: 'انشر النسخة العربية أولاً، ثم الإنجليزية.',
       legal_publish_requires_super_admin: 'نشر الصفحات القانونية متاح لمدير النظام فقط.',
       legal_review_required: 'سجّل المراجعة القانونية أولاً: املأ «المراجِع القانوني» و«تاريخ المراجعة القانونية» واحفظ، ثم انشر.',
       public_readiness_gate_failed: 'لم يجتز المحتوى شروط الجاهزية للنشر: ',
       forbidden: 'ليست لديك صلاحية النشر.',
-      default: 'تعذّر تنفيذ الطلب. حدّث الصفحة وحاول مرة أخرى.',
+      default: 'تعذّر تنفيذ الطلب. حدّث الصفحة وحاول مرة أخرى. رمز الخطأ: ',
     },
   },
   en: {
@@ -54,17 +55,18 @@ const COPY = {
     sep: ', ',
     errors: {
       incomplete_locale: 'Fill these fields in this language before publishing: ',
+      validation_failed: 'Not published: these fields are missing or invalid in this language. Fill them, save, then publish: ',
       requires_arabic_published: 'Publish the Arabic version first, then English.',
       legal_publish_requires_super_admin: 'Only the system admin can publish legal pages.',
       legal_review_required: 'Record the legal review first (reviewer and review date), save, then publish.',
       public_readiness_gate_failed: 'The content does not pass the publishing checks yet: ',
       forbidden: 'You do not have permission to publish.',
-      default: 'The request failed. Refresh the page and try again.',
+      default: 'The request failed. Refresh the page and try again. Error code: ',
     },
   },
 } as const;
 
-type ErrorBody = { error?: string; missing?: string[]; failingChecks?: string[] };
+type ErrorBody = { error?: string; missing?: string[]; failingChecks?: string[]; detail?: string; status?: number };
 
 export const PublishPanel = ({ path }: { path: string }) => {
   const { id, collectionSlug } = useDocumentInfo();
@@ -80,7 +82,8 @@ export const PublishPanel = ({ path }: { path: string }) => {
     const e = c.errors;
     switch (body.error) {
       case 'incomplete_locale':
-        return e.incomplete_locale + (body.missing ?? []).join(c.sep);
+      case 'validation_failed':
+        return e[body.error] + (body.missing ?? []).join(c.sep);
       case 'public_readiness_gate_failed':
         return e.public_readiness_gate_failed + (body.failingChecks ?? []).join(c.sep);
       case 'requires_arabic_published':
@@ -89,7 +92,8 @@ export const PublishPanel = ({ path }: { path: string }) => {
       case 'forbidden':
         return e[body.error];
       default:
-        return e.default;
+        // Unexpected answer: show the status and server reason so it can be reported.
+        return e.default + [body.status, body.error, body.detail].filter(Boolean).join(' · ');
     }
   };
 
@@ -107,7 +111,7 @@ export const PublishPanel = ({ path }: { path: string }) => {
       });
       const body = (await res.json().catch(() => ({}))) as ErrorBody;
       if (!res.ok) {
-        setMessage({ ok: false, text: explain(body) });
+        setMessage({ ok: false, text: explain({ ...body, status: res.status }) });
         return;
       }
       setMessage({ ok: true, text: action === 'publish' ? c.published(c.names[locale]) : c.unpublished(c.names[locale]) });

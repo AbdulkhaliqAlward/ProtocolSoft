@@ -86,14 +86,28 @@ export const publishEndpoints = [
         }
 
         const next = Array.from(new Set([...current, locale]));
-        const updated = await req.payload.update({
-          collection: collection as never,
-          id,
-          draft: true,
-          overrideAccess: true,
-          data: { publishedLocales: next, _status: 'published' } as never,
-          context: { skipAudit: true },
-        });
+        let updated: unknown;
+        try {
+          updated = await req.payload.update({
+            collection: collection as never,
+            id,
+            // Validate (and publish) the language being published, not the admin's default.
+            locale,
+            draft: true,
+            overrideAccess: true,
+            data: { publishedLocales: next, _status: 'published' } as never,
+            context: { skipAudit: true },
+          });
+        } catch (err) {
+          // Payload's own field validation (required fields, formats) runs on publish;
+          // name the failing fields instead of a bare 400 the editor cannot act on.
+          const fields = ((err as { data?: { errors?: { path?: string; label?: string }[] } }).data?.errors ?? [])
+            .map((e) => e.label || e.path)
+            .filter((f): f is string => Boolean(f));
+          req.payload.logger.warn({ err, msg: `publish ${collection}/${id} (${locale}) rejected` });
+          if (fields.length > 0) return Response.json({ error: 'validation_failed', missing: fields }, { status: 422 });
+          return Response.json({ error: 'publish_failed', detail: (err as Error).message?.slice(0, 300) }, { status: 500 });
+        }
         await writeAudit(req, 'publish', { collection, id, locale }, `locale published: ${locale}`);
         return Response.json({ ok: true, publishedLocales: (updated as unknown as { publishedLocales: Locale[] }).publishedLocales });
       }
