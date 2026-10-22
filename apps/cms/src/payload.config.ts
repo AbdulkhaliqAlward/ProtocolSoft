@@ -48,7 +48,11 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Production must never boot on a fallback secret (Phase 4 final security item):
 // a missing PAYLOAD_SECRET under NODE_ENV=production is a hard startup failure.
-if (process.env.NODE_ENV === 'production' && !process.env.PAYLOAD_SECRET) {
+// The one exception is `next build` itself (NEXT_PHASE=phase-production-build):
+// images are built without secrets by design, and nothing built there serves
+// requests; the running server is still refused without the real secret.
+const buildingImage = process.env.NEXT_PHASE === 'phase-production-build';
+if (process.env.NODE_ENV === 'production' && !process.env.PAYLOAD_SECRET && !buildingImage) {
   throw new Error('PAYLOAD_SECRET is required in production — refusing to start with a development fallback.');
 }
 
