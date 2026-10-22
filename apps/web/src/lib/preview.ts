@@ -21,7 +21,8 @@ export interface LocalVerifyResult {
 }
 
 export const verifyCode = (token: string): LocalVerifyResult => {
-  const pem = process.env.PREVIEW_VERIFY_PUBLIC_KEY;
+  // One-line .env form (literal \n) or real line breaks.
+  const pem = process.env.PREVIEW_VERIFY_PUBLIC_KEY?.replace(/\\n/g, '\n');
   if (!pem) return { ok: false, reason: 'no-verification-key' };
   try {
     const [header, body, signature] = token.split('.');

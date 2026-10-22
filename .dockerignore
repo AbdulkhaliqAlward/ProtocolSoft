@@ -1,15 +1,26 @@
-node_modules
-dist
-build
-.next
-out
-*.log
-.env
-.env.*
-!.env.example
+# Keep the build context small and free of secrets. Patterns apply at every
+# depth (**/), so app-level folders are excluded too, not just the root.
+**/node_modules
+**/dist
+**/build
+**/.next
+**/out
+**/*.log
+**/*.tsbuildinfo
+
+# Secrets never enter an image (runtime env comes from docker-compose).
+**/.env
+**/.env.*
+!**/.env.example
+
+# Data that lives in volumes, not images
 apps/cms/media
 apps/cms/media-staging
 apps/cms/backups
+
+# Not needed to build or run
 docs
 .git
+.claude
 coverage
+.dockerignore

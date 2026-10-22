@@ -2,7 +2,7 @@
 # The web variant contains no DB client libs beyond what Next.js ships; credential
 # isolation is enforced by env + `verify:no-db` + network policy, not just by image.
 
-ARG NODE_VERSION=20-alpine
+ARG NODE_VERSION=22-alpine
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./

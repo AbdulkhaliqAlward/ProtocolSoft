@@ -6,6 +6,10 @@
 # service, DISABLED by default (BD1) until an encrypted off-server destination is
 # approved and a restore test is completed.
 
+# Fixed project name: volume names (e.g. protocol-soft_cms-media, used by the
+# backup job) must not depend on the folder the repository is cloned into.
+name: protocol-soft
+
 services:
   caddy:
     image: caddy:2-alpine
@@ -76,7 +80,8 @@ services:
     volumes:
       - cms-media:/app/apps/cms/media
     networks: [app, data] # NO ports — reachable only via the tunnel
-    depends_on: [postgres]
+    depends_on:
+      postgres: { condition: service_healthy }
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3001/api/internal/health >/dev/null 2>&1 || exit 1']
@@ -90,8 +95,16 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Read once by init-roles.sh, on first start of an empty data volume.
+      POSTGRES_MIGRATE_USER: ${POSTGRES_MIGRATE_USER}
+      POSTGRES_MIGRATE_PASSWORD: ${POSTGRES_MIGRATE_PASSWORD}
+      POSTGRES_CMS_USER: ${POSTGRES_CMS_USER}
+      POSTGRES_CMS_PASSWORD: ${POSTGRES_CMS_PASSWORD}
+      POSTGRES_BACKUP_USER: ${POSTGRES_BACKUP_USER}
+      POSTGRES_BACKUP_PASSWORD: ${POSTGRES_BACKUP_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./scripts/postgres/init-roles.sh:/docker-entrypoint-initdb.d/10-init-roles.sh:ro
     networks: [data] # NO ports — private only (Phase 1 §11.3)
     restart: unless-stopped
     healthcheck:

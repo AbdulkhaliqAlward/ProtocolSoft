@@ -14,6 +14,9 @@ export const PREVIEW_MAX_TTL_SECONDS = 15 * 60; // hard ceiling — §6.7
 
 const b64url = (buf: Buffer): string => buf.toString('base64url');
 
+/** PEM from env: accepts real line breaks or the one-line form with literal \n (as written to .env files). */
+export const pemFromEnv = (value: string | undefined): string | undefined => (value ? value.replace(/\\n/g, '\n') : value);
+
 export interface PreviewCode {
   token: string;
   jti: string;
@@ -30,7 +33,7 @@ export const signPreviewCode = (input: {
   revisionId?: number | string;
   issuingAdminId: number;
 }): PreviewCode => {
-  const privateKeyPem = process.env.PREVIEW_SIGNING_PRIVATE_KEY;
+  const privateKeyPem = pemFromEnv(process.env.PREVIEW_SIGNING_PRIVATE_KEY);
   if (!privateKeyPem) throw new Error('PREVIEW_SIGNING_PRIVATE_KEY is not configured');
   const privateKey = createPrivateKey(privateKeyPem);
 
@@ -69,7 +72,7 @@ export interface VerifyResult {
 }
 
 export const verifyPreviewCode = (token: string, publicKeyPem?: string): VerifyResult => {
-  const keyPem = publicKeyPem ?? process.env.PREVIEW_VERIFY_PUBLIC_KEY ?? process.env.PREVIEW_SIGNING_PRIVATE_KEY;
+  const keyPem = publicKeyPem ?? pemFromEnv(process.env.PREVIEW_VERIFY_PUBLIC_KEY ?? process.env.PREVIEW_SIGNING_PRIVATE_KEY);
   if (!keyPem) return { ok: false, reason: 'no-verification-key' };
   try {
     const [header, body, signature] = token.split('.');
