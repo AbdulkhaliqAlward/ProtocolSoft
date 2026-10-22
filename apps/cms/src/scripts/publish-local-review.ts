@@ -1,24 +1,28 @@
 /**
- * LOCAL-REVIEW PUBLISH (Phase 5 D-2 — approved for LOCAL DEVELOPMENT ONLY).
+ * LOCAL-REVIEW PUBLISH (local development only).
  *
- * Publishes, in the local development database ONLY:
- *   - the three seeded service drafts, after filling neutral review copy
- *     (required fields cannot publish as [PLACEHOLDER]/empty — §6.9);
- *   - the minimum homepage content (the drafted homepage global);
- *   - the minimum about page content.
+ * Publishes, in the local development database only, the final copy for:
+ *   - the three services (copy below + review-content/serviceSpecs.ts);
+ *   - the homepage global (seeded copy + the homepage FAQs);
+ *   - the about page;
+ *   - the privacy policy (review-content/privacy.ts), marked as NOT reviewed
+ *     by legal counsel. Production publishing goes through the legal gate.
  *
- * It NEVER publishes: legal templates (privacy/terms), the case study, EDR
- * initiative content, team members, social links, or any real contact data.
- * Published local seed content is NOT a production-ready data state: it must
- * never be committed, exported to staging, or copied to production.
+ * It never publishes: terms of use, the case study, the EDR initiative, team
+ * members, social links, or any contact data.
  *
- * Hard guards: refuses to run outside local development. Idempotent.
- * Run:  npx tsx --env-file-if-exists=.env src/scripts/publish-local-review.ts
+ * Hard guard: refuses to run in production. Idempotent.
+ * Run:  npm run publish:local-review -w @protocol-soft/cms
+ *
+ * With --drafts-only (npm run content:load-drafts) it writes the same copy as
+ * drafts and publishes nothing; that mode is allowed in production, where the
+ * editors then review and publish each item from the admin.
  */
 import { getPayload } from 'payload';
 
 import configPromise from '../payload.config';
 
+import { PRIVACY } from './review-content/privacy';
 import { HOME_FAQS, SERVICE_SPECS } from './review-content/serviceSpecs';
 
 const guard = (): void => {
@@ -66,68 +70,68 @@ interface ServiceCopy {
   };
 }
 
-/* Neutral review copy (design-review content, not Phase 9 final copy). */
+/* Final service copy (AR + EN). The spec-sheet parts live in review-content/serviceSpecs.ts.
+   Roles: heroHeadline = the promise; heroSubhead = who it is for and the
+   outcome; summary = the one-line card used on the home page and service
+   lists; overview = the problem and our approach; deliverables = what you keep;
+   process descriptions = the activity of each step. */
 const SERVICES: ServiceCopy[] = [
   {
     slug: 'custom-software',
     icon: 'code',
     ar: {
       heroHeadline: 'أنظمة مخصصة تُبنى حول عملياتك، لا العكس.',
-      heroSubhead: 'من الدراسة والتحليل إلى التشغيل والدعم — نبني نظاماً يناسب طريقة عمل فريقك اليوم ويتيح نموه غداً.',
-      summary: 'نصمم ونطور أنظمة برمجية مخصصة تخدم عمليات عملك بدقة، مع جودة قابلة للصيانة والتطوير على المدى الطويل.',
+      heroSubhead: 'حين لا تناسب الأنظمة الجاهزة طريقة عملك، نبني نظاماً يناسبها اليوم، ويتّسع لنموّها غداً.',
+      summary: 'أنظمة داخلية وبوابات وربط بين الأنظمة القائمة، مصممة حول طريقة عمل فريقك.',
       overview: [
-        'كل عملية عمل لها تفاصيل لا تستوعبها الأنظمة الجاهزة. نبدأ بفهم سير العمل الفعلي داخل مؤسستك، ثم نصمم نظاماً يخدم هذه العملية بدقة — بدل إجبار فريقك على التكيف مع قالب جاهز.',
-        'نبني الأنظمة بمعايير هندسية تضمن قابليتها للصيانة والتطوير: بنية واضحة، اختبارات آلية، وتوثيق يبقى مع النظام. كما نضع الأمان والتكامل مع أنظمتك القائمة ضمن التصميم من اليوم الأول.',
-        'لا ينتهي عملنا عند الإطلاق: نرافقك في التشغيل والتوسع لاحقاً، ونوضح منذ البداية نطاق العمل وما يحتاج تطويراً في مراحل تالية.',
+        'كل جهة لها طريقة عمل خاصة بها، وكثير من الأنظمة الجاهزة يفرض على الفريق أن يتكيّف معه: خطوات زائدة، وجداول جانبية، وبيانات تُدخل مرتين. نبدأ من الجهة المقابلة: نفهم كيف يجري العمل فعلاً، ثم نصمم النظام ليخدمه.',
+        'ولأن النظام سيعيش سنوات، نهتم بما لا يظهر في العرض الأول: بنية يسهل البناء عليها، واختبارات تحمي كل تعديل لاحق، وربط محكم مع ما تستخدمه اليوم.',
       ],
       deliverables: [
-        { title: 'دراسة وتحليل العمليات', description: 'توثيق سير العمل والمتطلبات قبل كتابة أي سطر برمجي.' },
-        { title: 'تصميم النظام والواجهات', description: 'بنية تقنية وواجهات عربية/إنجليزية مبنية على نظام تصميم موحد.' },
-        { title: 'تطوير واختبارات آلية', description: 'تنفيذ مراحل مع اختبارات تمنع تراجع الجودة مع كل تعديل.' },
-        { title: 'إطلاق ودعم وتوثيق', description: 'تشغيل آمن، تدريب الفريق، وتوثيق تشغيلي يبقى لديك.' },
+        { title: 'النظام العامل', description: 'واجهات مبنية على نظام تصميم موحد، تعمل على الحاسب والجوال.' },
+        { title: 'الشيفرة المصدرية واختباراتها', description: 'شيفرة موثقة، مع اختبارات آلية تحمي النظام عند كل تعديل.' },
+        { title: 'الوثائق', description: 'وثائق البنية والتشغيل والصيانة، مكتوبة لمن سيعمل على النظام بعدنا.' },
+        { title: 'تدريب فريقك', description: 'جلسات عملية لمن سيستخدم النظام ومن سيديره.' },
       ],
-      capabilities: ['تحليل ودراسة العمليات', 'تكامل مع الأنظمة القائمة', 'واجهات عربية RTL / إنجليزية LTR', 'اختبارات آلية', 'تسليم تدريجي', 'دعم وتشغيل'],
+      capabilities: ['ورش عمل مع أصحاب العملية', 'ربط الأنظمة عبر واجهات برمجية', 'الأدوار والصلاحيات', 'التقارير ولوحات المتابعة', 'ترحيل البيانات', 'مراقبة الأداء'],
       processSteps: [
-        { title: 'الاستكشاف', description: 'نبدأ بفهم طريقة العمل والتحديات الفعلية.' },
-        { title: 'التصميم', description: 'نصمم حلاً مناسباً بدلاً من فرض قالب جاهز.' },
-        { title: 'البناء', description: 'تنفيذ بجودة قابلة للصيانة والتطوير.' },
-        { title: 'الأمن والاختبار', description: 'نأخذ الأمان في الاعتبار منذ بداية البناء.' },
-        { title: 'الإطلاق والدعم', description: 'نوضح نطاق العمل وما يحتاج تطويراً لاحقاً.' },
+        { title: 'الاستكشاف', description: 'نتتبع العملية خطوة بخطوة مع فريقك، لنعرف أين تتعطل.' },
+        { title: 'التصميم', description: 'نحوّل ما فهمناه إلى بنية تقنية ونماذج واجهات تجرّبها قبل كتابة الشيفرة.' },
+        { title: 'البناء', description: 'ننفّذ على مراحل قصيرة، وننهي كل مرحلة بشيء يعمل.' },
+        { title: 'الأمن والاختبار', description: 'نراجع الأمان، ونختبر الأداء والحالات الحرجة قبل وصول النظام إلى المستخدمين.' },
+        { title: 'الإطلاق والدعم', description: 'ننقل النظام إلى التشغيل الفعلي بخطة واضحة، ونتابع بدايته معك.' },
       ],
       faqs: [
-        { question: 'هل تتعاملون مع أنظمة جاهزة أم تطوير مخصص فقط؟', answer: 'ندرس حالتك أولاً؛ إن كان النظام الجاهز أنسب وأقل تكلفة على المدى الطويل أوصينا به بصراحة. التطوير المخصص هو خيارنا عندما تحتاج عملياتك شيئاً لا توفره الأنظمة الجاهزة.' },
-        { question: 'كيف تُحدد مدة التنفيذ والتكلفة؟', answer: 'بعد جلسة الاستكشاف نقدم نطاقاً واضحاً بمراحل تسليم محددة، لكل مرحلة مخرجات مكتوبة قبل البدء.' },
+        { question: 'هل تتعاملون مع أنظمة جاهزة أم تطوير مخصص فقط؟', answer: 'ندرس حالتك أولاً؛ إن كان نظام جاهز يكفيك وأقل تكلفة على المدى الطويل أوصينا به بصراحة. نبني نظاماً مخصصاً حين تحتاج عملياتك ما لا توفره الأنظمة الجاهزة.' },
       ],
-      seoDescription: 'تطوير أنظمة برمجية مخصصة تخدم عمليات عملك بدقة: دراسة وتحليل، تصميم وتطوير، اختبارات وإطلاق ودعم.',
+      seoDescription: 'تطوير أنظمة برمجية مخصصة حول طريقة عمل فريقك: أنظمة داخلية وبوابات وربط بين الأنظمة، بمراحل تسليم مكتوبة.',
     },
     en: {
       heroHeadline: 'Custom systems built around your operations — not the other way around.',
-      heroSubhead: 'From discovery to launch and support, we build software that fits how your team works today and can grow with it tomorrow.',
-      summary: 'We design and build custom software that fits how your business actually works, with maintainable quality for the long term.',
+      heroSubhead: 'When off-the-shelf tools do not fit how you work, we build a system that fits it today and has room to grow tomorrow.',
+      summary: 'Internal systems, portals and connections between existing tools, designed around how your team works.',
       overview: [
-        'Every operation has details that off-the-shelf systems cannot absorb. We start by understanding how work actually flows through your organization, then design a system that serves that process precisely — instead of forcing your team into a prebuilt template.',
-        'We build to engineering standards that keep systems maintainable: a clear architecture, automated tests, and documentation that stays with the system. Security and integration with your existing tools are part of the design from day one.',
-        'Our work does not end at launch: we stay with you through operation and later growth, with the scope and follow-up phases defined honestly from the start.',
+        'Every organisation works in its own way, and many ready-made systems make the team adapt to them: extra steps, side spreadsheets, data entered twice. We start from the other end: we learn how the work really runs, then design the system to serve it.',
+        'Because the system will live for years, we care about what a first demo does not show: an architecture that is easy to build on, tests that protect every later change, and solid connections to the tools you already use.',
       ],
       deliverables: [
-        { title: 'Process study & analysis', description: 'Documented workflows and requirements before any code is written.' },
-        { title: 'System & interface design', description: 'Technical architecture and AR/EN interfaces on a unified design system.' },
-        { title: 'Implementation with automated tests', description: 'Phased delivery with tests that prevent quality regressions.' },
-        { title: 'Launch, support & documentation', description: 'Safe rollout, team training, and operational docs you keep.' },
+        { title: 'The working system', description: 'Interfaces on a unified design system, working on desktop and mobile.' },
+        { title: 'Source code and its tests', description: 'Documented code, with automated tests that protect the system through every change.' },
+        { title: 'Documentation', description: 'Architecture, operations and maintenance documents, written for whoever works on the system after us.' },
+        { title: 'Training for your team', description: 'Hands-on sessions for the people who will use the system and those who will run it.' },
       ],
-      capabilities: ['Process analysis', 'Integration with existing systems', 'Arabic RTL / English LTR interfaces', 'Automated testing', 'Phased delivery', 'Support & operations'],
+      capabilities: ['Workshops with process owners', 'System integration through APIs', 'Roles and permissions', 'Reports and dashboards', 'Data migration', 'Performance monitoring'],
       processSteps: [
-        { title: 'Discovery', description: 'We start by understanding how the business works.' },
-        { title: 'Design', description: 'A fitting solution instead of a prebuilt template.' },
-        { title: 'Build', description: 'Maintainable, improvable implementation.' },
-        { title: 'Secure & Test', description: 'Security considered from the beginning of the build.' },
-        { title: 'Launch & Support', description: 'Clear scope and honest follow-up phases.' },
+        { title: 'Discovery', description: 'We trace the process step by step with your team to find where it breaks.' },
+        { title: 'Design', description: 'We turn what we learned into an architecture and interface prototypes you can try before any code is written.' },
+        { title: 'Build', description: 'Short phases, each finishing with something that works.' },
+        { title: 'Secure & Test', description: 'Security review, plus performance and edge-case testing, before the system reaches users.' },
+        { title: 'Launch & Support', description: 'A planned move into live operation, and we follow its first days with you.' },
       ],
       faqs: [
-        { question: 'Do you work with off-the-shelf systems or custom development only?', answer: 'We study your case first. If an off-the-shelf system is the better and cheaper long-term fit, we will say so honestly. Custom development is our choice when your operations need what ready-made systems cannot provide.' },
-        { question: 'How are timeline and cost defined?', answer: 'After a discovery session we provide a clearly scoped, phased plan with written deliverables for every phase before it starts.' },
+        { question: 'Do you work with off-the-shelf systems or custom development only?', answer: 'We study your case first; if a ready-made system is enough and cheaper over time, we will say so plainly. We build custom when your operations need what ready-made systems cannot provide.' },
       ],
-      seoDescription: 'Custom software development built around your operations: process analysis, design, implementation with tests, launch and support.',
+      seoDescription: 'Custom software built around how your team works: internal systems, portals and system integration, with written delivery phases.',
     },
   },
   {
@@ -135,61 +139,57 @@ const SERVICES: ServiceCopy[] = [
     icon: 'layers',
     ar: {
       heroHeadline: 'منتجات ومنصات رقمية تُطلق بثقة وتنمو بوضوح.',
-      heroSubhead: 'نحوّل الفكرة إلى منتج قابل للاستخدام: تصميم، بناء، إطلاق، ثم قياس وتحسين مستمر.',
-      summary: 'نرافقك من الفكرة إلى منصة رقمية عاملة: تصميم المنتج، بناء المنصة، الإطلاق، ثم التطوير المستمر بناءً على الاستخدام الفعلي.',
+      heroSubhead: 'من فكرة على الورق إلى منتج يستخدمه عملاؤك فعلاً، ويتحسّن مع كل دورة تطوير.',
+      summary: 'تطبيقات ومنصات لعملائك، من تعريف المنتج إلى الإطلاق والتحسين بناءً على الاستخدام.',
       overview: [
-        'المنتج الرقمي الناجح ليس مجرد تطبيق يعمل، بل منتج يفهم مستخدميه ويتطور معهم. نعمل معك على تحديد الجمهور الحقيقي والمشكلة الأساسية قبل أي تنفيذ، ثم نبني نسخة أولى صغيرة قابلة للقياس.',
-        'نبني المنصات على أساس تقني يتحمل النمو: بنية قابلة للتوسع، لوحات تشغيل داخلية واضحة، وتجربة استخدام عربية/إنجليزية مبنية على نظام تصميم موحد.',
-        'بعد الإطلاق نقرأ الاستخدام الفعلي معك: ما الذي يعمل؟ ما الذي يحتاج تحسيناً؟ ثم نرتب التطوير القادم على أساس بيانات لا تخمين.',
+        'المنتج الناجح لا يبدأ بقائمة مزايا طويلة، بل بمشكلة واضحة وجمهور محدد. نعمل معك على تحديدهما قبل التنفيذ، ثم نختار أصغر نسخة تكفي لاختبار الفكرة مع مستخدمين حقيقيين.',
+        'بعد الإطلاق تصبح البيانات هي الدليل: ما الذي يستخدمه الناس؟ وأين يتوقفون؟ نقرأ ذلك معك، ونبني الخطوة التالية على ما يحدث فعلاً لا على ما نتوقعه.',
       ],
       deliverables: [
-        { title: 'تحديد المنتج والنطاق', description: 'جمهور واضح، مشكلة أساسية، ونسخة أولى قابلة للقياس.' },
-        { title: 'تصميم تجربة الاستخدام', description: 'رحلات مستخدم وواجهات عربية/إنجليزية جاهزة للتنفيذ.' },
-        { title: 'بناء المنصة', description: 'تطوير كامل مع لوحات تشغيل داخلية وتكاملات الدفع والإشعارات عند الحاجة.' },
-        { title: 'إطلاق وتحسين مستمر', description: 'قياس الاستخدام الفعلي وخطة تحسين مرتبة بالأولوية.' },
+        { title: 'المنتج المنشور', description: 'متاح لمستخدميك على المنصة التي تناسبهم.' },
+        { title: 'لوحة التشغيل الداخلية', description: 'لإدارة المستخدمين والمحتوى والطلبات دون الرجوع إلينا.' },
+        { title: 'أدوات القياس', description: 'قياس الاستخدام منذ يوم الإطلاق، وتقارير تقرؤها بسهولة.' },
+        { title: 'ملفات التصميم', description: 'الواجهات ونظام التصميم، جاهزة لأي تطوير لاحق.' },
       ],
-      capabilities: ['تعريف المنتج وMVP', 'تصميم UX/UI ثنائي اللغة', 'بناء منصات قابلة للتوسع', 'تكاملات دفع وإشعارات', 'قياس وتحليلات استخدام', 'تطوير مستمر'],
+      capabilities: ['مقابلات المستخدمين', 'تطبيقات الويب والجوال', 'الحسابات وتسجيل الدخول', 'تكاملات الدفع والإشعارات', 'تحليلات الاستخدام', 'تجربة التحسينات'],
       processSteps: [
-        { title: 'الاستكشاف', description: 'نحدد الجمهور والمشكلة ونسخة الإطلاق الأولى.' },
-        { title: 'التصميم', description: 'تصميم تجربة وواجهات قابلة للتنفيذ مباشرة.' },
-        { title: 'البناء', description: 'بناء المنتج بمراحل قصيرة قابلة للمراجعة.' },
-        { title: 'الأمن والاختبار', description: 'حماية بيانات المستخدمين واختبارات قبل الإطلاق.' },
-        { title: 'الإطلاق والدعم', description: 'إطلاق مقيس، ثم تحسين مبني على بيانات الاستخدام.' },
+        { title: 'الاستكشاف', description: 'نختبر الفكرة: لمن هي، وما المشكلة التي تحلها.' },
+        { title: 'التصميم', description: 'نرسم رحلة المستخدم، ونختبر النماذج قبل البناء.' },
+        { title: 'البناء', description: 'دورات تطوير قصيرة، تنتهي كل منها بشيء يمكن تجربته.' },
+        { title: 'الأمن والاختبار', description: 'نحمي بيانات المستخدمين، ونختبر المنتج على الأجهزة والحالات الحرجة.' },
+        { title: 'الإطلاق والدعم', description: 'نطلق المنتج، ونراقب أيامه الأولى عن قرب.' },
       ],
       faqs: [
-        { question: 'هل تعملون مع شركات ناشئة في مرحلة الفكرة؟', answer: 'نعم. نبدأ بجلسات تحديد المنتج لتقييم الجدوى ونطاق نسخة أولى واقعية قبل أي التزام تطويري.' },
-        { question: 'ماذا يحدث بعد الإطلاق؟', answer: 'نقيس الاستخدام الفعلي معك ونرتب خطة التحسين بالأولوية — التطوير بعد الإطلاق جزء أصيل من نموذج عملنا.' },
+        { question: 'هل تعملون مع شركات ناشئة في مرحلة الفكرة؟', answer: 'نعم. نبدأ بجلسات تعريف المنتج لتقدير جدوى الفكرة ونطاق نسخة أولى واقعية، قبل أي التزام بالتطوير.' },
       ],
-      seoDescription: 'بناء المنتجات والمنصات الرقمية من الفكرة إلى الإطلاق: تعريف المنتج، تصميم التجربة، البناء، ثم التحسين المستمر.',
+      seoDescription: 'بناء المنتجات والمنصات الرقمية لعملائك: تعريف المنتج، وتصميم التجربة، والبناء، والإطلاق، والتحسين بناءً على الاستخدام.',
     },
     en: {
       heroHeadline: 'Digital products and platforms launched with confidence, grown with clarity.',
-      heroSubhead: 'We turn the idea into a usable product: design, build, launch, then measure and improve continuously.',
-      summary: 'From idea to a working platform: product design, platform build, launch, and continuous improvement driven by real usage.',
+      heroSubhead: 'From an idea on paper to a product your customers actually use, and that improves with every development cycle.',
+      summary: 'Apps and platforms for your customers, from product definition to launch and usage-led improvement.',
       overview: [
-        'A successful digital product is not just software that runs — it understands its users and evolves with them. We work with you to define the real audience and the core problem before any implementation, then build a small, measurable first release.',
-        'Platforms are built on foundations that tolerate growth: scalable architecture, clear internal operations dashboards, and an Arabic/English experience built on a unified design system.',
-        'After launch we read real usage with you: what works, what needs improvement, and we rank the next development round based on data rather than guesswork.',
+        'A successful product does not start with a long feature list, but with a clear problem and a defined audience. We pin both down with you before building, then choose the smallest release that can test the idea with real users.',
+        'After launch, the data becomes the evidence: what do people use, and where do they stop? We read it with you and base the next step on what is happening, not on what we expected.',
       ],
       deliverables: [
-        { title: 'Product & scope definition', description: 'A clear audience, core problem, and a measurable first release.' },
-        { title: 'Experience design', description: 'User journeys and AR/EN interfaces ready for implementation.' },
-        { title: 'Platform build', description: 'Full implementation with internal ops dashboards and payment/notification integrations when needed.' },
-        { title: 'Launch & continuous improvement', description: 'Real usage measurement and a prioritized improvement plan.' },
+        { title: 'The published product', description: 'Live for your users, on the platform that suits them.' },
+        { title: 'An internal back office', description: 'To manage users, content and orders without coming back to us.' },
+        { title: 'Measurement tools', description: 'Usage measurement from launch day, with reports that are easy to read.' },
+        { title: 'Design files', description: 'The interfaces and design system, ready for any later development.' },
       ],
-      capabilities: ['Product definition & MVP', 'Bilingual UX/UI design', 'Scalable platform engineering', 'Payment & notification integrations', 'Usage analytics', 'Continuous development'],
+      capabilities: ['User interviews', 'Web and mobile apps', 'Accounts and sign-in', 'Payment and notification integrations', 'Usage analytics', 'Testing improvements'],
       processSteps: [
-        { title: 'Discovery', description: 'We define the audience, the problem, and the first release.' },
-        { title: 'Design', description: 'Experience and interface design ready for direct implementation.' },
-        { title: 'Build', description: 'Short, reviewable delivery phases.' },
-        { title: 'Secure & Test', description: 'User-data protection and pre-launch testing.' },
-        { title: 'Launch & Support', description: 'A measured launch, then data-driven improvement.' },
+        { title: 'Discovery', description: 'We test the idea: who it is for, and the problem it solves.' },
+        { title: 'Design', description: 'We map the user journey and test prototypes before building.' },
+        { title: 'Build', description: 'Short development cycles, each ending in something you can try.' },
+        { title: 'Secure & Test', description: 'We protect user data and test the product across devices and edge cases.' },
+        { title: 'Launch & Support', description: 'We launch the product and watch its first days closely.' },
       ],
       faqs: [
-        { question: 'Do you work with early-stage founders?', answer: 'Yes. We start with product-definition sessions to assess feasibility and a realistic first-release scope before any development commitment.' },
-        { question: 'What happens after launch?', answer: 'We measure real usage with you and prioritize the improvement plan — post-launch development is a core part of how we work.' },
+        { question: 'Do you work with early-stage founders?', answer: 'Yes. We start with product-definition sessions to gauge the idea and a realistic first-release scope, before any development commitment.' },
       ],
-      seoDescription: 'Digital product & platform development from idea to launch: product definition, experience design, build, and continuous improvement.',
+      seoDescription: 'Digital products and platforms for your customers: product definition, experience design, build, launch and usage-led improvement.',
     },
   },
   {
@@ -197,61 +197,59 @@ const SERVICES: ServiceCopy[] = [
     icon: 'shield',
     ar: {
       heroHeadline: 'أمن يُبنى مع النظام، لا يُضاف إليه لاحقاً.',
-      heroSubhead: 'تقييم، تحصين، واستجابة — خدمات أمن سيبراني دفاعية تحمي أنظمتك وبيانات عملك.',
-      summary: 'خدمات أمن سيبراني دفاعية: تقييم الوضع الأمني، تحصين الأنظمة والبنية، وبناء الجاهزية للاستجابة للحوادث.',
+      heroSubhead: 'نقيّم وضعك الأمني، ونعالج الأولويات، ونجهّز فريقك للتعامل مع الحوادث بثقة.',
+      summary: 'تقييم أمني دفاعي، وتحصين للأنظمة، وجاهزية للاستجابة للحوادث.',
       overview: [
-        'الحماية تصبح أصعب وأكثر تكلفة عندما تؤجل إلى ما بعد الإطلاق. لذلك نضع الأمن ضمن التصميم منذ البداية: مراجعة البنية، إدارة الهويات والصلاحيات، وتأمين خطوط التكامل.',
-        'نقدم خدمات تقييم دفاعية توضح وضعك الأمني الحالي بلغة واضحة: أين الثغرات؟ ما أولوية معالجتها؟ وما الإجراء العملي لكل نقطة؟ بلا مبالغات تقنية ولا عروض مبهمة.',
-        'الهدف ليس تقريراً يُحفظ في درج، بل حالة أمنية أفضل يمكن قياسها: ضوابط مطبقة، سجلات مراقبة، وخطة استجابة يعرف فريقك كيف يتعامل معها فعلياً.',
+        'معظم المخاطر في البيئات الحقيقية لا تأتي من هجمات معقدة، بل من صلاحيات زائدة، وإعدادات افتراضية لم تُراجَع، وسجلات لا يقرؤها أحد. نبدأ بما يصنع الفرق الأكبر في بيئتك تحديداً.',
+        'نكتب النتائج بلغة يفهمها الفريق التقني والإدارة معاً: ما المشكلة، وما أثرها، وما الإجراء المقترح لكل نقطة. بلا تهويل، وبلا توصيات عامة يصعب تطبيقها.',
       ],
       deliverables: [
-        { title: 'تقييم الوضع الأمني', description: 'مسح منظم للثغرات والمخاطر مع أولويات معالجة واضحة.' },
-        { title: 'تحصين الأنظمة والبنية', description: 'ضوابط تشغيلية: صلاحيات، تهيئة آمنة، وتأمين التكاملات.' },
-        { title: 'المراقبة والسجلات', description: 'إعداد سجلات وتنبيهات تسمح برصد الأنشطة غير الطبيعية.' },
-        { title: 'الجاهزية للاستجابة', description: 'خطة استجابة للحوادث وتدريب عملي لفريقك.' },
+        { title: 'تقرير التقييم الأمني', description: 'صورة كاملة لوضعك الأمني، مع إجراء محدد لكل نقطة.' },
+        { title: 'تطبيق المعالجات', description: 'الصلاحيات، والإعدادات الآمنة، وتأمين التكاملات، بالترتيب الأهم أولاً.' },
+        { title: 'المراقبة والتنبيهات', description: 'سجلات وتنبيهات تكشف النشاط غير المعتاد مبكراً.' },
+        { title: 'خطة الاستجابة للحوادث', description: 'أدوار واضحة وخطوات مكتوبة، وتمرين عملي لفريقك.' },
       ],
-      capabilities: ['تقييم أمني دفاعي', 'إدارة الهويات والصلاحيات', 'تحصين البنية والتهيئة الآمنة', 'مراقبة السجلات والتنبيهات', 'الاستجابة للحوادث', 'توعية وتدريب الفرق'],
+      capabilities: ['مراجعة البنية والتصميم', 'نمذجة التهديدات', 'إدارة الهويات والصلاحيات', 'تحصين الخوادم والسحابة', 'تحليل السجلات', 'التعامل مع الحوادث'],
       processSteps: [
-        { title: 'الاستكشاف', description: 'فهم بنيتك وأنظمتك وسياق مخاطر عملك.' },
-        { title: 'التقييم', description: 'مسح منظم يعطي أولويات معالجة واضحة.' },
-        { title: 'التحصين', description: 'تطبيق الضوابط الأمنية حسب الأولوية.' },
-        { title: 'التحقق', description: 'اختبارات تثبت أن الضوابط تعمل فعلاً.' },
-        { title: 'المتابعة', description: 'مراقبة ومراجعات دورية تحافظ على الحالة الأمنية.' },
+        { title: 'الاستكشاف', description: 'نفهم أنظمتك وبياناتك، وما يهمّ عملك أن يبقى متاحاً.' },
+        { title: 'التقييم', description: 'نراجع البنية والإعدادات والصلاحيات وفق منهجية منظمة.' },
+        { title: 'التحصين', description: 'نطبّق المعالجات بالترتيب الذي يقلل المخاطر أسرع.' },
+        { title: 'التحقق', description: 'نختبر أن كل معالجة تعمل كما ينبغي.' },
+        { title: 'المتابعة', description: 'نعود إلى الوضع الأمني دورياً، ومع كل تغيير مهم في أنظمتك.' },
       ],
       faqs: [
-        { question: 'هل تقدمون اختبارات اختراق؟', answer: 'نركز على الخدمات الدفاعية: التقييم والتحصين والمراقبة والاستجابة. أي اختبار هجومي يتم فقط بتفويض مكتوب ونطاق متفق عليه مسبقاً، ونساعدك في تحديد نطاقه ومتابعة معالجة نتائجه.' },
-        { question: 'من أين نبدأ إن لم يكن لدينا أي وضع أمني موثق؟', answer: 'من تقييم أساسي: جرد الأنظمة والصلاحيات، مراجعة التهيئة، ثم معالجة الأولويات القصوى أولاً بخطة زمنية واقعية.' },
+        { question: 'هل تقدمون اختبارات اختراق؟', answer: 'نركز على الخدمات الدفاعية. أي اختبار هجومي يتم فقط بتفويض مكتوب ونطاق متفق عليه مسبقاً، ونساعدك في تحديد نطاقه ومتابعة معالجة نتائجه.' },
+        { question: 'من أين نبدأ إن لم يكن لدينا أي توثيق أمني؟', answer: 'من جرد بسيط: ما الأنظمة لديك، ومن يصل إليها. هذا وحده يكشف عادةً أهم ما يحتاج معالجة، ونبني عليه خطة واقعية.' },
       ],
-      seoDescription: 'خدمات أمن سيبراني دفاعية: تقييم الوضع الأمني، تحصين الأنظمة والبنية، المراقبة، والجاهزية للاستجابة للحوادث.',
+      seoDescription: 'خدمات أمن سيبراني دفاعية: تقييم أمني بلغة واضحة، وتحصين للأنظمة، ومراقبة، وجاهزية للاستجابة للحوادث.',
     },
     en: {
       heroHeadline: 'Security built with the system — not bolted on later.',
-      heroSubhead: 'Assessment, hardening, and response — defensive cybersecurity services that protect your systems and business data.',
-      summary: 'Defensive cybersecurity services: security posture assessment, system and infrastructure hardening, and incident-response readiness.',
+      heroSubhead: 'We assess your security, fix what matters first, and prepare your team to handle incidents with confidence.',
+      summary: 'Defensive security assessment, system hardening, and incident-response readiness.',
       overview: [
-        'Protection becomes harder and more expensive when it is postponed until after launch. That is why security is part of the design from the beginning: architecture review, identity and access management, and secured integration points.',
-        'Our defensive assessments explain your current security posture in plain language: where the gaps are, what priority each one deserves, and the practical action for each finding — no technical scaremongering, no vague offers.',
-        'The goal is not a report that sits in a drawer, but a measurable security state: applied controls, monitored logs, and a response plan your team actually knows how to use.',
+        'Most risk in real environments does not come from sophisticated attacks, but from excess permissions, default settings nobody reviewed, and logs nobody reads. We start with what makes the biggest difference in your environment specifically.',
+        'We write findings in language your technical team and management can both follow: what the issue is, its impact, and the action we propose for each. No scaremongering, and no generic advice that is hard to apply.',
       ],
       deliverables: [
-        { title: 'Security posture assessment', description: 'A systematic scan of gaps and risks with clear remediation priorities.' },
-        { title: 'System & infrastructure hardening', description: 'Operational controls: access, secure configuration, and integration security.' },
-        { title: 'Monitoring & logging', description: 'Logs and alerting that make abnormal activity visible.' },
-        { title: 'Response readiness', description: 'An incident-response plan and practical training for your team.' },
+        { title: 'Security assessment report', description: 'A full picture of your security, with a specific action for each finding.' },
+        { title: 'Fixes applied', description: 'Permissions, secure settings and integration security, most important first.' },
+        { title: 'Monitoring and alerting', description: 'Logs and alerts that surface unusual activity early.' },
+        { title: 'Incident response plan', description: 'Clear roles, written steps, and a practical exercise for your team.' },
       ],
-      capabilities: ['Defensive security assessment', 'Identity & access management', 'Infrastructure hardening', 'Log monitoring & alerting', 'Incident response', 'Team awareness & training'],
+      capabilities: ['Architecture and design review', 'Threat modelling', 'Identity and access management', 'Server and cloud hardening', 'Log analysis', 'Incident handling'],
       processSteps: [
-        { title: 'Discovery', description: 'Understanding your infrastructure, systems, and risk context.' },
-        { title: 'Assessment', description: 'A systematic scan that yields clear remediation priorities.' },
-        { title: 'Hardening', description: 'Applying security controls in priority order.' },
-        { title: 'Verification', description: 'Testing that proves the controls actually work.' },
-        { title: 'Follow-up', description: 'Monitoring and periodic reviews that keep the posture healthy.' },
+        { title: 'Discovery', description: 'We learn your systems, your data, and what your business needs to keep available.' },
+        { title: 'Assessment', description: 'We review architecture, settings and permissions using a structured method.' },
+        { title: 'Hardening', description: 'We apply fixes in the order that reduces risk fastest.' },
+        { title: 'Verification', description: 'We test that each fix works as intended.' },
+        { title: 'Follow-up', description: 'We revisit your security periodically, and after every significant change to your systems.' },
       ],
       faqs: [
-        { question: 'Do you offer penetration testing?', answer: 'We focus on defensive services: assessment, hardening, monitoring and response. Any offensive testing happens only with written authorisation and a scope agreed in advance, and we help you define that scope and follow up on the fixes.' },
-        { question: 'Where do we start with no documented security posture?', answer: 'With a baseline assessment: inventory systems and access, review configurations, then remediate the highest priorities first with a realistic timeline.' },
+        { question: 'Do you offer penetration testing?', answer: 'We focus on defensive services. Any offensive testing happens only with written authorisation and a scope agreed in advance, and we help you define that scope and follow up on the fixes.' },
+        { question: 'Where do we start with no security documentation at all?', answer: 'With a simple inventory: what systems you have and who can reach them. That alone usually reveals what most needs fixing, and we build a realistic plan on it.' },
       ],
-      seoDescription: 'Defensive cybersecurity services: security posture assessment, system and infrastructure hardening, monitoring, and incident-response readiness.',
+      seoDescription: 'Defensive cybersecurity: plain-language security assessment, system hardening, monitoring and incident-response readiness.',
     },
   },
 ];
@@ -261,24 +259,23 @@ const ABOUT_AR = {
   blocks: [
     {
       blockType: 'contentRichText' as const,
-      heading: 'قصتنا',
+      heading: 'بروتوكول سوفت باختصار',
       content: lexical(
         [
-          'بروتوكول سوفت شركة هندسة برمجيات وأمن سيبراني. نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة — لفرق تعمل بوضوح وتنمو بثقة.',
-          'نؤمن أن البرمجيات الجيدة تُبنى حول طريقة عمل الناس الفعلية، لا حول قوالب جاهزة. لذلك نبدأ كل مشروع بالاستماع والفهم: ما العملية الحقيقية؟ أين الألم؟ ما الذي يجب أن يبقى بسيطاً؟',
-          'نرى أنفسنا شريكاً تقنياً طويل الأمد، لا مجرد مورّد: نبني، نحمي، ثم نبقى للتشغيل والتطوير بعد الإطلاق.',
+          'بدأت بروتوكول سوفت من قناعة بسيطة: البرمجيات الجيدة تُبنى حول طريقة عمل الناس، لا حول قوالب جاهزة، وحمايتها جزء من بنائها لا مرحلة تأتي بعده.',
+          'نقدّم خدماتنا بالعربية والإنجليزية، في ثلاثة مسارات: الأنظمة المخصصة، والمنتجات والمنصات الرقمية، والأمن السيبراني الدفاعي.',
         ],
         'rtl',
       ),
     },
     {
       blockType: 'featureGrid' as const,
-      heading: 'مبادئ عملنا',
+      heading: 'كيف نتصرف في كل مشروع',
       items: [
-        { title: 'عمق هندسي', description: 'أنظمة قابلة للتطوير مع الوقت: بنية واضحة، اختبارات آلية، وتوثيق يبقى.' },
-        { title: 'الأمان من اليوم الأول', description: 'الحماية جزء من البناء منذ البداية، لا إضافة لاحقة.' },
-        { title: 'وضوح النطاق', description: 'نطاق عمل مكتوب ومراحل تسليم واضحة — بلا مفاجآت.' },
-        { title: 'شراكة طويلة الأمد', description: 'نرافق النمو والتشغيل بعد الإطلاق، ونبني علاقة تستمر.' },
+        { title: 'نستمع قبل أن نقترح', description: 'نبدأ بأسئلة عن عملك وأهدافه، لا بعرض جاهز نحاول أن نطابقه عليك.' },
+        { title: 'نكتب ما نتفق عليه', description: 'القرارات والتغييرات موثقة أولاً بأول، فيعرف الجميع ما اتُّفق عليه ولماذا.' },
+        { title: 'نشرح الخيارات بوضوح', description: 'لكل قرار تقني بدائل وتكلفة؛ نعرضها عليك بلغة مفهومة لتختار وأنت مطّلع.' },
+        { title: 'نسلّم ما يبقى لك', description: 'الشيفرة والوثائق والمعرفة تنتقل إلى فريقك، فلا تبقى معتمداً علينا.' },
       ],
     },
   ],
@@ -289,31 +286,35 @@ const ABOUT_EN = {
   blocks: [
     {
       blockType: 'contentRichText' as const,
-      heading: 'Our story',
+      heading: 'Protocol Soft in brief',
       content: lexical(
         [
-          'Protocol Soft is a software engineering and cybersecurity company. We build reliable digital systems and protect them to run with confidence — for teams that work with clarity and grow with confidence.',
-          'We believe good software is built around how people actually work, not around prebuilt templates. So every project starts with listening and understanding: what is the real process? Where does it hurt? What must stay simple?',
-          'We see ourselves as a long-term technology partner, not just a vendor: we build, we secure, and then we stay for operations and growth after launch.',
+          'Protocol Soft started from a simple conviction: good software is built around how people work, not around templates, and protecting it is part of building it, not a stage that comes after.',
+          'We deliver in Arabic and English, across three tracks: custom systems, digital products and platforms, and defensive cybersecurity.',
         ],
         'ltr',
       ),
     },
     {
       blockType: 'featureGrid' as const,
-      heading: 'How we work',
+      heading: 'How we behave on every project',
       items: [
-        { title: 'Engineering depth', description: 'Systems you can improve over time: clear architecture, automated tests, lasting documentation.' },
-        { title: 'Secure by design', description: 'Protection is part of the build from the start — not an afterthought.' },
-        { title: 'Honest scope', description: 'Written scope and clear delivery phases — no surprises.' },
-        { title: 'Long-term partnership', description: 'We stay for growth and operations after launch.' },
+        { title: 'We listen before we propose', description: 'We start with questions about your work and goals, not with a ready-made offer to fit you into.' },
+        { title: 'We write down what we agree', description: 'Decisions and changes are documented as we go, so everyone knows what was agreed and why.' },
+        { title: 'We explain the options', description: 'Every technical decision has alternatives and a cost; we lay them out plainly so you choose with full sight.' },
+        { title: 'We hand over what you keep', description: 'Code, documentation and know-how pass to your team, so you are never dependent on us.' },
       ],
     },
   ],
 };
 
+/** --drafts-only: write the same copy as DRAFTS and publish nothing. Safe in
+ *  any environment, including production: editors then review each item and
+ *  publish it from the admin's "publish per language" panel. */
+const DRAFTS_ONLY = process.argv.includes('--drafts-only');
+
 const publish = async (): Promise<void> => {
-  guard();
+  if (!DRAFTS_ONLY) guard();
   const payload = await getPayload({ config: configPromise });
 
   /* ── 1. Services: fill review copy per locale, then publish (same mutation as
@@ -353,6 +354,10 @@ const publish = async (): Promise<void> => {
         } as never,
       });
     }
+    if (DRAFTS_ONLY) {
+      console.log(`draft written: service ${copy.slug} (ar+en)`);
+      continue;
+    }
     await payload.update({
       collection: 'services',
       id: svc.id,
@@ -377,6 +382,12 @@ const publish = async (): Promise<void> => {
     const data = { ...homeDraft };
     for (const k of ['id', 'globalType', 'createdAt', 'updatedAt'] as const) delete data[k];
     data.sections = { ...((data.sections ?? {}) as Record<string, unknown>), faqEnabled: true, faqs: HOME_FAQS[locale] };
+    if (DRAFTS_ONLY) {
+      delete data._status;
+      await payload.updateGlobal({ slug: 'homepage', data: data as never, draft: true, locale, overrideAccess: true, context: { skipAudit: true } } as never);
+      console.log(`draft written: homepage FAQs (${locale})`);
+      continue;
+    }
     // Globals with versions.drafts publish by saving the draft content with an
     // explicit published status (the local API's draft flag alone is not enough).
     await payload.updateGlobal({
@@ -410,7 +421,8 @@ const publish = async (): Promise<void> => {
         data: { title: content.title, blocks: content.blocks } as never,
       });
     }
-    await payload.update({
+    if (DRAFTS_ONLY) console.log('draft written: about page (ar+en)');
+    else await payload.update({
       collection: 'pages',
       id: about.id,
       draft: true,
@@ -418,18 +430,59 @@ const publish = async (): Promise<void> => {
       context: { skipAudit: true },
       data: { _status: 'published', publishedLocales: ['ar', 'en'] } as never,
     });
-    console.log('published about page (ar+en) — LOCAL REVIEW ONLY');
+    if (!DRAFTS_ONLY) console.log('published about page (ar+en) — LOCAL REVIEW ONLY');
   }
 
-  /* ── Explicit non-publishing confirmation (D-2 negative space) ── */
-  console.log('NOT published (by decision D-2): legal templates (privacy/terms), case study, EDR initiative, team, social links, real contact data.');
+  /* ── 4. Privacy policy: local review copy of the legal text. The legal gate
+         still applies in production (Super Admin + recorded legal review);
+         here the review fields say plainly that counsel has not reviewed it. ── */
+  const privacyRes = await payload.find({ collection: 'pages', where: { slug: { equals: 'privacy' } }, limit: 1, draft: true, overrideAccess: true });
+  const privacy = privacyRes.docs[0];
+  if (!privacy) {
+    console.warn('privacy page not found — run the seed first');
+  } else {
+    for (const locale of ['ar', 'en'] as const) {
+      await payload.update({
+        collection: 'pages',
+        id: privacy.id,
+        draft: true,
+        locale,
+        overrideAccess: true,
+        context: { skipAudit: true },
+        data: { title: PRIVACY[locale].title, blocks: PRIVACY[locale].blocks, seo: { description: PRIVACY[locale].seoDescription } } as never,
+      });
+    }
+    if (DRAFTS_ONLY) console.log('draft written: privacy page (ar+en) — publish only after legal review');
+    else await payload.update({
+      collection: 'pages',
+      id: privacy.id,
+      draft: true,
+      overrideAccess: true,
+      context: { skipAudit: true },
+      data: {
+        _status: 'published',
+        publishedLocales: ['ar', 'en'],
+        legalReviewedBy: 'LOCAL REVIEW ONLY — not reviewed by legal counsel',
+        legalReviewedAt: new Date().toISOString(),
+      } as never,
+    });
+    if (!DRAFTS_ONLY) console.log('published privacy page (ar+en) — LOCAL REVIEW ONLY, legal review still required for production');
+  }
+
+  if (DRAFTS_ONLY) {
+    console.log('\nDrafts written. Nothing was published: review and publish each item in the admin.');
+    process.exit(0);
+  }
+
+  /* ── Explicit non-publishing confirmation ── */
+  console.log('NOT published: terms of use, case study, EDR initiative, team, social links, real contact data.');
 
   const check = async (): Promise<void> => {
     const svc = await payload.find({ collection: 'services', where: { _status: { equals: 'published' } }, limit: 10, overrideAccess: true });
     const pages = await payload.find({ collection: 'pages', where: { _status: { equals: 'published' } }, limit: 10, overrideAccess: true });
-    const legal = pages.docs.filter((p) => ['privacy', 'terms'].includes(String(p.slug)));
-    console.log(`state: published services=${svc.totalDocs}, published pages=${pages.totalDocs}, published legal (must be 0)=${legal.length}`);
-    if (legal.length > 0) throw new Error('LEGAL PAGE PUBLISHED — this must never happen under D-2');
+    const terms = pages.docs.filter((p) => String(p.slug) === 'terms');
+    console.log(`state: published services=${svc.totalDocs}, published pages=${pages.totalDocs}, published terms (must be 0)=${terms.length}`);
+    if (terms.length > 0) throw new Error('TERMS PAGE PUBLISHED — it has no reviewed text yet');
   };
   await check();
   console.log('\nLocal review publish complete. This data state is LOCAL ONLY — never commit, export to staging, or copy to production.');

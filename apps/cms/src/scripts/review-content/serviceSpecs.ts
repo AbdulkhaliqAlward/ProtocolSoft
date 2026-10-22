@@ -1,85 +1,91 @@
 /**
- * Spec-sheet content for the three services (LOCAL REVIEW copy, AR + EN):
- * engagement facts, what is NOT included, the process as an exchange (what we
- * need from you / what you receive) and capabilities grouped by stage.
+ * Spec-sheet content for the three services (AR + EN): engagement facts, what
+ * is NOT included, the process as an exchange (what we need from you / what
+ * you receive), capabilities grouped by stage, and service-specific questions.
  *
- * Every "not included" line and every fact that depends on company practice
- * (durations, response times, team set-up) carries needsConfirmation: true,
- * which renders a visible NEEDS CONFIRMATION tag until Protocol Soft reviews it
- * in the CMS. Nothing here states a number, client, certification or year.
+ * Each section of a service page has one job, so nothing is said twice:
+ *   overview      the problem and our approach (publish-local-review.ts)
+ *   deliverables  the concrete outputs you keep        (publish-local-review.ts)
+ *   exchange      what each step needs and produces
+ *   capabilities  specific skills not named elsewhere on the page
+ *   FAQs          questions the page does not already answer
+ * No number, duration, client, certification or year is stated.
  */
-export interface Fact { label: string; value: string; needsConfirmation?: boolean }
+export interface Fact { label: string; value: string }
 export interface Step { clientProvides: string; weDeliver: string }
 export interface CapabilityGroup { stage: string; title: string; items: Array<{ label: string }> }
 export interface LocaleSpec {
   engagementFacts: Fact[];
-  notIncluded: Array<{ item: string; needsConfirmation: boolean }>;
+  notIncluded: Array<{ item: string }>;
   /** Same order as the service's processSteps. */
   exchange: Step[];
   capabilityGroups: CapabilityGroup[];
   extraFaqs?: Array<{ question: string; answer: string }>;
 }
 
-const tbc = (item: string) => ({ item, needsConfirmation: true });
+const items = (...list: string[]) => list.map((item) => ({ item }));
+const labels = (...list: string[]) => list.map((label) => ({ label }));
 
 export const SERVICE_SPECS: Record<string, { ar: LocaleSpec; en: LocaleSpec }> = {
   'custom-software': {
     ar: {
       engagementFacts: [
         { label: 'نوع الارتباط', value: 'مشروع بمراحل تسليم مكتوبة' },
-        { label: 'المدة المعتادة', value: 'تُحدد بعد جلسة الاستكشاف', needsConfirmation: true },
-        { label: 'ما تستلمه', value: 'نظام عامل، الشيفرة المصدرية، والتوثيق' },
-        { label: 'لغة النظام', value: 'العربية والإنجليزية' },
+        { label: 'الجدول الزمني', value: 'خطة مكتوبة لكل مرحلة بعد جلسة الاستكشاف' },
+        { label: 'ما يبقى لك', value: 'النظام وشيفرته المصدرية ووثائقه' },
+        { label: 'لغات الواجهة', value: 'العربية والإنجليزية' },
       ],
-      notIncluded: [
-        tbc('شراء التراخيص أو الخوادم نيابةً عنك؛ نوصي بها ونساعدك في إعدادها.'),
-        tbc('إدخال البيانات القديمة يدوياً؛ نبني أدوات الترحيل ونشرف عليها.'),
-        tbc('تطوير مزايا خارج النطاق المكتوب دون اتفاق على مرحلة جديدة.'),
-        tbc('الدعم التشغيلي على مدار الساعة ما لم يُتفق عليه في عقد دعم منفصل.'),
-      ],
+      notIncluded: items(
+        'شراء التراخيص أو الخوادم نيابةً عنك؛ نوصي بالمناسب منها ونساعدك في إعداده.',
+        'إدخال البيانات القديمة يدوياً؛ نبني أدوات ترحيلها ونشرف على تشغيلها.',
+        'استضافة النظام على حسابنا؛ يعمل في بيئتك أو لدى مزوّد تختاره.',
+        'دعم تشغيلي على مدار الساعة، إلا ضمن اتفاقية دعم منفصلة.',
+      ),
       exchange: [
-        { clientProvides: 'وقت مع أصحاب العملية الفعليين ووصف للأنظمة الحالية.', weDeliver: 'توثيق سير العمل ونطاق مكتوب بمراحل.' },
-        { clientProvides: 'مراجعة النماذج والموافقة على التصميم.', weDeliver: 'بنية تقنية ونماذج واجهات قابلة للتنفيذ.' },
-        { clientProvides: 'ملاحظات على كل مرحلة خلال أيام من تسليمها.', weDeliver: 'إصدارات قابلة للتجربة مع اختبارات آلية.' },
-        { clientProvides: 'بيئة اختبار وصلاحيات الوصول اللازمة.', weDeliver: 'مراجعة أمنية ونتائج الاختبارات.' },
-        { clientProvides: 'فريق يستلم التدريب ويتولى التشغيل اليومي.', weDeliver: 'إطلاق، تدريب، وتوثيق تشغيلي يبقى لديك.' },
+        { clientProvides: 'وقت مع أصحاب العملية، ووصف للأنظمة الحالية.', weDeliver: 'خريطة سير العمل، ونطاق مكتوب مقسّم إلى مراحل.' },
+        { clientProvides: 'ملاحظاتك على النماذج، واعتماد التصميم.', weDeliver: 'بنية تقنية معتمدة، ونماذج واجهات جاهزة للتنفيذ.' },
+        { clientProvides: 'ملاحظات مجمّعة على كل إصدار في موعدها.', weDeliver: 'إصدار يعمل في نهاية كل مرحلة.' },
+        { clientProvides: 'بيئة اختبار وصلاحيات الوصول اللازمة.', weDeliver: 'تقرير المراجعة الأمنية ونتائج الاختبارات.' },
+        { clientProvides: 'فريق يتولى التشغيل اليومي بعد التدريب.', weDeliver: 'إطلاق مُدار، وخطة للمرحلة التالية.' },
       ],
       capabilityGroups: [
-        { stage: 'A · قبل', title: 'نفهم العملية', items: [{ label: 'تحليل ودراسة العمليات' }, { label: 'تحديد النطاق والمراحل' }] },
-        { stage: 'B · أثناء', title: 'نبني بجودة', items: [{ label: 'تكامل مع الأنظمة القائمة' }, { label: 'واجهات عربية وإنجليزية' }, { label: 'اختبارات آلية' }] },
-        { stage: 'C · بعد', title: 'نشغّل ونطوّر', items: [{ label: 'تسليم تدريجي' }, { label: 'دعم وتشغيل' }, { label: 'تطوير المراحل اللاحقة' }] },
+        { stage: 'A · قبل', title: 'نفهم العملية', items: labels('ورش عمل مع أصحاب العملية', 'ترتيب الأولويات وتقسيم المراحل') },
+        { stage: 'B · أثناء', title: 'نبني بجودة', items: labels('ربط الأنظمة عبر واجهات برمجية (API)', 'الأدوار والصلاحيات', 'التقارير ولوحات المتابعة', 'ترحيل البيانات من الأنظمة القديمة') },
+        { stage: 'C · بعد', title: 'نشغّل ونطوّر', items: labels('مراقبة الأداء والأعطال', 'تحسينات مستمرة حسب الأولوية') },
       ],
       extraFaqs: [
-        { question: 'من يملك الشيفرة المصدرية؟', answer: 'تُسلَّم لك الشيفرة المصدرية والتوثيق مع كل مرحلة وفق ما ينص عليه العقد. [⚠️ NEEDS CONFIRMATION: شروط الملكية الفكرية في عقودكم]' },
+        { question: 'من يملك الشيفرة المصدرية؟', answer: 'نحدد ملكيتها وحقوق استخدامها في العقد قبل بدء العمل، وتنتقل إليك مع كل مرحلة مكتملة وفق ما اتفقنا عليه.' },
+        { question: 'ماذا لو تغيّرت متطلباتنا أثناء المشروع؟', answer: 'هذا متوقع. نراجع الأولويات معك بعد كل إصدار، وأي إضافة جديدة نتفق عليها كمرحلة مستقلة بتكلفتها قبل تنفيذها.' },
       ],
     },
     en: {
       engagementFacts: [
         { label: 'Engagement', value: 'A project with written delivery phases' },
-        { label: 'Typical duration', value: 'Set after the discovery session', needsConfirmation: true },
-        { label: 'You receive', value: 'A working system, source code and documentation' },
+        { label: 'Timeline', value: 'A written plan for each phase after discovery' },
+        { label: 'Yours to keep', value: 'The system, its source code and its documentation' },
         { label: 'Interface languages', value: 'Arabic and English' },
       ],
-      notIncluded: [
-        tbc('Buying licences or servers on your behalf; we recommend them and help set them up.'),
-        tbc('Manual entry of legacy data; we build and supervise the migration tools.'),
-        tbc('Features outside the written scope without agreeing a new phase.'),
-        tbc('Round-the-clock operational support unless agreed in a separate support contract.'),
-      ],
+      notIncluded: items(
+        'Buying licences or servers on your behalf; we recommend what fits and help you set it up.',
+        'Manual entry of legacy data; we build the migration tools and supervise their run.',
+        'Hosting the system on our account; it runs in your environment or with a provider you choose.',
+        'Round-the-clock operational support, except under a separate support agreement.',
+      ),
       exchange: [
-        { clientProvides: 'Time with the people who run the process and a description of current systems.', weDeliver: 'Documented workflows and a written, phased scope.' },
-        { clientProvides: 'Review of prototypes and design sign-off.', weDeliver: 'Technical architecture and implementation-ready interface designs.' },
-        { clientProvides: 'Feedback on each phase within days of delivery.', weDeliver: 'Testable releases with automated tests.' },
-        { clientProvides: 'A test environment and the access we need.', weDeliver: 'A security review and the test results.' },
-        { clientProvides: 'A team to take the training and own daily operation.', weDeliver: 'Launch, training and operational documentation you keep.' },
+        { clientProvides: 'Time with the people who own the process, and a description of current systems.', weDeliver: 'A workflow map and a written scope split into phases.' },
+        { clientProvides: 'Your feedback on the prototypes, and design sign-off.', weDeliver: 'An approved technical architecture and build-ready interface designs.' },
+        { clientProvides: 'Consolidated feedback on each release, on time.', weDeliver: 'A working release at the end of every phase.' },
+        { clientProvides: 'A test environment and the access we need.', weDeliver: 'The security review report and test results.' },
+        { clientProvides: 'A team that takes over daily operation after training.', weDeliver: 'A managed launch and a plan for the next phase.' },
       ],
       capabilityGroups: [
-        { stage: 'A · Before', title: 'Understand the process', items: [{ label: 'Process analysis' }, { label: 'Scope and phase planning' }] },
-        { stage: 'B · During', title: 'Build it well', items: [{ label: 'Integration with existing systems' }, { label: 'Arabic and English interfaces' }, { label: 'Automated testing' }] },
-        { stage: 'C · After', title: 'Run and improve', items: [{ label: 'Phased delivery' }, { label: 'Support and operations' }, { label: 'Follow-up phases' }] },
+        { stage: 'A · Before', title: 'Understand the process', items: labels('Workshops with process owners', 'Prioritising and phasing') },
+        { stage: 'B · During', title: 'Build it well', items: labels('System integration through APIs', 'Roles and permissions', 'Reports and dashboards', 'Data migration from legacy systems') },
+        { stage: 'C · After', title: 'Run and improve', items: labels('Performance and error monitoring', 'Ongoing improvements by priority') },
       ],
       extraFaqs: [
-        { question: 'Who owns the source code?', answer: 'Source code and documentation are handed over with each phase as set out in the contract. [⚠️ NEEDS CONFIRMATION: IP terms in your contracts]' },
+        { question: 'Who owns the source code?', answer: 'Ownership and usage rights are set out in the contract before work starts, and the code passes to you with each completed phase, as agreed.' },
+        { question: 'What if our requirements change mid-project?', answer: 'That is expected. We review priorities with you after each release, and anything new is agreed as a separate phase, with its cost, before we build it.' },
       ],
     },
   },
@@ -88,53 +94,59 @@ export const SERVICE_SPECS: Record<string, { ar: LocaleSpec; en: LocaleSpec }> =
     ar: {
       engagementFacts: [
         { label: 'نوع الارتباط', value: 'من تعريف المنتج إلى الإطلاق والتحسين' },
-        { label: 'النسخة الأولى', value: 'نطاق صغير قابل للقياس' },
-        { label: 'المدة المعتادة للنسخة الأولى', value: 'تُحدد بعد ورشة التعريف', needsConfirmation: true },
-        { label: 'المنصات', value: 'ويب وجوال حسب حاجة المنتج', needsConfirmation: true },
+        { label: 'اللغات', value: 'العربية والإنجليزية' },
+        { label: 'الجدول الزمني', value: 'يُحدَّد في ورشة تعريف المنتج، مع موعد مكتوب للنسخة الأولى' },
       ],
-      notIncluded: [
-        tbc('التسويق وحملات اكتساب المستخدمين بعد الإطلاق.'),
-        tbc('إنتاج المحتوى التسويقي والتصوير.'),
-        tbc('رسوم متاجر التطبيقات وبوابات الدفع والخدمات السحابية.'),
-        tbc('ضمان أرقام نمو أو عدد مستخدمين محدد.'),
-      ],
+      notIncluded: items(
+        'التسويق وحملات اكتساب المستخدمين بعد الإطلاق.',
+        'إنتاج المحتوى التسويقي والتصوير.',
+        'رسوم متاجر التطبيقات وبوابات الدفع والخدمات السحابية؛ تُدفع باسمك مباشرة.',
+        'التعهد بأرقام نمو أو أعداد مستخدمين محددة؛ نلتزم بجودة المنتج وقياس أدائه بوضوح.',
+      ),
       exchange: [
-        { clientProvides: 'الفكرة، الجمهور المستهدف، وأي بحث أو بيانات متوفرة.', weDeliver: 'تعريف المنتج ونطاق النسخة الأولى.' },
-        { clientProvides: 'قرارات سريعة على رحلات المستخدم والنماذج.', weDeliver: 'تصميم تجربة وواجهات جاهزة للتنفيذ.' },
-        { clientProvides: 'مراجعة كل دورة تطوير قصيرة.', weDeliver: 'إصدارات قابلة للتجربة على أجهزة حقيقية.' },
-        { clientProvides: 'سياسات الخصوصية والحسابات اللازمة للإطلاق.', weDeliver: 'اختبارات قبل الإطلاق وحماية بيانات المستخدمين.' },
-        { clientProvides: 'وصول لبيانات الاستخدام بعد الإطلاق.', weDeliver: 'إطلاق مقيس وخطة تحسين مرتبة بالأولوية.' },
+        { clientProvides: 'الفكرة، والجمهور، وأي بحث أو بيانات لديك.', weDeliver: 'وثيقة تعريف المنتج ونطاق النسخة الأولى.' },
+        { clientProvides: 'قرارات سريعة على النماذج.', weDeliver: 'واجهات معتمدة جاهزة للتنفيذ.' },
+        { clientProvides: 'مراجعة كل دورة تطوير.', weDeliver: 'إصدارات تجربها على أجهزة حقيقية.' },
+        { clientProvides: 'سياسة الخصوصية والحسابات اللازمة للنشر.', weDeliver: 'نتائج الاختبار على الأجهزة، وإصلاح ما ظهر.' },
+        { clientProvides: 'وصول إلى بيانات الاستخدام بعد الإطلاق.', weDeliver: 'تقرير الإطلاق الأول، وأولويات الدورة التالية.' },
       ],
       capabilityGroups: [
-        { stage: 'A · قبل', title: 'نعرّف المنتج', items: [{ label: 'تعريف المنتج والنسخة الأولى' }, { label: 'تصميم تجربة ثنائية اللغة' }] },
-        { stage: 'B · أثناء', title: 'نبني المنصة', items: [{ label: 'منصات قابلة للتوسع' }, { label: 'لوحات تشغيل داخلية' }, { label: 'تكاملات الدفع والإشعارات' }] },
-        { stage: 'C · بعد', title: 'نقيس ونحسّن', items: [{ label: 'قياس الاستخدام' }, { label: 'تطوير مستمر' }] },
+        { stage: 'A · قبل', title: 'نختبر الفكرة', items: labels('مقابلات المستخدمين', 'ترتيب المزايا حسب قيمتها') },
+        { stage: 'B · أثناء', title: 'نبني المنتج', items: labels('تطبيقات الويب والجوال', 'الحسابات وتسجيل الدخول', 'تكاملات الدفع والإشعارات') },
+        { stage: 'C · بعد', title: 'نقيس ونحسّن', items: labels('تحليلات الاستخدام', 'تجربة التحسينات قبل تعميمها') },
+      ],
+      extraFaqs: [
+        { question: 'هل تبنون تطبيقات للجوال؟', answer: 'نعم، حسب ما يحتاجه المنتج: تطبيق ويب يعمل على كل الأجهزة، أو تطبيق في متاجر الجوال. نوصي بالأنسب لجمهورك ولمرحلة منتجك.' },
+        { question: 'باسم من تُنشأ حسابات المنتج؟', answer: 'باسمك. حسابات المتاجر والخوادم وبوابات الدفع تُنشأ لجهتك من البداية، فيبقى المنتج وبياناته تحت تصرفك.' },
       ],
     },
     en: {
       engagementFacts: [
         { label: 'Engagement', value: 'From product definition to launch and improvement' },
-        { label: 'First release', value: 'A small, measurable scope' },
-        { label: 'Typical time to first release', value: 'Set after the definition workshop', needsConfirmation: true },
-        { label: 'Platforms', value: 'Web and mobile, as the product needs', needsConfirmation: true },
+        { label: 'Languages', value: 'Arabic and English' },
+        { label: 'Timeline', value: 'Set in the definition workshop, with a written date for the first release' },
       ],
-      notIncluded: [
-        tbc('Marketing and user-acquisition campaigns after launch.'),
-        tbc('Marketing content production and photography.'),
-        tbc('App-store, payment-gateway and cloud service fees.'),
-        tbc('Guaranteed growth figures or user numbers.'),
-      ],
+      notIncluded: items(
+        'Marketing and user-acquisition campaigns after launch.',
+        'Marketing content production and photography.',
+        'App-store, payment-gateway and cloud fees; these are paid in your name directly.',
+        'Commitments to specific growth figures or user numbers; we commit to product quality and clear measurement.',
+      ),
       exchange: [
-        { clientProvides: 'The idea, the target audience and any research or data you have.', weDeliver: 'A product definition and the first-release scope.' },
-        { clientProvides: 'Quick decisions on user journeys and prototypes.', weDeliver: 'Experience and interface design ready to build.' },
-        { clientProvides: 'A review of each short development cycle.', weDeliver: 'Releases you can try on real devices.' },
-        { clientProvides: 'Privacy policies and the accounts needed to launch.', weDeliver: 'Pre-launch testing and user-data protection.' },
-        { clientProvides: 'Access to usage data after launch.', weDeliver: 'A measured launch and a prioritised improvement plan.' },
+        { clientProvides: 'The idea, the audience, and any research or data you have.', weDeliver: 'A product definition document and the first-release scope.' },
+        { clientProvides: 'Quick decisions on the prototypes.', weDeliver: 'Approved, build-ready interfaces.' },
+        { clientProvides: 'A review of each development cycle.', weDeliver: 'Releases you can try on real devices.' },
+        { clientProvides: 'The privacy policy and the accounts needed to publish.', weDeliver: 'Device test results, and fixes for what they found.' },
+        { clientProvides: 'Access to usage data after launch.', weDeliver: 'A first launch report and the priorities for the next cycle.' },
       ],
       capabilityGroups: [
-        { stage: 'A · Before', title: 'Define the product', items: [{ label: 'Product definition and first release' }, { label: 'Bilingual experience design' }] },
-        { stage: 'B · During', title: 'Build the platform', items: [{ label: 'Scalable platforms' }, { label: 'Internal operations dashboards' }, { label: 'Payment and notification integrations' }] },
-        { stage: 'C · After', title: 'Measure and improve', items: [{ label: 'Usage measurement' }, { label: 'Continuous development' }] },
+        { stage: 'A · Before', title: 'Test the idea', items: labels('User interviews', 'Ranking features by value') },
+        { stage: 'B · During', title: 'Build the product', items: labels('Web and mobile apps', 'Accounts and sign-in', 'Payment and notification integrations') },
+        { stage: 'C · After', title: 'Measure and improve', items: labels('Usage analytics', 'Testing improvements before rolling them out') },
+      ],
+      extraFaqs: [
+        { question: 'Do you build mobile apps?', answer: 'Yes, depending on what the product needs: a web app that works on every device, or an app in the mobile stores. We recommend what fits your audience and your stage.' },
+        { question: 'Whose name are the product accounts in?', answer: 'Yours. Store, server and payment-gateway accounts are created for your organisation from the start, so the product and its data stay under your control.' },
       ],
     },
   },
@@ -142,73 +154,75 @@ export const SERVICE_SPECS: Record<string, { ar: LocaleSpec; en: LocaleSpec }> =
   cybersecurity: {
     ar: {
       engagementFacts: [
-        { label: 'نوع الارتباط', value: 'تقييم ثم خطة معالجة' },
-        { label: 'المدة المعتادة للتقييم', value: 'تُحدد حسب حجم البيئة', needsConfirmation: true },
-        { label: 'ما تستلمه', value: 'تقرير بالأولويات وخطة عمل' },
-        { label: 'لغة التقرير', value: 'العربية والإنجليزية' },
+        { label: 'نوع الارتباط', value: 'تقييم، ثم خطة معالجة' },
+        { label: 'الجدول الزمني', value: 'يُحدَّد بحسب حجم البيئة، ويُكتب في نطاق العمل' },
+        { label: 'لغة التقارير', value: 'العربية والإنجليزية' },
       ],
-      notIncluded: [
-        tbc('أي اختبار هجومي دون تفويض مكتوب ونطاق متفق عليه.'),
-        tbc('وعود بحماية مطلقة من جميع التهديدات.'),
-        tbc('تشغيل مركز مراقبة أمنية على مدار الساعة.'),
-        tbc('شهادات امتثال رسمية؛ نساعدك في الاستعداد لها.'),
-      ],
+      notIncluded: items(
+        'شراء تراخيص الأدوات الأمنية نيابةً عنك؛ نوصي بما يناسب بيئتك.',
+        'وعود بحماية مطلقة؛ نعمل على تقليل المخاطر بشكل يمكن قياسه.',
+        'تشغيل مركز عمليات أمنية على مدار الساعة.',
+        'إصدار شهادات امتثال رسمية؛ نجهّزك لمتطلباتها.',
+      ),
       exchange: [
-        { clientProvides: 'وصف للأنظمة وصلاحيات الوصول اللازمة.', weDeliver: 'نطاق مكتوب وخطة زمنية.' },
-        { clientProvides: 'جهة اتصال تقنية للأسئلة.', weDeliver: 'تقرير بالنتائج مرتب حسب الأثر والأولوية.' },
-        { clientProvides: 'موافقة على التغييرات ونوافذ التنفيذ.', weDeliver: 'ضوابط مطبقة وموثقة.' },
-        { clientProvides: 'وقت قصير لمراجعة النتائج.', weDeliver: 'نتائج التحقق وما تبقى للمعالجة.' },
-        { clientProvides: 'تحديثات عن أي تغيير في الأنظمة.', weDeliver: 'مراجعة دورية وتوصيات محدثة.' },
+        { clientProvides: 'وصف للأنظمة، وصلاحيات الوصول اللازمة.', weDeliver: 'نطاق مكتوب وخطة زمنية للتقييم.' },
+        { clientProvides: 'جهة اتصال تقنية للإجابة عن الأسئلة.', weDeliver: 'قائمة النتائج وأولويات معالجتها.' },
+        { clientProvides: 'الموافقة على التغييرات ونوافذ التنفيذ.', weDeliver: 'سجل بكل تغيير طُبّق.' },
+        { clientProvides: 'وقت قصير لمراجعة النتائج.', weDeliver: 'ما عولج، وما تبقى، وخطته.' },
+        { clientProvides: 'إشعارنا بالتغييرات المهمة في أنظمتك.', weDeliver: 'توصيات محدثة بعد كل مراجعة.' },
       ],
       capabilityGroups: [
-        { stage: 'A · قبل', title: 'نفهم ونقيّم', items: [{ label: 'تقييم أمني دفاعي' }, { label: 'مراجعة البنية والتصميم' }] },
-        { stage: 'B · أثناء', title: 'نحصّن ونبني', items: [{ label: 'إدارة الهويات والصلاحيات' }, { label: 'تحصين البنية والتهيئة الآمنة' }] },
-        { stage: 'C · بعد', title: 'نراقب ونستجيب', items: [{ label: 'مراقبة السجلات والتنبيهات' }, { label: 'الاستجابة للحوادث' }, { label: 'توعية وتدريب الفرق' }] },
+        { stage: 'A · قبل', title: 'نفهم ونقيّم', items: labels('مراجعة البنية والتصميم', 'نمذجة التهديدات') },
+        { stage: 'B · أثناء', title: 'نحصّن', items: labels('إدارة الهويات والصلاحيات', 'تحصين الخوادم والبيئات السحابية', 'تأمين الواجهات البرمجية') },
+        { stage: 'C · بعد', title: 'نراقب ونستجيب', items: labels('تحليل السجلات', 'التعامل مع الحوادث', 'توعية الفرق وتدريبها') },
+      ],
+      extraFaqs: [
+        { question: 'هل تساعدوننا في الاستعداد لمتطلبات تنظيمية أو معايير أمنية؟', answer: 'نعم، أياً كان الإطار الذي تحتاج الالتزام به: ضوابط جهة تنظيمية، أو معياراً دولياً مثل ISO 27001. نقارن وضعك الحالي به، ونرتب الفجوات حسب الأولوية، ونساعدك في معالجتها وتوثيقها قبل أي تدقيق. أما التدقيق أو الاعتماد الرسمي فتتولاه الجهات المختصة.' },
       ],
     },
     en: {
       engagementFacts: [
         { label: 'Engagement', value: 'Assessment, then a remediation plan' },
-        { label: 'Typical assessment duration', value: 'Depends on the size of the environment', needsConfirmation: true },
-        { label: 'You receive', value: 'A prioritised report and an action plan' },
+        { label: 'Timeline', value: 'Set by the size of the environment and written into the scope' },
         { label: 'Report language', value: 'Arabic and English' },
       ],
-      notIncluded: [
-        tbc('Any offensive testing without written authorisation and an agreed scope.'),
-        tbc('Promises of absolute protection against every threat.'),
-        tbc('Running a round-the-clock security operations centre.'),
-        tbc('Formal compliance certification; we help you prepare for it.'),
-      ],
+      notIncluded: items(
+        'Buying security tool licences on your behalf; we recommend what fits your environment.',
+        'Promises of absolute protection; we reduce risk in ways you can measure.',
+        'Running a round-the-clock security operations centre.',
+        'Issuing formal compliance certificates; we prepare you for their requirements.',
+      ),
       exchange: [
-        { clientProvides: 'A description of your systems and the access we need.', weDeliver: 'A written scope and timeline.' },
-        { clientProvides: 'A technical contact for questions.', weDeliver: 'A findings report ranked by impact and priority.' },
-        { clientProvides: 'Approval of changes and maintenance windows.', weDeliver: 'Controls applied and documented.' },
-        { clientProvides: 'A little time to review the results.', weDeliver: 'Verification results and what remains to fix.' },
-        { clientProvides: 'Updates about any change to your systems.', weDeliver: 'Periodic reviews and updated recommendations.' },
+        { clientProvides: 'A description of your systems and the access we need.', weDeliver: 'A written scope and assessment timeline.' },
+        { clientProvides: 'A technical contact to answer questions.', weDeliver: 'The list of findings and their remediation priorities.' },
+        { clientProvides: 'Approval of changes and maintenance windows.', weDeliver: 'A log of every change applied.' },
+        { clientProvides: 'A little time to review the results.', weDeliver: 'What was fixed, what remains, and its plan.' },
+        { clientProvides: 'Notice of significant changes to your systems.', weDeliver: 'Updated recommendations after each review.' },
       ],
       capabilityGroups: [
-        { stage: 'A · Before', title: 'Understand and assess', items: [{ label: 'Defensive security assessment' }, { label: 'Architecture and design review' }] },
-        { stage: 'B · During', title: 'Harden and build', items: [{ label: 'Identity and access management' }, { label: 'Infrastructure hardening' }] },
-        { stage: 'C · After', title: 'Monitor and respond', items: [{ label: 'Log monitoring and alerting' }, { label: 'Incident response' }, { label: 'Team awareness and training' }] },
+        { stage: 'A · Before', title: 'Understand and assess', items: labels('Architecture and design review', 'Threat modelling') },
+        { stage: 'B · During', title: 'Harden', items: labels('Identity and access management', 'Server and cloud hardening', 'API security') },
+        { stage: 'C · After', title: 'Monitor and respond', items: labels('Log analysis', 'Incident handling', 'Team awareness and training') },
+      ],
+      extraFaqs: [
+        { question: 'Can you help us prepare for regulatory requirements or security standards?', answer: 'Yes, whatever framework you need to meet: a regulator’s controls, or an international standard such as ISO 27001. We compare your current state with it, rank the gaps by priority, and help you fix and document them before any audit. The formal audit or certification itself is carried out by the competent bodies.' },
       ],
     },
   },
 };
 
 /** General questions for the homepage (shown before getting in touch). */
-// Answers that depend on company practice carry an inline [⚠️ NEEDS CONFIRMATION: …]
-// marker naming exactly what to confirm, so the per-item flag stays off here.
 export const HOME_FAQS = {
   ar: [
-    { question: 'كيف نبدأ العمل معكم؟', answer: 'ترسل لنا وصفاً مختصراً عبر نموذج التواصل، ثم نرتب جلسة استكشاف نفهم فيها التحدي ونقترح نقطة البداية المناسبة ونطاقاً مكتوباً.', needsConfirmation: false },
-    { question: 'كم تستغرق الردود على الطلبات؟', answer: 'نرد على كل طلب خلال مدة محددة من أيام العمل. [⚠️ NEEDS CONFIRMATION: مدة الرد]', needsConfirmation: false },
-    { question: 'هل توقعون اتفاقية عدم إفصاح قبل مناقشة المشروع؟', answer: 'نعم عند الحاجة، قبل مشاركة أي تفاصيل حساسة. [⚠️ NEEDS CONFIRMATION]', needsConfirmation: false },
-    { question: 'هل تعملون مع شركات خارج المملكة؟', answer: 'نخدم السعودية ودول الخليج، ونعمل بالعربية والإنجليزية. [⚠️ NEEDS CONFIRMATION: نطاق الأسواق]', needsConfirmation: false },
+    { question: 'كيف نبدأ العمل معكم؟', answer: 'أرسل وصفاً مختصراً للتحدي عبر نموذج التواصل. نبدأ من هناك بجلسة استكشاف نتفق في نهايتها على نطاق مكتوب ونقطة بداية واضحة.' },
+    { question: 'ماذا يحدث بعد إرسال الطلب؟', answer: 'يقرأ طلبك مختص في مجاله، ويرد عليك برأي صريح: هل نحن الجهة المناسبة، وما الخطوة التي نقترحها.' },
+    { question: 'كيف تُحدَّد التكلفة؟', answer: 'نسعّر كل مرحلة على حدة، مع مخرجاتها المكتوبة، فلا تدفع مقابل عمل لم يُعرَّف بعد.' },
+    { question: 'هل يمكن توقيع اتفاقية عدم إفصاح؟', answer: 'نعم. اذكر ذلك في طلبك ونوقّعها قبل أن تشاركنا أي تفاصيل حساسة. ولا تحتاج إلى معلومات سرية في رسالتك الأولى.' },
   ],
   en: [
-    { question: 'How do we start working together?', answer: 'Send a short description through the contact form. We then arrange a discovery session to understand the challenge, suggest where to start and agree a written scope.', needsConfirmation: false },
-    { question: 'How quickly do you reply to requests?', answer: 'We reply to every request within a set number of working days. [⚠️ NEEDS CONFIRMATION: reply time]', needsConfirmation: false },
-    { question: 'Will you sign an NDA before discussing a project?', answer: 'Yes when needed, before any sensitive details are shared. [⚠️ NEEDS CONFIRMATION]', needsConfirmation: false },
-    { question: 'Do you work with companies outside Saudi Arabia?', answer: 'We serve Saudi Arabia and the GCC, in Arabic and English. [⚠️ NEEDS CONFIRMATION: markets served]', needsConfirmation: false },
+    { question: 'How do we start working together?', answer: 'Send a short description of the challenge through the contact form. We take it from there with a discovery session that ends in a written scope and a clear starting point.' },
+    { question: 'What happens after I send a request?', answer: 'Someone who works in that area reads it and replies with an honest view: whether we are the right fit, and the next step we suggest.' },
+    { question: 'How is the cost defined?', answer: 'Each phase is priced on its own, with its written outputs, so you never pay for work that has not been defined yet.' },
+    { question: 'Can we sign an NDA?', answer: 'Yes. Mention it when you write to us, and we will sign it before you share anything sensitive. You do not need confidential details in your first message.' },
   ],
 };

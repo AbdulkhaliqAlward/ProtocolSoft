@@ -14,6 +14,7 @@
     "migrate:status": "payload migrate:status",
     "seed": "tsx --env-file-if-exists=.env src/scripts/seed.ts",
     "publish:local-review": "tsx --env-file-if-exists=.env src/scripts/publish-local-review.ts",
+    "content:load-drafts": "tsx --env-file-if-exists=.env src/scripts/publish-local-review.ts --drafts-only",
     "bootstrap:superadmin": "tsx --env-file-if-exists=.env src/scripts/bootstrap-superadmin.ts",
     "verify:roles": "tsx src/scripts/verify-roles.ts",
     "typecheck": "tsc --noEmit",

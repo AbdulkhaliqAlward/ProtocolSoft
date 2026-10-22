@@ -7,49 +7,33 @@ import { getPayload } from 'payload';
 
 import configPromise from '../payload.config';
 
+import { PRIVACY } from './review-content/privacy';
+
 const seed = async (): Promise<void> => {
   const payload = await getPayload({ config: configPromise });
 
-  /* Phase 5 visual rebuild: the generic slogan tagline was replaced by the
-     approved bilingual positioning line (applies to existing local DBs too). */
-  await payload.updateGlobal({
-    slug: 'site-settings',
-    data: {
-      // Required fields included so this also succeeds against an empty database.
-      companyName: { ar: 'بروتوكول سوفت', en: 'Protocol Soft' },
-      description: {
-        ar: 'شركة هندسة برمجيات وأمن سيبراني نبني أنظمة رقمية موثوقة ونحميها لتعمل بثقة.',
-        en: 'A software engineering and cybersecurity company building reliable digital systems and protecting them to run with confidence.',
-      },
-      tagline: { ar: 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.', en: 'Trusted digital systems, built and protected to run with confidence.' },
-      footerCopyright: { ar: '© {year} بروتوكول سوفت', en: '© {year} Protocol Soft' },
+  /* Site identity copy, written PER LOCALE (locale:'all' leaves localized
+     fields unchanged once they hold values, in this Payload version). */
+  const siteCopy = {
+    ar: {
+      companyName: 'بروتوكول سوفت',
+      description: 'شركة هندسة برمجيات وأمن سيبراني تبني الأنظمة الرقمية وتحميها.',
+      tagline: 'هندسة تُكتب بوضوح، وتُسلَّم بأمانة.',
+      footerCopyright: '© {year} بروتوكول سوفت',
     },
-    overrideAccess: true,
-    locale: 'all',
-    context: { skipAudit: true },
-  } as never);
+    en: {
+      companyName: 'Protocol Soft',
+      description: 'A software engineering and cybersecurity company that builds digital systems and protects them.',
+      tagline: 'Engineering written clearly, delivered honestly.',
+      footerCopyright: '© {year} Protocol Soft',
+    },
+  } as const;
+  for (const locale of ['ar', 'en'] as const) {
+    await payload.updateGlobal({ slug: 'site-settings', data: siteCopy[locale], overrideAccess: true, locale, context: { skipAudit: true } } as never);
+  }
 
   /* Globals defaults */
-  const existingSite = await payload.findGlobal({ slug: 'site-settings' });
-  if (!existingSite || !(existingSite as { emailMain?: string }).emailMain) {
-    await payload.updateGlobal({
-      slug: 'site-settings',
-      data: {
-        companyName: { ar: 'بروتوكول سوفت', en: 'Protocol Soft' },
-        legalCompanyName: { ar: '[PLACEHOLDER]', en: '[PLACEHOLDER]' }, // supplied by Protocol Soft later; never public
-        description: {
-          ar: 'شركة هندسة برمجيات وأمن سيبراني نبني أنظمة رقمية موثوقة ونحميها لتعمل بثقة.',
-          en: 'A software engineering and cybersecurity company building reliable digital systems and protecting them to run with confidence.',
-        },
-        tagline: { ar: 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.', en: 'Trusted digital systems, built and protected to run with confidence.' },
-        // emailMain intentionally left empty — official contact details come from Protocol Soft (§6.9)
-        footerCopyright: { ar: '© {year} بروتوكول سوفت', en: '© {year} Protocol Soft' },
-      },
-      overrideAccess: true,
-      locale: 'all',
-      context: { skipAudit: true },
-    } as never);
-  }
+  // emailMain and the other contact fields stay empty until Protocol Soft supplies them (§6.9).
 
   await payload.updateGlobal({
     slug: 'theme-settings',
@@ -95,31 +79,25 @@ const seed = async (): Promise<void> => {
       sections: {
         valueStatementEnabled: true,
         servicesOverviewEnabled: true,
-        servicesHeading: { ar: 'خدماتنا', en: 'Our Services' },
         whyEnabled: true,
-        whyItems: [],
         methodologyEnabled: true,
         featuredProject: {
           enabled: true,
-          heading: { ar: 'مشروع مميز', en: 'Featured Project' },
           project: null, // NO default — renders fallback (hide/neutral) until a gate-passing project exists
           fallbackMode: 'hide_section',
           neutralAlternative: null,
         },
         technicalInitiatives: {
           enabled: false, // D2: disabled at launch
-          heading: { ar: 'مبادرات تقنية', en: 'Technical Initiatives' },
         },
         secureByDesignEnabled: true,
       },
       finalCta: {
         enabled: true,
-        ctaLabel: { ar: 'ابدأ مشروعك', en: 'Start a Project' },
         ctaTarget: '/contact',
       },
     },
     overrideAccess: true,
-    locale: 'all',
     context: { skipAudit: true },
   } as never);
 
@@ -131,58 +109,68 @@ const seed = async (): Promise<void> => {
       hero: {
         kicker: 'هندسة البرمجيات والأمن السيبراني',
         headline: 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.',
-        subheadline: 'تطوير الأنظمة المخصصة، بناء المنتجات والمنصات الرقمية، وخدمات الأمن السيبراني — لفرق تعمل بوضوح وتنمو بثقة.',
-        primaryCtaLabel: 'ابدأ مشروعك',
+        subheadline: 'فريق هندسي واحد يصمم أنظمتك ومنتجاتك الرقمية، ويبنيها، ويحميها.',
+        primaryCtaLabel: 'تحدّث مع فريقنا',
         secondaryCtaLabel: 'تعرّف على خدماتنا',
       },
       sections: {
-        valueStatement: 'نحن شريك تقني طويل الأمد، لا مجرد مورّد — نبني ونعمل وندعم.',
+        servicesHeading: 'ثلاثة مسارات نعمل بها',
+        featuredHeading: 'مشروع مميز',
+        initiativesHeading: 'مبادرات تقنية',
+        valueStatement: 'أربعة التزامات نطبّقها في كل مشروع، مهما كان حجمه.',
         differentiators: [
-          { title: 'عمق هندسي', description: 'أنظمة قابلة للتطوير مع الوقت.' },
-          { title: 'الأمان من اليوم الأول', description: 'الحماية جزء من البناء، لا إضافة لاحقة.' },
-          { title: 'شراكة طويلة الأمد', description: 'نرافق النمو والتشغيل بعد الإطلاق.' },
+          { title: 'عمق هندسي', description: 'بنية واضحة واختبارات آلية وتوثيق، فيبقى النظام سهل التطوير بعد سنوات.' },
+          { title: 'وضوح النطاق', description: 'نطاق ومراحل مكتوبة قبل البدء، فلا مفاجآت في التكلفة أو الموعد.' },
+          { title: 'صراحة في التوصية', description: 'إن كان حل جاهز يكفيك، أو كان طلبك خارج تخصصنا، نقول لك ذلك.' },
         ],
+        whyItems: [{ title: 'شراكة بعد الإطلاق', description: 'الفريق الذي بنى النظام يبقى معك في تشغيله ومراحله التالية.' }],
         methodologySteps: [
-          { title: 'الاستكشاف', promise: 'نبدأ بفهم طريقة العمل والتحديات الفعلية.' },
-          { title: 'التصميم', promise: 'نصمم حلاً مناسباً بدلاً من فرض قالب جاهز.' },
-          { title: 'البناء', promise: 'تنفيذ بجودة قابلة للصيانة والتطوير.' },
-          { title: 'الأمن والاختبار', promise: 'نأخذ الأمان في الاعتبار منذ بداية البناء.' },
-          { title: 'الإطلاق والدعم', promise: 'نوضح نطاق العمل وما يحتاج تطويراً لاحقاً.' },
+          { title: 'الاستكشاف', promise: 'نفهم طريقة العمل والتحدي الفعلي، ونكتب ما فهمناه لتراجعه.' },
+          { title: 'التصميم', promise: 'نصمم الحل حول عملك، ونعرض عليك البنية والنماذج قبل البناء.' },
+          { title: 'البناء', promise: 'نبني على مراحل قصيرة، وفي نهاية كل مرحلة إصدار تجربه بنفسك.' },
+          { title: 'الأمن والاختبار', promise: 'نراجع الأمان ونختبر النظام قبل أن يصل إلى المستخدمين.' },
+          { title: 'الإطلاق والدعم', promise: 'نطلق النظام، وندرّب فريقك على تشغيله.' },
         ],
         secureByDesign: 'نأخذ الأمان في الاعتبار منذ بداية بناء النظام، لأن الحماية تصبح أصعب وأكثر تكلفة عندما تؤجل إلى ما بعد الإطلاق.',
       },
       finalCta: {
+        ctaLabel: 'احجز جلسة استكشاف',
         heading: 'جاهزون للاستماع إلى تحديك التقني.',
-        body: 'أخبرنا عن نظامك أو فكرتك، وسنوضح نطاق العمل وخطوات التنفيذ.',
+        body: 'حدّثنا عن نظامك أو فكرتك، ونقترح عليك نقطة بداية واقعية.',
       },
     },
     en: {
       hero: {
         kicker: 'Software Engineering & Cybersecurity',
         headline: 'Trusted digital systems, built and protected to run with confidence.',
-        subheadline: 'Custom software, digital products and platforms, and cybersecurity services — for teams that run with clarity and grow with confidence.',
-        primaryCtaLabel: 'Start a Project',
+        subheadline: 'One engineering team that designs, builds and protects your systems and digital products.',
+        primaryCtaLabel: 'Talk to our team',
         secondaryCtaLabel: 'Explore our services',
       },
       sections: {
-        valueStatement: 'A long-term technology partner, not just a vendor — we build, secure, and support.',
+        servicesHeading: 'Three ways we work with you',
+        featuredHeading: 'Featured Project',
+        initiativesHeading: 'Technical Initiatives',
+        valueStatement: 'Four commitments we keep on every project, whatever its size.',
         differentiators: [
-          { title: 'Engineering depth', description: 'Systems you can improve over time.' },
-          { title: 'Secure by design', description: 'Protection is part of the build, not an afterthought.' },
-          { title: 'Long-term partnership', description: 'We stay for growth and operations after launch.' },
+          { title: 'Engineering depth', description: 'A clear architecture, automated tests and documentation, so the system stays easy to develop years later.' },
+          { title: 'Clear scope', description: 'Scope and phases written before we start, so there are no surprises in cost or timing.' },
+          { title: 'Honest recommendations', description: 'If a ready-made tool is enough, or your request is outside our field, we tell you.' },
         ],
+        whyItems: [{ title: 'Partnership after launch', description: 'The team that built the system stays with you to run it and take it further.' }],
         methodologySteps: [
-          { title: 'Discovery', promise: 'We start by understanding how the business works.' },
-          { title: 'Design', promise: 'A fitting solution instead of a prebuilt template.' },
-          { title: 'Build', promise: 'Maintainable, improvable implementation.' },
-          { title: 'Secure & Test', promise: 'Security considered from the beginning of the build.' },
-          { title: 'Launch & Support', promise: 'Clear scope and honest follow-up phases.' },
+          { title: 'Discovery', promise: 'We learn how the work really runs and write down what we understood for you to review.' },
+          { title: 'Design', promise: 'We design around your business and show you the architecture and prototypes before building.' },
+          { title: 'Build', promise: 'Short phases, and a release you can try at the close of each.' },
+          { title: 'Secure & Test', promise: 'Security review and testing before the system reaches users.' },
+          { title: 'Launch & Support', promise: 'We launch the system and train your team to run it.' },
         ],
         secureByDesign: 'We consider security from the beginning of the build, because protection is harder and more expensive to add after launch.',
       },
       finalCta: {
+        ctaLabel: 'Book a discovery session',
         heading: 'Ready to talk about your technical challenge?',
-        body: 'Tell us about your system or idea and we will define the scope and the path.',
+        body: 'Tell us about your system or idea, and we will suggest a realistic place to start.',
       },
     },
   } as const;
@@ -193,8 +181,12 @@ const seed = async (): Promise<void> => {
       data: {
         hero: homepageCopy[locale].hero,
         sections: {
+          servicesHeading: homepageCopy[locale].sections.servicesHeading,
+          featuredProject: { heading: homepageCopy[locale].sections.featuredHeading },
+          technicalInitiatives: { heading: homepageCopy[locale].sections.initiativesHeading },
           valueStatement: homepageCopy[locale].sections.valueStatement,
           differentiators: homepageCopy[locale].sections.differentiators,
+          whyItems: homepageCopy[locale].sections.whyItems,
           methodologySteps: homepageCopy[locale].sections.methodologySteps,
           secureByDesign: homepageCopy[locale].sections.secureByDesign,
         },
@@ -214,8 +206,7 @@ const seed = async (): Promise<void> => {
           { label: { ar: 'الرئيسية', en: 'Home' }, target: '/', sortOrder: 1, visible: true },
           { label: { ar: 'من نحن', en: 'About' }, target: '/about', sortOrder: 2, visible: true },
           { label: { ar: 'الخدمات', en: 'Services' }, target: '/services', sortOrder: 3, visible: true },
-          { label: { ar: 'المشاريع', en: 'Case Studies' }, target: '/case-studies', sortOrder: 4, visible: true },
-          { label: { ar: 'تواصل معنا', en: 'Contact' }, target: '/contact', sortOrder: 5, visible: true },
+          { label: { ar: 'تواصل معنا', en: 'Contact' }, target: '/contact', sortOrder: 4, visible: true },
         ],
         headerCta: { label: { ar: 'ابدأ مشروعك', en: 'Start a Project' }, target: '/contact' },
         footerColumns: [],
@@ -232,8 +223,8 @@ const seed = async (): Promise<void> => {
       data: {
         // notificationRecipients intentionally unset — official recipients come from Protocol Soft later
         confirmationMessage: {
-          ar: 'تم استلام طلبك بنجاح. سنعود إليك خلال يوم عمل.',
-          en: 'Your request has been received. We usually reply within one business day.',
+          ar: 'وصلنا طلبك، وسنرد عليك على بريدك الإلكتروني.',
+          en: 'We have received your request, and we will reply to your email.',
         },
         rateLimits: { perIpPerHour: 5, perIpPerDay: 20, perServicePerMinute: 30 },
         autoResponderEnabled: false,
@@ -379,7 +370,9 @@ const seed = async (): Promise<void> => {
     ]) {
       // localized blocks array: write per-locale (create ar, update en) — the
       // locale:'all' path does not attach block-row ids in this Payload version
-      const blocks = legalDraft(p.title.ar, p.title.en, p.introAr, p.introEn).blocks;
+      // Privacy starts from the drafted policy text; terms from a short draft note.
+      const draft = legalDraft(p.title.ar, p.title.en, p.introAr, p.introEn).blocks;
+      const blocks = p.slug === 'privacy' ? PRIVACY.ar.blocks : draft;
       const created = await payload.create({
         collection: 'pages',
         draft: true,
@@ -404,7 +397,7 @@ const seed = async (): Promise<void> => {
         context: { skipAudit: true },
         data: {
           title: p.title.en,
-          blocks,
+          blocks: p.slug === 'privacy' ? PRIVACY.en.blocks : draft,
         } as never,
       });
     }
