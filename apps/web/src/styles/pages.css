@@ -1,8 +1,8 @@
 /* Page compositions. Built from the layout primitives; one opener per page,
    one rhythm between sections, purple reserved for the moments that matter. */
 
-/* ── Light page opener (services, about, contact, legal) ─────────────── */
-.page-hero { padding-block: clamp(48px, 4rem + 2vw, 88px) clamp(40px, 3rem + 1vw, 64px); border-bottom: 1px solid var(--line); }
+/* ── Inner-page opener: the same purple band as the home and service heroes ── */
+.page-hero.plate--bleed { padding-block: clamp(48px, 4vw + 24px, 96px) clamp(44px, 3vw + 24px, 80px); }
 .page-hero__main { display: grid; gap: var(--s-4); align-content: start; min-width: 0; }
 .page-hero h1 { font-size: var(--fs-display); line-height: var(--lh-display); }
 .page-hero__aside { min-width: 0; align-self: end; }

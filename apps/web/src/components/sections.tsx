@@ -64,7 +64,9 @@ export const Section = ({ no, title, lead, id, sticky, wide, band, flushTop, rev
   );
 };
 
-/** Light page opener for pages without a purple plate (services, about, contact, legal). */
+/** Page opener for inner pages (services index, about, contact, legal): the
+ *  same full-width purple band as the home and service heroes, so every page
+ *  starts the same way. */
 export const PageHero = ({ no, title, lead, crumbs, aside, children }: {
   no?: string;
   title: string;
@@ -73,7 +75,7 @@ export const PageHero = ({ no, title, lead, crumbs, aside, children }: {
   aside?: ReactNode;
   children?: ReactNode;
 }) => (
-  <header className="page-hero">
+  <header className="page-hero plate plate--bleed">
     <div className="container rail">
       <div className="page-hero__main">
         {crumbs && crumbs.length > 0 && <Breadcrumbs items={crumbs} />}
