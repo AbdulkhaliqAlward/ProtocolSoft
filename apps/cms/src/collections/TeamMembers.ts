@@ -49,7 +49,7 @@ export const TeamMembers: CollectionConfig = {
       hasMany: true,
       options: [{ label: 'ar', value: 'ar' }, { label: 'en', value: 'en' }],
       access: { update: () => false, create: () => false },
-      admin: { readOnly: true, position: 'sidebar' },
+      admin: { components: { Field: '/components/PublishPanel#PublishPanel' }, readOnly: true, position: 'sidebar' },
     },
   ],
   timestamps: true,

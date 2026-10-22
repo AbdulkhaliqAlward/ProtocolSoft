@@ -96,6 +96,7 @@ export default buildConfig({
 
   admin: {
     user: 'users',
+    importMap: { baseDir: dirname },
     meta: {
       titleSuffix: '| بروتوكول سوفت',
       robots: 'noindex, nofollow', // never indexed (Phase 1 §7)

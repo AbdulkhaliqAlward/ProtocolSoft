@@ -141,7 +141,7 @@ export const Services: CollectionConfig = {
       hasMany: true,
       options: [{ label: 'ar', value: 'ar' }, { label: 'en', value: 'en' }],
       access: { update: () => false, create: () => false }, // server-mutated only (publish endpoint)
-      admin: { readOnly: true, position: 'sidebar', description: 'تُضبط عبر إجراء النشر لكل لغة / set via per-locale publish actions' },
+      admin: { components: { Field: '/components/PublishPanel#PublishPanel' }, readOnly: true, position: 'sidebar', description: 'تُضبط عبر إجراء النشر لكل لغة / set via per-locale publish actions' },
     },
   ],
   timestamps: true,

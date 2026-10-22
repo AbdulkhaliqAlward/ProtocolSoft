@@ -67,7 +67,10 @@ export const previewEndpoints = [
       await writeAudit(req, 'draft_saved', { collection: body.collection, id: body.docId, locale: body.locale }, 'preview code issued');
       // urlPath carries the code in the FRAGMENT — links must keep it there; a
       // query-string code would land in proxy/Cloudflare access logs.
-      return Response.json({ code: code.token, expiresIn: 15 * 60, urlPath: `/preview#code=${code.token}` });
+      // `url` is the full link the admin publish panel opens in a new tab.
+      const webOrigin = (process.env.WEB_PUBLIC_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+      const urlPath = `/preview#code=${code.token}`;
+      return Response.json({ code: code.token, expiresIn: 15 * 60, urlPath, url: `${webOrigin}${urlPath}` });
     },
   },
   {
