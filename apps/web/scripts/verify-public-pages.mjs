@@ -98,9 +98,9 @@ const main = async () => {
 
   /* ── 6. About (published locally per D-2) ── */
   const about = await get('/about');
-  check('about renders published values grid', about.body.includes('مبادئ عملنا'));
+  check('about renders the published principles grid', about.body.includes('class="principles"'));
   const aboutEn = await get('/en/about');
-  check('EN about renders', aboutEn.body.includes('How we work'));
+  check('EN about renders the principles grid', aboutEn.body.includes('class="principles"'));
 
   /* ── 7. Contact page (D-5) ── */
   const contact = await get('/contact');

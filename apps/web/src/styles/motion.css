@@ -45,17 +45,6 @@
   .js .home-hero .eyebrow { animation: rv-from-start var(--dur-4) var(--ease-out) 80ms both; }
   .js .home-hero .lead { animation: rv-rise var(--dur-4) var(--ease-out) 180ms both; }
   .js .home-hero__actions { animation: rv-rise var(--dur-4) var(--ease-out) 280ms both; }
-  .js .home-hero__index ol { border-top-color: transparent; }
-  .js .home-hero__index li { position: relative; border-bottom-color: transparent; }
-  .js .home-hero__index li::after {
-    content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: var(--plate-line);
-    transform-origin: left center; animation: rv-draw 520ms var(--ease-out) var(--hero-d, 420ms) both;
-  }
-  [dir="rtl"] .home-hero__index li::after { transform-origin: right center; }
-  .js .home-hero__link { animation: rv-from-start var(--dur-4) var(--ease-out) calc(var(--hero-d, 420ms) + 60ms) both; }
-  .js .home-hero__num { animation: rv-blink 360ms steps(1) calc(var(--hero-d, 420ms) + 140ms) both; }
-  .home-hero__index li:nth-child(2) { --hero-d: 560ms; }
-  .home-hero__index li:nth-child(3) { --hero-d: 700ms; }
   .js .home-hero__sparks i { animation: rv-blink 900ms steps(1) both; }
   .js .home-hero__sparks i:nth-child(1) { animation-delay: 700ms; }
   .js .home-hero__sparks i:nth-child(3) { animation-delay: 820ms; }

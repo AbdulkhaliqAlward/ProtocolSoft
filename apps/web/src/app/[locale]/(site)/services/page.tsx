@@ -1,26 +1,53 @@
-/** Services overview: one spec panel per published service (promise, the
- *  first deliverables, a link to the full spec sheet and a preselected
- *  contact form), then help choosing and one closing action. Unpublished
- *  services are omitted upstream by the API — never stubbed. */
+/** Services overview: one panel per published service (what it is, who it
+ *  fits, a link to the full spec sheet and a preselected contact form), then
+ *  one closing action. The spec sheet itself (deliverables, process) lives on
+ *  each service page and is not repeated here. Unpublished services are
+ *  omitted upstream by the API — never stubbed. */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import type { Locale, PublicContactConfig, PublicServiceSummary } from '@protocol-soft/shared';
 
-import { PageHero, Section, clause } from '@/components/sections';
+import { PageHero, clause } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
 import { Spark } from '@/components/Spark';
 import { CtaBand } from '@/components/ui';
 import { getOptional } from '@/lib/internalApi';
 import { pageMetadata } from '@/lib/pageMeta';
 
-interface ServiceDetail {
-  slug: string;
-  title: string;
-  heroHeadline: string;
-  summary: string;
-  deliverables: Array<{ title: string; description?: string | null }>;
-}
+/** Who each track fits, and the action that starts it. */
+const FIT: Record<string, Record<Locale, { fits: string[]; action: string }>> = {
+  'custom-software': {
+    ar: {
+      fits: ['تدير عملية يدوياً، أو تتوزع بين الجداول والرسائل.', 'لا تناسبك الأنظمة الجاهزة دون حلول التفافية كثيرة.', 'تحتاج أن تتحدث أنظمتك القائمة مع بعضها.'],
+      action: 'ناقش نظامك',
+    },
+    en: {
+      fits: ['You run a process by hand, or across spreadsheets and email.', 'Off-the-shelf tools only fit with constant workarounds.', 'You need your existing systems to talk to each other.'],
+      action: 'Discuss your system',
+    },
+  },
+  'digital-products': {
+    ar: {
+      fits: ['لديك فكرة منتج لعملائك وتريد اختبارها بجدية.', 'لديك منصة قائمة تحتاج إعادة بناء أو توسعاً.', 'تريد التصميم والبناء والإطلاق لدى فريق واحد.'],
+      action: 'ناقش فكرة منتجك',
+    },
+    en: {
+      fits: ['You have a product idea for customers and want to test it properly.', 'An existing platform needs rebuilding or scaling.', 'You want design, build and launch with one team.'],
+      action: 'Discuss your product idea',
+    },
+  },
+  cybersecurity: {
+    ar: {
+      fits: ['أنظمتك تعمل، ولا تعرف بدقة أين تقف أمنياً.', 'تستعد لمتطلبات تنظيمية أو مراجعة قادمة.', 'تريد أن يعرف فريقك ما يفعله عند وقوع حادث.'],
+      action: 'اطلب تقييماً أمنياً',
+    },
+    en: {
+      fits: ['Your systems run, but you do not know exactly where you stand.', 'You are preparing for regulatory requirements or an upcoming review.', 'You want your team to know what to do when an incident happens.'],
+      action: 'Request a security assessment',
+    },
+  },
+};
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -50,9 +77,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
     getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
-  const details = await Promise.all(
-    services.map((s) => getOptional<ServiceDetail>('/api/internal/content/services', locale, { slug: s.slug })),
-  );
 
   return (
     <>
@@ -62,13 +86,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           ? 'ثلاثة مسارات واضحة: نبني الأنظمة، نطلق المنتجات، ونحمي ما يعمل. كل خدمة بنطاق مكتوب ومراحل تسليم محددة.'
           : 'Three clear tracks: we build systems, launch products, and protect what runs. Every service comes with a written scope and defined delivery phases.'}
         crumbs={[{ label: ar ? 'الرئيسية' : 'Home', href: localePath(locale, '/') }, { label: ar ? 'الخدمات' : 'Services' }]}
-        aside={services.length > 0 ? (
-          <ol className="svc-jump" role="list" aria-label={ar ? 'انتقل إلى خدمة' : 'Jump to a service'}>
-            {services.map((s, i) => (
-              <li key={s.slug}><a href={`#${s.slug}`}><span className="clause-no">{clause(i + 1)}</span>{T(s.title, locale)}</a></li>
-            ))}
-          </ol>
-        ) : undefined}
       />
 
       <section className="section" aria-label={ar ? 'الخدمات' : 'Services'}>
@@ -80,30 +97,32 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             </div>
           ) : (
             services.map((s, i) => {
-              const d = details[i];
               const href = localePath(locale, `/services/${s.slug}`);
+              const fit = FIT[s.slug]?.[locale];
               return (
                 <article key={s.slug} id={s.slug} className="svc-panel" aria-labelledby={`${s.slug}-title`} data-reveal>
                   <div className="svc-panel__head">
                     <span className="clause-no">{clause(i + 1)}</span>
                     <h2 id={`${s.slug}-title`}>{T(s.title, locale)}</h2>
-                    <p>{d?.heroHeadline || T(s.summary, locale)}</p>
+                    <p>{T(s.summary, locale)}</p>
                     <div className="cluster">
                       <Link href={href} className="btn btn--primary">{ar ? 'النطاق والتفاصيل' : 'Scope and details'}</Link>
-                      <Link href={`${localePath(locale, '/contact')}?service=${s.slug}`} className="btn btn--text">
-                        {ar ? 'اطلب هذه الخدمة' : 'Request this service'} <span className="btn__arrow" aria-hidden="true">→</span>
-                      </Link>
+                      {fit && (
+                        <Link href={`${localePath(locale, '/contact')}?service=${s.slug}`} className="btn btn--text">
+                          {fit.action} <span className="btn__arrow" aria-hidden="true">→</span>
+                        </Link>
+                      )}
                     </div>
                   </div>
-                  {d && d.deliverables.length > 0 && (
-                    <ul className="svc-panel__list" role="list" aria-label={ar ? 'ما تستلمه' : 'What you receive'}>
-                      {d.deliverables.slice(0, 4).map((x) => (
-                        <li key={x.title}>
-                          <Spark size="sm" />
-                          <span><strong>{x.title}</strong>{x.description && <span>{x.description}</span>}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {fit && (
+                    <div className="svc-panel__fit">
+                      <h3>{ar ? 'مناسب لك إذا' : 'A fit if'}</h3>
+                      <ul className="svc-panel__list" role="list">
+                        {fit.fits.map((f) => (
+                          <li key={f}><Spark size="sm" /><span>{f}</span></li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </article>
               );
@@ -112,22 +131,11 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         </div>
       </section>
 
-      <Section
-        no={clause(services.length + 1)}
-        title={ar ? 'كيف تختار المسار؟' : 'How to choose a track'}
-        lead={ar ? 'إن لم تكن متأكداً، صف التحدي وسنقترح نقطة البداية بصراحة.' : 'If you are not sure, describe the challenge and we will honestly suggest where to start.'}
-      >
-        <ul className="commitments" role="list">
-          <li><Spark /><div><h3>{ar ? 'لديك عملية تحتاج نظاماً' : 'You have a process that needs a system'}</h3><p>{ar ? 'أنظمة داخلية، بوابات، أو ربط بين أنظمة قائمة: تطوير الأنظمة المخصصة.' : 'Internal systems, portals or connecting existing tools: custom software development.'}</p></div></li>
-          <li><Spark /><div><h3>{ar ? 'لديك فكرة منتج لعملائك' : 'You have a product idea for customers'}</h3><p>{ar ? 'تطبيق أو منصة تُطلق للمستخدمين وتنمو معهم: المنتجات والمنصات الرقمية.' : 'An app or platform launched to users and grown with them: digital products and platforms.'}</p></div></li>
-          <li><Spark /><div><h3>{ar ? 'لديك أنظمة تحتاج حماية' : 'You have systems that need protecting'}</h3><p>{ar ? 'تقييم وضعك الأمني، تحصين، وجاهزية للاستجابة: الأمن السيبراني.' : 'Assessing your posture, hardening and response readiness: cybersecurity.'}</p></div></li>
-        </ul>
-      </Section>
-
       <CtaBand
         locale={locale}
-        heading={ar ? 'صف لنا التحدي، ونقترح المسار.' : 'Describe the challenge, and we will suggest the track.'}
-        ctaLabel={ar ? 'ابدأ مشروعك' : 'Start a project'}
+        heading={ar ? 'لست متأكداً من المسار المناسب؟' : 'Not sure which track fits?'}
+        body={ar ? 'صف لنا التحدي، ونقترح عليك من أين تبدأ.' : 'Describe the challenge, and we will suggest where to start.'}
+        ctaLabel={ar ? 'احجز جلسة استكشاف' : 'Book a discovery session'}
         email={contact?.channels.emailMain || undefined}
         phone={contact?.channels.phone || undefined}
       />

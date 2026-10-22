@@ -47,14 +47,17 @@ h3 { font-size: var(--fs-h3); line-height: 1.4; }
 h4 { font-size: var(--fs-h4); line-height: 1.45; }
 p, li, dd { text-wrap: pretty; overflow-wrap: break-word; }
 /* Reading text is justified with the last line at the start edge, so blocks
-   have clean edges on both sides. Arabic justifies by widening word gaps, so
-   this applies to paragraphs and list text only, never to headings, labels,
-   buttons or figures. */
-main :is(p, .svc-index__summary, .scope__desc, .scope__list li, .prose li) {
+   have clean edges on both sides. Arabic justifies by widening word gaps and
+   reads well even in narrow columns, so all Arabic reading text is justified.
+   English without hyphenation opens wide gaps in narrow columns, so English
+   justifies only wide blocks and keeps narrow cells and cards start-aligned.
+   Headings, labels, buttons and figures always keep natural alignment.
+   Plain wrapping: "pretty" moves words down to avoid a short last line, and
+   justification would then stretch the shortened line above it. */
+html[lang="ar"] main :is(p, .svc-index__summary, .scope__desc, .scope__list li, .prose li),
+html[lang="en"] main :is(.prose p, .prose li, .lead, .rail__head p, .faq details > p, .statement__text, .cta-band__inner p, .empty-state p) {
   text-align: justify;
   text-align-last: start;
-  /* Plain wrapping: "pretty" moves words down to avoid a short last line,
-     and justification would then stretch the shortened line above it. */
   text-wrap: wrap;
 }
 strong, b { font-weight: var(--fw-strong); }

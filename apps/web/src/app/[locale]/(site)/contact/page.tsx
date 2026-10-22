@@ -49,7 +49,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <>
       <PageHero
         title={T('تواصل معنا', 'Contact us')}
-        lead={T('أخبرنا عن نظامك أو فكرتك في بضعة أسطر، وسنقترح الخطوة التالية بوضوح.', 'Tell us about your system or idea in a few lines, and we will suggest the next step clearly.')}
+        lead={T('أخبرنا عن نظامك أو فكرتك في بضعة أسطر؛ لا تحتاج إلى تفاصيل تقنية كاملة لتبدأ.', 'Tell us about your system or idea in a few lines; you do not need full technical detail to start.')}
         crumbs={[{ label: T('الرئيسية', 'Home'), href: localePath(locale, '/') }, { label: T('تواصل معنا', 'Contact') }]}
       />
 

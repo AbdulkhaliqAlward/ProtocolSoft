@@ -52,8 +52,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <PageHero
         title={page?.title ?? (ar ? 'من نحن' : 'About us')}
         lead={ar
-          ? 'شركة هندسة برمجيات وأمن سيبراني. نبني أنظمة رقمية موثوقة، ونحميها، ثم نبقى بعد الإطلاق.'
-          : 'A software engineering and cybersecurity company. We build reliable digital systems, protect them, and stay after launch.'}
+          ? 'نعمل مع الجهات التي تريد تقنية تعمل كما ينبغي، وتبقى كذلك بعد سنوات من إطلاقها.'
+          : 'We work with organisations that want technology that works as it should, and keeps working years after launch.'}
         crumbs={[{ label: ar ? 'الرئيسية' : 'Home', href: localePath(locale, '/') }, { label: ar ? 'من نحن' : 'About' }]}
       />
 
@@ -98,7 +98,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <CtaBand
         locale={locale}
         heading={ar ? 'يسعدنا أن نسمع عن مشروعك.' : 'We would like to hear about your project.'}
-        ctaLabel={ar ? 'ابدأ مشروعك' : 'Start a project'}
+        ctaLabel={ar ? 'احجز جلسة استكشاف' : 'Book a discovery session'}
         email={contact?.channels.emailMain || undefined}
         phone={contact?.channels.phone || undefined}
       />

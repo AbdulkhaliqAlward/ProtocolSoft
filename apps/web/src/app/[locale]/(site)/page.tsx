@@ -95,7 +95,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const kicker = T(hero?.kicker, locale) || (ar ? 'هندسة البرمجيات والأمن السيبراني' : 'Software engineering & cybersecurity');
   const headline = T(hero?.headline, locale) || T(settings?.tagline, locale) || (ar ? 'نبني أنظمة رقمية موثوقة، ونحميها لتعمل بثقة.' : 'Trusted digital systems, built and protected to run with confidence.');
   const sub = T(hero?.subheadline, locale);
-  const primaryCta = T(hero?.primaryCtaLabel, locale) || (ar ? 'ابدأ مشروعك' : 'Start a project');
+  // Distinct from the header's "start a project", which sits beside the hero.
+  const primaryCta = T(hero?.primaryCtaLabel, locale) || (ar ? 'تحدّث مع فريقنا' : 'Talk to our team');
   const secondaryCta = T(hero?.secondaryCtaLabel, locale) || (ar ? 'تعرّف على خدماتنا' : 'Explore our services');
 
   const valueStatement = s?.valueStatementEnabled === false ? '' : T(s?.valueStatement, locale);
@@ -123,8 +124,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         ]}
       />
 
-      {/* Hero: a full-width purple band. The thesis spans the whole width;
-          below it, the promise and actions sit beside the three services. */}
+      {/* Hero: a full-width purple band: the thesis, the promise and two
+          actions. The services are listed once, in the section below. */}
       <section className="home-hero plate plate--bleed" aria-labelledby="hero-title">
         <span className="home-hero__sparks" aria-hidden="true"><Spark size="lg" /><Spark /></span>
         <div className="container home-hero__grid">
@@ -139,21 +140,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <Link href={localePath(locale, '/services')} className="btn btn--outline-inverse btn--lg">{secondaryCta}</Link>
             </div>
           </div>
-          {services.length > 0 && (
-            <nav className="home-hero__index" aria-label={ar ? 'خدماتنا' : 'Our services'}>
-              <ol role="list">
-                {services.map((svc, i) => (
-                  <li key={svc.slug}>
-                    <Link href={localePath(locale, `/services/${svc.slug}`)} className="home-hero__link">
-                      <span className="clause-no home-hero__num">{clause(i + 1)}</span>
-                      <span className="home-hero__svc">{T(svc.title, locale)}</span>
-                      <span className="btn__arrow" aria-hidden="true">→</span>
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
         </div>
       </section>
 
@@ -251,7 +237,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           locale={locale}
           heading={T(finalCta?.heading, locale) || (ar ? 'أخبرنا عن نظامك أو فكرتك.' : 'Tell us about your system or idea.')}
           body={T(finalCta?.body, locale) || undefined}
-          ctaLabel={T(finalCta?.ctaLabel, locale) || primaryCta}
+          ctaLabel={T(finalCta?.ctaLabel, locale) || (ar ? 'احجز جلسة استكشاف' : 'Book a discovery session')}
           email={contact?.channels.emailMain || undefined}
           phone={contact?.channels.phone || undefined}
         />

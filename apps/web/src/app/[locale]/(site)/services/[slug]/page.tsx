@@ -23,6 +23,23 @@ import { notFoundMetadata, pageMetadata } from '@/lib/pageMeta';
 import { breadcrumbLd, faqLd, serviceLd } from '@/lib/structuredData';
 
 const SLUGS = ['custom-software', 'digital-products', 'cybersecurity'] as const;
+type Slug = (typeof SLUGS)[number];
+
+/** Closing invitation, written per service so no two pages end the same way. */
+const CLOSING: Record<Slug, Record<Locale, { heading: string; body: string; label: string }>> = {
+  'custom-software': {
+    ar: { heading: 'لديك عملية تستحق نظاماً خاصاً بها؟', body: 'صفها لنا في بضعة أسطر، ونعود إليك برأي صريح حول أفضل طريق لها.', label: 'ناقش نظامك' },
+    en: { heading: 'Have a process that deserves its own system?', body: 'Describe it in a few lines, and we will come back with an honest view of the best route.', label: 'Discuss your system' },
+  },
+  'digital-products': {
+    ar: { heading: 'لديك فكرة منتج؟', body: 'اكتب لنا عنها وعن جمهورها، ونقترح أصغر بداية تختبرها بجدية.', label: 'ناقش فكرة منتجك' },
+    en: { heading: 'Have a product idea?', body: 'Tell us about it and its audience, and we will suggest the smallest start that tests it properly.', label: 'Discuss your product idea' },
+  },
+  cybersecurity: {
+    ar: { heading: 'تريد أن تعرف أين تقف أمنياً؟', body: 'صف لنا بيئتك باختصار، ونقترح نطاق تقييم يناسب حجمها.', label: 'اطلب تقييماً أمنياً' },
+    en: { heading: 'Want to know where you stand on security?', body: 'Describe your environment briefly, and we will propose an assessment scope that fits it.', label: 'Request a security assessment' },
+  },
+};
 
 interface ServiceDetail {
   slug: string;
@@ -81,7 +98,8 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
   const excluded = svc.notIncluded ?? [];
   const groups = (svc.capabilityGroups ?? []).filter((g) => (g.items ?? []).length > 0);
   const contactHref = `${localePath(locale, '/contact')}?service=${svc.slug}`;
-  const ctaLabel = slug === 'cybersecurity' ? (ar ? 'اطلب تقييماً أمنياً' : 'Request a security assessment') : (ar ? 'اطلب استشارة' : 'Request a consultation');
+  const ctaLabel = ar ? 'اطلب استشارة' : 'Request a consultation';
+  const closing = CLOSING[slug as Slug][locale];
   const initiativeHeading = T(svc.initiativeSection?.heading as never, locale) || (ar ? 'مبادرة تقنية مفتوحة المصدر' : 'Open-source technical initiative');
 
   let n = 0;
@@ -138,7 +156,7 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
         </div>
       </section>
 
-      <Section id="overview" no={next()} title={ar ? 'نظرة عامة' : 'Overview'} lead={svc.summary}>
+      <Section id="overview" no={next()} title={ar ? 'نظرة عامة' : 'Overview'}>
         <RichText data={svc.overview} className="prose" />
       </Section>
 
@@ -147,7 +165,6 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
           id="scope"
           no={next()}
           title={ar ? 'نطاق العمل' : 'Scope'}
-          lead={ar ? 'نحدد قبل البدء ما الذي سنعمل عليه وما الذي لن يدخل في هذا الارتباط، حتى لا تكون هناك مفاجآت.' : 'Before we start, we agree what is in and what is out of this engagement, so there are no surprises.'}
         >
           <Scope locale={locale} included={svc.deliverables} excluded={excluded} />
         </Section>
@@ -158,7 +175,6 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
           id="process"
           no={next()}
           title={ar ? 'كيف نعمل' : 'How we work'}
-          lead={ar ? 'كل خطوة تبادل واضح: ما نحتاجه منك، وما تستلمه منا في نهايتها.' : 'Each step is a clear exchange: what we need from you, and what you receive at the end of it.'}
         >
           <Exchange locale={locale} steps={svc.processSteps} />
         </Section>
@@ -169,7 +185,6 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
           id="capabilities"
           no={next()}
           title={ar ? 'القدرات' : 'Capabilities'}
-          lead={ar ? 'مرتبة حسب المرحلة التي تحتاجها فيها.' : 'Grouped by the stage where you need them.'}
         >
           {groups.length > 0 ? (
             <CapabilityGroups groups={groups} />
@@ -208,9 +223,9 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
 
       <CtaBand
         locale={locale}
-        heading={ar ? 'ابدأ بجلسة استكشاف قصيرة.' : 'Start with a short discovery session.'}
-        body={ar ? 'نناقش احتياجك، ونوضح النطاق والخيارات قبل أي التزام.' : 'We discuss your need and set out the scope and options before any commitment.'}
-        ctaLabel={ctaLabel}
+        heading={closing.heading}
+        body={closing.body}
+        ctaLabel={closing.label}
         href={contactHref}
         email={contact?.channels.emailMain || undefined}
         phone={contact?.channels.phone || undefined}
