@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-import type { Locale, PublicContactConfig, PublicInitiativeCard, PublicServiceSummary } from '@protocol-soft/shared';
+import type { Locale, PublicInitiativeCard, PublicServiceSummary } from '@protocol-soft/shared';
 
 import { InitiativeCard } from '@/components/InitiativeCard';
 import { JsonLd } from '@/components/JsonLd';
@@ -86,11 +86,10 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
   const svc = await getOptional<ServiceDetail>('/api/internal/content/services', locale, { slug });
   if (!svc) notFound();
 
-  const [all, initiatives, contact] = await Promise.all([
+  const [all, initiatives] = await Promise.all([
     getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
     // Initiative card: published initiatives, card-safe fields only (EDR stays draft at launch).
     getOptional<PublicInitiativeCard[], PublicInitiativeCard[]>('/api/internal/content/initiatives', locale, undefined, []),
-    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
   ]);
   const index = Math.max(0, all.findIndex((s) => s.slug === slug));
   const others = all.filter((s) => s.slug !== slug);
@@ -227,8 +226,6 @@ export default async function ServicePage({ params }: { params: Promise<{ locale
         body={closing.body}
         ctaLabel={closing.label}
         href={contactHref}
-        email={contact?.channels.emailMain || undefined}
-        phone={contact?.channels.phone || undefined}
       />
     </>
   );

@@ -36,14 +36,13 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
   const c = contact?.channels;
   const emailMain = c?.emailMain ?? '';
-  const emailSales = c?.emailSales ?? '';
-  const emailSupport = c?.emailSupport ?? '';
   const phone = c?.phone ?? '';
   const hours = (ar ? c?.workingHours?.ar : c?.workingHours?.en) ?? '';
   const address = c?.addressLine?.[locale] ?? '';
   const whatsapp = c?.whatsapp.status === 'configured' && c.whatsapp.url ? c.whatsapp : null;
   // Shown only once at least one real channel exists in the CMS; until then the form is the only channel.
-  const hasChannels = Boolean(emailMain || phone || emailSales || emailSupport || hours || address || whatsapp);
+  // Email is not listed here: it appears only in the footer.
+  const hasChannels = Boolean(phone || hours || address || whatsapp);
 
   return (
     <>
@@ -77,9 +76,6 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               <div className="contact-card">
                 <h2><Spark size="sm" />{T('قنوات مباشرة', 'Direct channels')}</h2>
                 <ul className="channel-list">
-                  {emailMain && <li><span className="channel-label">{T('البريد الإلكتروني', 'Email')}</span><a href={`mailto:${emailMain}`} className="bidi">{emailMain}</a></li>}
-                  {emailSales && emailSales !== emailMain && <li><span className="channel-label">{T('المبيعات', 'Sales')}</span><a href={`mailto:${emailSales}`} className="bidi">{emailSales}</a></li>}
-                  {emailSupport && emailSupport !== emailMain && <li><span className="channel-label">{T('الدعم', 'Support')}</span><a href={`mailto:${emailSupport}`} className="bidi">{emailSupport}</a></li>}
                   {phone && <li><span className="channel-label">{T('الهاتف', 'Phone')}</span><a href={`tel:${phone}`} className="bidi">{phone}</a></li>}
                   {address && <li><span className="channel-label">{T('العنوان', 'Address')}</span><span>{address}</span></li>}
                   {hours && <li><span className="channel-label">{T('ساعات العمل', 'Working hours')}</span><span>{hours}</span></li>}

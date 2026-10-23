@@ -3,7 +3,7 @@
  *  The team section appears only once team members are published and visible. */
 import type { Metadata } from 'next';
 
-import type { Locale, PublicContactConfig, PublicTeamMember } from '@protocol-soft/shared';
+import type { Locale, PublicTeamMember } from '@protocol-soft/shared';
 
 import { PageBlocks } from '@/components/PageBlocks';
 import { RichText } from '@/components/RichText';
@@ -39,9 +39,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
 
-  const [page, contact, team] = await Promise.all([
+  const [page, team] = await Promise.all([
     getOptional<PageData>('/api/internal/content/pages', locale, { slug: 'about' }),
-    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
     getOptional<PublicTeamMember[], PublicTeamMember[]>('/api/internal/content/team', locale, undefined, []),
   ]);
   const photoId = (photo: unknown): number | string | null =>
@@ -99,8 +98,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         locale={locale}
         heading={ar ? 'يسعدنا أن نسمع عن مشروعك.' : 'We would like to hear about your project.'}
         ctaLabel={ar ? 'احجز جلسة استكشاف' : 'Book a discovery session'}
-        email={contact?.channels.emailMain || undefined}
-        phone={contact?.channels.phone || undefined}
       />
     </>
   );

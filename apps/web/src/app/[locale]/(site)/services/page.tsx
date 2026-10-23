@@ -6,7 +6,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import type { Locale, PublicContactConfig, PublicServiceSummary } from '@protocol-soft/shared';
+import type { Locale, PublicServiceSummary } from '@protocol-soft/shared';
 
 import { PageHero, clause } from '@/components/sections';
 import { localePath } from '@/components/siteChrome';
@@ -73,10 +73,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const locale: Locale = localeParam === 'en' ? 'en' : 'ar';
   const ar = locale === 'ar';
 
-  const [services, contact] = await Promise.all([
-    getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []),
-    getOptional<PublicContactConfig>('/api/internal/content/contact-config', locale),
-  ]);
+  const services = await getOptional<PublicServiceSummary[], PublicServiceSummary[]>('/api/internal/content/services', locale, undefined, []);
 
   return (
     <>
@@ -136,8 +133,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         heading={ar ? 'لست متأكداً من المسار المناسب؟' : 'Not sure which track fits?'}
         body={ar ? 'صف لنا التحدي، ونقترح عليك من أين تبدأ.' : 'Describe the challenge, and we will suggest where to start.'}
         ctaLabel={ar ? 'احجز جلسة استكشاف' : 'Book a discovery session'}
-        email={contact?.channels.emailMain || undefined}
-        phone={contact?.channels.phone || undefined}
       />
     </>
   );

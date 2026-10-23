@@ -28,6 +28,11 @@ const TEAM: Member[] = [
     ar: { name: 'رؤوف عبدالله الفلاح', jobTitle: 'مهندس أمن سيبراني' },
     en: { name: 'Raouf Abdullah Alfallah', jobTitle: 'Cybersecurity Engineer' },
   },
+  {
+    sortOrder: 40,
+    ar: { name: 'عمر عباس الرباط', jobTitle: 'أخصائي أمن سيبراني' },
+    en: { name: 'Omar Abbas Alrabbat', jobTitle: 'Cybersecurity Specialist' },
+  },
 ];
 
 const run = async (): Promise<void> => {

@@ -239,8 +239,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           heading={T(finalCta?.heading, locale) || (ar ? 'أخبرنا عن نظامك أو فكرتك.' : 'Tell us about your system or idea.')}
           body={T(finalCta?.body, locale) || undefined}
           ctaLabel={T(finalCta?.ctaLabel, locale) || (ar ? 'احجز جلسة استكشاف' : 'Book a discovery session')}
-          email={contact?.channels.emailMain || undefined}
-          phone={contact?.channels.phone || undefined}
         />
       )}
     </>
