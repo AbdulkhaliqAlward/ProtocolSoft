@@ -31,7 +31,7 @@ export const TeamMembers: CollectionConfig = {
   versions: { drafts: { autosave: { interval: 1500 } }, maxPerDoc: 50 },
   hooks: { afterChange: [auditAfterChange(), revalidateOnPublish('team-members')] },
   fields: [
-    { name: 'name', type: 'text', required: true }, // names are not localized
+    { name: 'name', type: 'text', required: true, localized: true }, // Arabic script / Latin spelling
     { name: 'jobTitle', type: 'text', required: true, localized: true },
     { name: 'bio', type: 'richText', localized: true },
     {

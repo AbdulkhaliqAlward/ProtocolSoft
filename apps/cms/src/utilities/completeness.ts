@@ -53,7 +53,7 @@ export const COMPLETENESS: Record<string, CompletenessRule> = {
     minItems: {},
   },
   'team-members': {
-    fields: ['jobTitle'],
+    fields: ['name', 'jobTitle'],
     minItems: {},
   },
   pages: {
@@ -67,7 +67,7 @@ const STRUCTURAL_REQUIRED: Record<string, string[]> = {
   services: ['slug', 'sortOrder'],
   'case-studies': ['slug', 'projectType', 'client.approvalStatus', 'coverImage', 'sortOrder'],
   'technical-initiatives': ['category', 'status'],
-  'team-members': ['name', 'visible', 'sortOrder'],
+  'team-members': ['visible', 'sortOrder'],
   pages: ['slug'],
 };
 
