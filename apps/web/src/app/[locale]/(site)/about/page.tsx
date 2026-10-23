@@ -70,19 +70,23 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       )}
 
       {team.length > 0 && (
-        <Section id="team" title={ar ? 'فريقنا' : 'Our team'}>
+        <Section id="team" title={ar ? 'فريقنا' : 'Our team'} wide>
           <ul className="team" role="list">
             {team.map((m) => {
               const id = photoId(m.photo);
               return (
                 <li key={m.name} className="team__member">
-                  {id != null && (
+                  {id != null ? (
                     // Gated media proxy: unscreened or private media 404s.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={`/api/media/${id}`} alt="" loading="lazy" decoding="async" className="team__photo" />
+                    <img src={`/api/media/${id}`} alt="" loading="lazy" decoding="async" className="team__avatar team__avatar--photo" />
+                  ) : (
+                    <span className="team__avatar" aria-hidden="true">{Array.from(m.name.trim())[0]}</span>
                   )}
-                  <h3>{m.name}</h3>
-                  <p className="team__role">{m.jobTitle}</p>
+                  <div className="team__text">
+                    <h3 className="team__name">{m.name}</h3>
+                    <p className="team__role">{m.jobTitle}</p>
+                  </div>
                   {m.bio != null && <RichText data={m.bio} className="prose team__bio" />}
                   {m.linkedinUrl && (
                     <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="team__link">LinkedIn</a>

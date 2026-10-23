@@ -38,11 +38,10 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const emailMain = c?.emailMain ?? '';
   const phone = c?.phone ?? '';
   const hours = (ar ? c?.workingHours?.ar : c?.workingHours?.en) ?? '';
-  const address = c?.addressLine?.[locale] ?? '';
   const whatsapp = c?.whatsapp.status === 'configured' && c.whatsapp.url ? c.whatsapp : null;
   // Shown only once at least one real channel exists in the CMS; until then the form is the only channel.
-  // Email is not listed here: it appears only in the footer.
-  const hasChannels = Boolean(phone || hours || address || whatsapp);
+  // Email and address are not listed here (the email appears only in the footer).
+  const hasChannels = Boolean(phone || hours || whatsapp);
 
   return (
     <>
@@ -77,7 +76,6 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <h2><Spark size="sm" />{T('قنوات مباشرة', 'Direct channels')}</h2>
                 <ul className="channel-list">
                   {phone && <li><span className="channel-label">{T('الهاتف', 'Phone')}</span><a href={`tel:${phone}`} className="bidi">{phone}</a></li>}
-                  {address && <li><span className="channel-label">{T('العنوان', 'Address')}</span><span>{address}</span></li>}
                   {hours && <li><span className="channel-label">{T('ساعات العمل', 'Working hours')}</span><span>{hours}</span></li>}
                 </ul>
                 {whatsapp && <WhatsAppCta url={whatsapp.url!} locale={locale} />}
