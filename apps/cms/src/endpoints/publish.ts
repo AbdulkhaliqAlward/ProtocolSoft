@@ -44,7 +44,9 @@ export const publishEndpoints = [
       if (!isLocale(body.locale)) return Response.json({ error: 'invalid locale' }, { status: 400 });
       const locale = body.locale as Locale;
 
-      const doc = (await req.payload.findByID({ collection: collection as never, id, draft: true, overrideAccess: true })) as unknown as Record<string, unknown>;
+      // Read the document in the language being published, so completeness is
+      // checked on that language's values (not the admin's default language).
+      const doc = (await req.payload.findByID({ collection: collection as never, id, locale, draft: true, overrideAccess: true })) as unknown as Record<string, unknown>;
       if (!doc) return Response.json({ error: 'not_found' }, { status: 404 });
 
       const current = ((doc.publishedLocales as Locale[] | undefined) ?? []) as Locale[];

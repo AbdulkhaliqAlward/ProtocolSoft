@@ -19,9 +19,13 @@ const isFilled = (value: unknown): boolean => {
   return true;
 };
 
+const get = (doc: Doc, path: string): unknown =>
+  path.split('.').reduce<unknown>((acc, segment) => (acc != null && typeof acc === 'object' ? (acc as Doc)[segment] : undefined), doc);
+
 /** localized value getter: localized fields store { ar, en } objects on the doc. */
 const localizedValue = (doc: Doc, field: string, locale: Locale): unknown => {
-  const value = doc[field];
+  // Dotted paths reach into groups (e.g. 'seo.description').
+  const value = get(doc, field);
   if (value != null && typeof value === 'object' && !Array.isArray(value) && !(value as { root?: unknown }).root) {
     return (value as Record<string, unknown>)[locale];
   }
@@ -66,9 +70,6 @@ const STRUCTURAL_REQUIRED: Record<string, string[]> = {
   'team-members': ['name', 'visible', 'sortOrder'],
   pages: ['slug'],
 };
-
-const get = (doc: Doc, path: string): unknown =>
-  path.split('.').reduce<unknown>((acc, segment) => (acc != null && typeof acc === 'object' ? (acc as Doc)[segment] : undefined), doc);
 
 export const missingForLocale = (collectionSlug: string, doc: Doc, locale: Locale): string[] => {
   const rule = COMPLETENESS[collectionSlug];
