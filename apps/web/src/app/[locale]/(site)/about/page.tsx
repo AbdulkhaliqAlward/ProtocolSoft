@@ -81,7 +81,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={`/api/media/${id}`} alt="" loading="lazy" decoding="async" className="team__avatar team__avatar--photo" />
                   ) : (
-                    <span className="team__avatar" aria-hidden="true">{Array.from(m.name.trim())[0]}</span>
+                    <span className="team__avatar" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+                      </svg>
+                    </span>
                   )}
                   <div className="team__text">
                     <h3 className="team__name">{m.name}</h3>
